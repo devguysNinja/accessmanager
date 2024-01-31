@@ -6,8 +6,11 @@ import { Context } from "../App";
 
 export default function AccessRightFeeder({ userData }) {
   const BASE_URL = ApiRoute.API_DOMAIN;
+  console.log("@@@API_DOMAIN:", BASE_URL)
   const { avatar } = userData || "";
   const srcUrl = avatar ? `${BASE_URL}${avatar}` : "";
+
+  console.log("@@@ASCR_URL:", srcUrl)
   return (
     <Card style={{ height: "172px"}} >
       <Image

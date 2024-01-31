@@ -9,11 +9,13 @@ src/core/migrations/__pycache__/
 src/mealmanager/__pycache__/
 src/users/__pycache__/
 src/users/migrations/__pycache__/
+**/.env*
 **/__pycache__/
 **/build_dev.sh*
 **/*.sqlite3
 **/src/media
 **/src/static
+**/oldenv.txt
 # ***************** General *****************
 .env
 __pycache__
