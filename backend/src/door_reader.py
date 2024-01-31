@@ -4,8 +4,8 @@ import time
 import json
 
 TOPIC = "orinlakantobad"
-USERNAME = "jagaban" #"Dammy" "jagaban"
-UID =   "GMKACBGLR6" #"PFFF0STA5Z" "GMKACBGLR6"  #  13357647
+USERNAME = "flolikewater" # "flolikewater GMDACBGLR6"
+UID =   "GMDACBGLR6" #
 
 reader_data = {
     "type": "access",
