@@ -79,6 +79,8 @@ function ProfileForm(props) {
         setDisableAll(!disabledAll);
         setUserProfile(content);
       }
+     if (content?.auth_error){
+       await ApiLogout();}
     } catch (error) {
       await ApiLogout();
     }

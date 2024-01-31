@@ -1,5 +1,4 @@
 #version: "3.7"
-
 services:
   nginx:
     image: nginx:latest
@@ -7,22 +6,26 @@ services:
       - "80:80"
     volumes:
       - ./config/nginx/conf.d:/etc/nginx/conf.d
-      - static_volume:/home/appuser/static
-      - media_volume:/home/appuser/media
+      - static_volume:/home/appuser/staticfiles
+      - media_volume:/home/appuser/mediafiles
     depends_on:
       - gunicorn
+    networks:
+      - back-to-front
 
   gunicorn:
     build:
       context: .
+        #dockerfile: ./Dockerfile
       args:
         PIP_REQUIREMENTS: "${PIP_REQUIREMENTS}"
     command: bash -c "/home/appuser/env/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 mealmanager.wsgi:application"
     depends_on:
       - db
     volumes:
-      - static_volume:/home/appuser/static
-      - media_volume:/home/appuser/media
+      #- .:/home/appuser
+      - static_volume:/home/appuser/staticfiles
+      - media_volume:/home/appuser/mediafiles
     expose:
       - "8000"
     environment:
@@ -35,7 +38,23 @@ services:
       EMAIL_PORT: "${EMAIL_PORT}"
       EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
       EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
-      JWT_SALT: "${JWT_SALT}"
+      PIP_REQUIREMENTS: "${PIP_REQUIREMENTS}"
+      JWT_SALT: "${JWT_SALT}" 
+    networks:
+      - back-to-front
+
+  client:
+    build:
+      context: ../frontend
+      dockerfile: ../frontend/Dockerfile
+    restart: on-failure
+    volumes: 
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      REACT_APP_API_DOMAIN: "${REACT_APP_API_DOMAIN}"
+    networks: 
+      - back-to-front
 
   db:
     image: postgres:latest
@@ -45,9 +64,15 @@ services:
       POSTGRES_USER: "${DATABASE_USER}"
       POSTGRES_PASSWORD: "${DATABASE_PASSWORD}"
     ports:
-      - 5432
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - back-to-front
+
+networks:
+  back-to-front:
+    driver: bridge
 
 volumes:
   postgres_data:

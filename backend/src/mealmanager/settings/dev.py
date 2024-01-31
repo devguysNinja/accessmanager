@@ -5,6 +5,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "0.0.0.0",
+    "localhost",
 ]
 
 DATABASES = {
@@ -21,3 +22,4 @@ EMAIL_HOST = get_secret("EMAIL_HOST")
 EMAIL_PORT = get_secret("EMAIL_PORT")
 EMAIL_HOST_USER = get_secret("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
+

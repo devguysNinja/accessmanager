@@ -24,7 +24,7 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/frontend
-**/build_dev.sh
+**/build_dev.sh*
 **/old_compose.yaml
 **/Dockerfile*
 **/*.sqlite3

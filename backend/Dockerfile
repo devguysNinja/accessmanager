@@ -14,6 +14,9 @@ RUN pip install --upgrade pip setuptools
 # create user for the Django project
 RUN useradd -ms /bin/bash appuser
 
+# Debugging statement
+RUN echo "PIP_REQUIREMENTS is set to: ${PIP_REQUIREMENTS}"
+
 # set current user
 USER appuser
 

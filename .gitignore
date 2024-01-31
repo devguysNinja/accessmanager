@@ -10,7 +10,7 @@ src/mealmanager/__pycache__/
 src/users/__pycache__/
 src/users/migrations/__pycache__/
 **/__pycache__/
-**/build_dev.sh
+**/build_dev.sh*
 **/*.sqlite3
 **/src/media
 **/src/static

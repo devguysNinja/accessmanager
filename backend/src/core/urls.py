@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TransactionView,get_owner_transaction_details
+from .views import TransactionView, get_owner_transaction_details
 
 
 
