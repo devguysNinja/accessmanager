@@ -1,4 +1,4 @@
 -r _base.txt
-psycopg[binary]
-psycopg==3.1.17
-psycopg==2.9.9
+#psycopg[binary]
+psycopg2==2.9.9
+#psycopg==3.1.17
