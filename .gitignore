@@ -16,6 +16,7 @@ src/users/migrations/__pycache__/
 **/src/media
 **/src/static
 **/oldenv.txt
+**/build_*
 # ***************** General *****************
 .env
 __pycache__

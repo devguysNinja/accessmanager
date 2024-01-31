@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+DJANGO_SETTINGS_MODULE="projectname.settings.env" \
+DJANGO_SECRET_KEY="django-secrete-goes-here" \
+DATABASE_NAME="projectdbname" \
+DATABASE_USER="projectusername" \
+DATABASE_PASSWORD="projectpwd" \
+PIP_REQUIREMENTS="env.txt" \
+JWT_SALT="random-uuid" \
+EMAIL_HOST="your-email-host" \
+EMAIL_HOST_USER="your-email-user" \
+EMAIL_PORT=25 \
+EMAIL_HOST_PASSWORD="email-host-password" \
+REACT_APP_API_DOMAIN="http://localhost:8080" \
+docker-compose up --detach --build
