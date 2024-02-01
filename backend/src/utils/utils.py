@@ -25,6 +25,11 @@ def is_card_reader_json(data):
     except ValueError:
         return False
 
-def generate_uid():
+def generate_unique_str():
     random_string = "".join(random.choices("0123456789ABCDEFGHIJKLMNPRSTVWXYZ", k=10))
     return random_string
+
+def dummy_unique_str():
+    random_string = "".join(random.choices("0123456789ABCDEFGHIJKLMNPRSTVWXYZ", k=10))
+    return f"DUMMY-{random_string}"
+

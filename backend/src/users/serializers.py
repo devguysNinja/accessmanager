@@ -83,6 +83,52 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class BatchUploadUserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    user_id = serializers.IntegerField()
+    reader_uid = serializers.CharField()
+
+    class Meta:
+        model = UserProfile
+        fields = [
+            "id",
+            "user_id",
+            "user",
+            "reader_uid",
+            "meal_category",
+            "profile_image",
+            "department",
+        ]
+        extra_kwargs = {
+            "id": {"read_only": True},
+            "reader_uid": {"read_only": True},
+        }
+
+    def create(self, validated_data):
+        print("**** 1st Validated_data****:", validated_data)
+        user = validated_data.pop("user", None)  # pass  pk value as user
+        user_id = validated_data.pop("user_id")  #
+        print("**** 2nd Validated_data****:", validated_data)
+        profile = self.Meta.model(**validated_data)
+        if user_id is None or user is None:
+            raise NotFound("User id is required!")
+        auth_user = User.objects.get(id=user_id)
+        profile.user = auth_user
+        profile.save()
+        return profile
+
+    def update(self, instance, validated_data):
+        # user = validated_data.pop('user', None) # pass  pk value as user
+        instance.meal_category = validated_data.get(
+            "meal_category", instance.meal_category
+        )
+        # instance.reader_uid = validated_data.get(
+        #     "reader_uid", instance.reader_uid
+        # )
+        instance.department = validated_data.get("department", instance.department)
+        instance.save()
+        return instance
+
 
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:

@@ -10,7 +10,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
-from .serializers import UserSerializer, UserProfileSerializer, AvatarSerializer
+from .serializers import (
+    BatchUploadUserProfileSerializer,
+    UserSerializer,
+    UserProfileSerializer,
+    AvatarSerializer,
+)
 from .models import User, UserProfile, EmployeeBatchUpload
 from .auth_service import user_auth
 
@@ -217,7 +222,9 @@ def bulk_create(request):
             batch_file__icontains="employee_batch"
         ).batch_file
     except EmployeeBatchUpload.DoesNotExist:
-        return Response(data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
+        )
     wb: Workbook = load_workbook(filename=batch_file)
     ws_user: Worksheet = wb.worksheets[0]
     ws_profile: Worksheet = wb.worksheets[1]
@@ -280,7 +287,7 @@ def bulk_create(request):
             profile_row_dict = dict(zip(ws_profile_columns, profile_row_values))
             print("%%%%%%%%- ROW DICT:", profile_row_dict)
 
-            p_serializer = UserProfileSerializer(data=profile_row_dict)
+            p_serializer = BatchUploadUserProfileSerializer(data=profile_row_dict)
             if p_serializer.is_valid():
                 # print("@@@@  VALID PROFILE:")
                 p_serializer.save()

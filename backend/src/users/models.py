@@ -4,7 +4,7 @@ from uuid import uuid4
 from django.core.exceptions import BadRequest
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from utils.utils import generate_uid
+from utils.utils import dummy_unique_str
 
 def upload_image(instance,filename ):
     return os.path.join('images', 'avatars', str(instance.pk), filename)
@@ -32,7 +32,7 @@ class UserProfile(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
     id = models.UUIDField(default=uuid4, editable=False)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    reader_uid = models.CharField(max_length=128,default=f"DUMMY_{generate_uid}", unique=True)
+    reader_uid = models.CharField(max_length=128,default=dummy_unique_str, unique=True)
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
     meal_category = models.PositiveSmallIntegerField(default=1)
     department = models.CharField(max_length=225)
