@@ -8,6 +8,13 @@ from users.models import UserProfile
 from utils.utils import publish_data, is_card_reader_json
 
 # Create your models here.
+class ReportType(models.Model):
+    report_type = models.CharField(max_length=25)
+    # by_user = models.ForeignKey(User)
+
+    def __str__(self):
+        return f"{self.report_type}"
+
 
 
 class Transaction(models.Model):

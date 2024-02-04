@@ -34,4 +34,6 @@
 **/src/media
 **/src/static
 **/compose*
+**/staticfiles/
+**/mediafiles/
 README.md
