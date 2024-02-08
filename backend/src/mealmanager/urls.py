@@ -26,3 +26,7 @@ urlpatterns = [
     path('', index, name="index"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+admin.site.site_header = "Meal Manager Admin"
+admin.site.site_title = "Admin Portal"
+admin.site.index_title = "Welcome"
