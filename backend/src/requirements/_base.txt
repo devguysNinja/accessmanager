@@ -7,3 +7,5 @@ Pillow==10.1.0
 openpyxl==3.1.2
 gunicorn==21.2.0
 django-import-export==3.3.6
+libusb==1.0.26rc4
+pyusb==1.2.1

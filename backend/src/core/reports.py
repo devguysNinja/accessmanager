@@ -19,7 +19,6 @@ def report(report=None, sort_by=None, period=None):
     start_date = ""
     end_date = ""
     if period is not None:
-        print("********** GET START DATE", period.get("start_date"))
         start_date = datetime.strptime(period.get("start_date"), "%Y-%m-%d").date()
         end_date = datetime.strptime(period.get("end_date"), "%Y-%m-%d").date()
         if start_date == "" or end_date == "":

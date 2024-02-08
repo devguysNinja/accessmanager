@@ -36,11 +36,8 @@ class TransactionResouce(resources.ModelResource):
     )
 
     def filter_export(self, queryset, *args, **kwargs):
-        print("&&&&&&& CUSTOM REPORT:", str(self.custom_report["start_date"]))
         pr = report(report=str(self.periodic_report))
-        print("##### PR: ", pr)
         if str(self.periodic_report) == "All":
-            print("##### REPORT IINER: ", self.periodic_report)
             return report()
         if pr is None and (
             str(self.custom_report["start_date"]) == "None"
@@ -51,12 +48,8 @@ class TransactionResouce(resources.ModelResource):
                                str(self.custom_report['end_date']) =="None"):
             return pr
         try:
-            # type(self.custom_report["start_date"]) is not None
-            # and type(self.custom_report["end_date"]) is not None
-            print("&&&&&&& CUSTOM REPORT2:", type(self.custom_report["start_date"]))
             return report(period=self.custom_report)
         except ValueError as e:
-            print("&&&&&&& CUSTOM ERROR: ", e.args[0])
             return []
 
     class Meta:
