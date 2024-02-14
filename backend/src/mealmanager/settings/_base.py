@@ -174,11 +174,8 @@ JWT_SALT = get_secret("JWT_SALT")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "sandbox.smtp.mailtrap.io"
-EMAIL_HOST_PASSWORD = "aef8caa18dc2eb"
+EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 EMAIL_HOST_USER = "046b79560c33ab"
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_HOST_PASSWORD="bums xogn hqxr vzfw"
-# EMAIL_HOST_USER = "mydjangopythonprojects@gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
