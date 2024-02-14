@@ -207,16 +207,16 @@ class UploadProfileImageView(APIView):
             return Response(data=serialiser.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["POST"])
+# @api_view(["POST"])
 def bulk_create(request):
-    payload: dict[str, str] | Any = user_auth(request)
-    if payload.get("auth_error", None):
-        return Response(payload, status=status.HTTP_403_FORBIDDEN)
-    _user: Any = User.objects.filter(id=payload["id"]).first()
-    if not _user.is_superuser or not _user.is_staff:
-        return Response(
-            data={"error": "User is not an Admin!"}, status=status.HTTP_401_UNAUTHORIZED
-        )
+    # payload: dict[str, str] | Any = user_auth(request)
+    # if payload.get("auth_error", None):
+        # return Response(payload, status=status.HTTP_403_FORBIDDEN)
+    # _user: Any = User.objects.filter(id=payload["id"]).first()
+    # if not _user.is_superuser or not _user.is_staff:
+        # return Response(
+            # data={"error": "User is not an Admin!"}, status=status.HTTP_401_UNAUTHORIZED
+        # )
     try:
         batch_file: Any = EmployeeBatchUpload.objects.get(
             batch_file__icontains="employee_batch"

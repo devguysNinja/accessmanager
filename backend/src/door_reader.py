@@ -4,9 +4,11 @@ import time
 import json
 
 TOPIC = "orinlakantobad"
-USERNAME = "flolikewater" # "flolikewater GMDACBGLR6"
-UID =   "GMDACBGLR6" #
+USERNAME = "flolikewater"  # "flolikewater GMDACBGLR6"
+# UID = "GMDACBGLR6"  #
+UID = input("Swap your card: ")
 
+print("UID: ", UID)
 reader_data = {
     "type": "access",
     "time": 1572542188,

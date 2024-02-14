@@ -1,4 +1,5 @@
 class ApiRoute {
+  static API_ADMIN = process.env.REACT_APP_API_ADMIN
   static FRONTEND_DOMAIN = window.location.origin;
   static API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
   static BASE_PATH = "/api/v1";

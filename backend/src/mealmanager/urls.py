@@ -17,10 +17,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views
 from .views import index
 
 urlpatterns = [
     path('danger-zone/', admin.site.urls),
+    path('accounts/login/', views.LoginView.as_view(), name="login"),
+    path('accounts/password-reset', views.PasswordResetView.as_view(), name="password_reset"),
+    path('accounts/password-reset/done', views.PasswordResetDoneView.as_view(), name="password_reset_done"),
+    path('accounts/reset-confirm/<uidb64>/<token>/', views.PasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+    path('accounts/reset/', views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     path('api/v1/', include('users.urls')),
     path('api/v1/', include('core.urls')),
     path('', index, name="index"),

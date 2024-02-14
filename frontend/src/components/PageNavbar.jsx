@@ -4,14 +4,14 @@ import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
-import ApiRoute, {ApiLogout} from "../config/ApiSettings";
+import ApiRoute, { ApiLogout } from "../config/ApiSettings";
 
 function PageNavbar(props) {
   // const [redirect, setRedirect] = useState(false);
 
   //...logout Handler
   const logout = async (e) => {
-    await ApiLogout()
+    await ApiLogout();
     props?.setProfile(null);
     // setRedirect(true);
   };
@@ -26,14 +26,20 @@ function PageNavbar(props) {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/register`);
   };
 
+  //...Profile Handler
+  const profile = (e) => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/profile`);
+  };
+
+  //...Admin Handler
+  const gotoAdmin = (e) => {
+    window.location.assign(`${ApiRoute.API_ADMIN}`);
+  };
+
   //...Access-board Handler
   const accessBoard = (e) => {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/access-gate`);
   };
-    //...Access board Handler
-    const profile = (e) => {
-      window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/profile`);
-    };
 
   // if (redirect) {
   //   window.location.assign(ApiRoute.FRONTEND_DOMAIN);
@@ -46,8 +52,11 @@ function PageNavbar(props) {
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
             <ButtonGroup aria-label="Basic example" size="sm" className="mb-2">
-            <Button variant="secondary" onClick={accessBoard}>
+              <Button variant="secondary" onClick={accessBoard}>
                 Access Board
+              </Button>
+              <Button variant="secondary" onClick={gotoAdmin}>
+                Admin
               </Button>
               <Button variant="secondary" onClick={profile}>
                 Profile
