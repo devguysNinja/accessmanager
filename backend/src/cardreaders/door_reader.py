@@ -5,8 +5,8 @@ import json
 
 TOPIC = "orinlakantobad"
 USERNAME = "flolikewater"  # "flolikewater GMDACBGLR6"
-UID = "GMDACBGLR6"  #
-# UID = input("Swap your card: ")
+# UID = "GMDACBGLR6"  #
+UID = input("Swap your card: ")
 
 print("UID: ", UID)
 reader_data = {
@@ -28,7 +28,7 @@ try:
         payload = input("Flash your card :")
         client.publish(TOPIC, payload)
         print(f"Just published {payload} to topic {TOPIC}")
-        time.sleep(15)
+        time.sleep(1.5)
 except KeyboardInterrupt:
     print(" \n Ctrl + C pressed!")
 

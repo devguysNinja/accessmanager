@@ -29,7 +29,10 @@ try:
     while True:
         payload = input("Flash your card :")
         if payload != "" and is_connected:
-            response = client.publish(TOPIC, payload, qos=1)
+            response = client.publish(
+                TOPIC,
+                str(payload),
+            )
             response.wait_for_publish(timeout=TIMEOUT)
             # print("RESPONSE after waiting: ", response.is_published())
             if response.is_published():
@@ -38,7 +41,7 @@ try:
                 is_connected = False
         if not is_connected:
             print("Connection lost\nTrying to reconnect...")
-            is_connected =  connect_to_broker()
+            is_connected = connect_to_broker()
         payload = ""
 except KeyboardInterrupt:
     print("\n Ctrl+C pressed!")

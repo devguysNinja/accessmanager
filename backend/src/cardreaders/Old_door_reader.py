@@ -25,7 +25,7 @@ client.connect(mqtt_broker)
 
 try:
     while True:
-        payload = input("Flash your card :")
+        # payload = input("Flash your card :")
         client.publish(TOPIC, payload)
         print(f"Just published {payload} to topic {TOPIC}")
         time.sleep(15)
