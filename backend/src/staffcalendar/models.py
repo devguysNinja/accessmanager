@@ -23,6 +23,9 @@ class MonthlyRoster(models.Model):
     start_date =  models.DateField()
     end_date = models.DateField()
 
+    class Meta:
+        verbose_name = "Employees' roster"
+
     def __str__(self):
         return f"{self.shift.name.capitalize()}::StartDate({self.start_date})::EndDate({self.end_date})"
 
