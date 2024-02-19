@@ -25,9 +25,10 @@ client.connect(mqtt_broker)
 
 try:
     while True:
+        payload = input("Flash your card :")
         client.publish(TOPIC, payload)
         print(f"Just published {payload} to topic {TOPIC}")
-        time.sleep(15)
+        time.sleep(1.5)
 except KeyboardInterrupt:
     print(" \n Ctrl + C pressed!")
 

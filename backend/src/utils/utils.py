@@ -10,12 +10,14 @@ def publish_data(grant: str, uid: str = ""):
 
 def is_json(data):
     try:
-        json.loads(data)
-        return True
+        jlo = json.loads(data)
+        return isinstance(jlo, dict)
     except ValueError:
         return False
 
 def is_card_reader_json(data):
+    if not is_json(data):
+        return False
     try:
         data_keys = [key for key in json.loads(data).keys()]
         if len(data_keys) > 2 and "grant_type" not in data_keys:
