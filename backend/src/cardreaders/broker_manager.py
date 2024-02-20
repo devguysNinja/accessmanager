@@ -1,4 +1,5 @@
 import json
+import time
 from typing import Any
 import paho.mqtt.client as mqtt
 from utils.utils import publish_data, is_card_reader_json
@@ -9,7 +10,7 @@ class BrokerEventManager:
     def __init__(self, client) -> None:
         self.client = client
 
-    def __call__(self, client, userdata,  message, *args: Any, **kwds: Any) -> Any:
+    def __call__(self, client, userdata, message, *args: Any, **kwds: Any) -> Any:
         event_message = message.payload.decode("UTF-8")
         print("MESSAGE: ", event_message)
         if isinstance(event_message, str):
@@ -18,25 +19,59 @@ class BrokerEventManager:
             return
 
         # if is_card_reader_json(event_message):
-            # print("$$$$$...Calling jsondata_smartcard_handler")
-            # jsondata_smartcard_handler(client, message)
+        # print("$$$$$...Calling jsondata_smartcard_handler")
+        # jsondata_smartcard_handler(client, message)
+
+
+DELAY = 1.2
+TIMEOUT = 1.2
+MQTT_BROKER = "broker.hivemq.com"
+client = mqtt.Client("apiMonitor")
+client.connect(MQTT_BROKER)
+TOPIC = "orinlakantobad"
+
+
+def connect_to_broker():
+    NOT_CONNECTED = True
+    while NOT_CONNECTED:
+        try:
+            client.connect(MQTT_BROKER)
+            NOT_CONNECTED = False
+            print("Connected!\nWaiting for incoming events...")
+            return True
+        except Exception as ex:
+            print(f"{ex.args[1]}\nWaiting for connection...\n")
+            NOT_CONNECTED = True
+            time.sleep(DELAY)
 
 
 def main():
-    MQTT_BROKER = "broker.hivemq.com"
-    client = mqtt.Client("apiMonitor")
-    client.connect(MQTT_BROKER)
-    TOPIC = "orinlakantobad"
-
     try:
-        on_message = BrokerEventManager(client)
-        client.on_message = on_message
-        client.subscribe(TOPIC)
-        client.loop_forever()
+        is_connected = connect_to_broker()
+        if is_connected:
+            on_message = BrokerEventManager(client)
+            client.on_message = on_message
+            client.subscribe(TOPIC)
+            client.loop_forever()
+    except TimeoutError:
+        print("TimeoutError in Main()")
+        client.loop_stop()
+        return -1
     except KeyboardInterrupt:
         print(" \n Ctrl + C pressed!")
 
 
-if __name__ == "__main__":
-    print("waiting for an events to fire...")
+try:
+    if __name__ == "__main__":
+        error_report = main()
+        if error_report == -1:
+            print("calling Main after TimeoutError...")
+            main()
+except RuntimeError as ex:
+    client.loop_stop()
+    print("RuntimeError occur: ", ex.args)
+    main()
+except TimeoutError as ex:
+    client.loop_stop()
+    print("TimeoutError occur: ", ex.args)
     main()
