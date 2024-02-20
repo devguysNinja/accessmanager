@@ -17,7 +17,7 @@ from .reports import report
 
 
 class ReportTypeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["report_type", "created_on", "updated_on"]
 
 
 admin.site.register(ReportType, ReportTypeAdmin)
@@ -44,8 +44,10 @@ class TransactionResouce(resources.ModelResource):
             or str(self.custom_report["end_date"]) == "None"
         ):
             return []
-        if pr is not None and (str(self.custom_report['start_date']) =="None" or 
-                               str(self.custom_report['end_date']) =="None"):
+        if pr is not None and (
+            str(self.custom_report["start_date"]) == "None"
+            or str(self.custom_report["end_date"]) == "None"
+        ):
             return pr
         try:
             return report(period=self.custom_report)
@@ -55,21 +57,22 @@ class TransactionResouce(resources.ModelResource):
     class Meta:
         model = Transaction
         fields = (
-        # "id",
-        "swipe_count",
-        "reader_uid",
-        "date",
-        "owner",
-        "authorizer",
-        "access_point",
-        # "raw_payload",
-        "door",
-        "grant_type",
+            # "id",
+            "swipe_count",
+            "reader_uid",
+            "date",
+            "owner",
+            "authorizer",
+            "access_point",
+            # "raw_payload",
+            "door",
+            "grant_type",
         )
 
 
 # Register your models here.
 class TransactionAdmin(ExportMixin, admin.ModelAdmin):
+    list_display = ["owner", "reader_uid", "swipe_count", "date", "grant_type", "authorizer"]
     resource_classes = [TransactionResouce]
     export_form_class = CustomExportForm
 

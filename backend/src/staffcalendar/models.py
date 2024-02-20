@@ -1,7 +1,9 @@
 from django.db import models
 
 from users.models import UserProfile
+
 # from users.models import UserProfile
+
 
 # Create your models here.
 class ShiftType(models.Model):
@@ -18,14 +20,13 @@ class ShiftType(models.Model):
 
 class MonthlyRoster(models.Model):
     # work_day = models.CharField(max_length=50)
-    shift = models.ForeignKey('ShiftType',null=True, on_delete=models.SET_NULL)
+    shift = models.ForeignKey("ShiftType", null=True, on_delete=models.SET_NULL)
     employees = models.ManyToManyField(UserProfile)
-    start_date =  models.DateField()
+    start_date = models.DateField()
     end_date = models.DateField()
 
     class Meta:
         verbose_name = "Employees' roster"
 
     def __str__(self):
-        return f"{self.shift.name.capitalize()}::StartDate({self.start_date})::EndDate({self.end_date})"
-
+        return f"{self.shift.name.capitalize()}::StartDate[{self.start_date}]::EndDate[{self.end_date}]"
