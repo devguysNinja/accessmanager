@@ -74,14 +74,14 @@ while NOT_RUNNING:
             if error_report == -1:
                 print("calling Main after TimeoutError...")
                 NOT_RUNNING = True
-                # main()
     except RuntimeError as ex:
         NOT_RUNNING = True
         client.loop_stop()
         print("RuntimeError occur: ", ex.args)
-        # main()
     except TimeoutError as ex:
         NOT_RUNNING = True
         client.loop_stop()
         print("TimeoutError occur: ", ex.args)
-        # main()
+    except OSError as ex:
+        NOT_RUNNING = True
+        print("OSError occur: ", ex.args)
