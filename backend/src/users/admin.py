@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from .models import User, UserProfile, EmployeeBatchUpload
+from .forms import UserProfileForm
 from .views import bulk_create
 
 
@@ -21,13 +22,23 @@ admin.site.register(User, UserAdmin)
 
 
 class UserProfileAdmin(admin.ModelAdmin):
+    form = UserProfileForm
     list_display = [
         "user",
         "reader_uid",
         "meal_category",
         "department",
         "profile_image",
+        "shift"
     ]
+    filter_horizontal = ["roster"]
+    # readonly_fields = ["reader_uid", "user"]
+    list_per_page: int = 20
+    save_on_top: bool = True
+
+    def shift(self, obj):
+        return f"{', '.join([shift.work_day for shift in obj.roster.all()][::-1])}"
+    shift.short_description = 'Shifts'
 
 
 # Register your models here.
