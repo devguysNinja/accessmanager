@@ -12,9 +12,9 @@ class BrokerEventManager:
 
     def __call__(self, client, userdata, message, *args: Any, **kwds: Any) -> Any:
         event_message = message.payload.decode("UTF-8")
-        print("MESSAGE: ", event_message)
+        # print("MESSAGE: ", event_message)
         if isinstance(event_message, str):
-            print("$$$$$...Calling usb_smartcard_handler")
+            # print("$$$$$...Calling usb_smartcard_handler")
             usb_smartcard_handler(client, message)
             return
 
@@ -22,12 +22,11 @@ class BrokerEventManager:
         # print("$$$$$...Calling jsondata_smartcard_handler")
         # jsondata_smartcard_handler(client, message)
 
-
 DELAY = 1.2
 TIMEOUT = 1.2
 MQTT_BROKER = "broker.hivemq.com"
 client = mqtt.Client("apiMonitor")
-client.connect(MQTT_BROKER)
+# client.connect(MQTT_BROKER)
 TOPIC = "orinlakantobad"
 
 
@@ -35,7 +34,7 @@ def connect_to_broker():
     NOT_CONNECTED = True
     while NOT_CONNECTED:
         try:
-            client.connect(MQTT_BROKER)
+            client.connect(MQTT_BROKER, keepalive=25)
             NOT_CONNECTED = False
             print("Connected!\nWaiting for incoming events...")
             return True
@@ -60,18 +59,29 @@ def main():
     except KeyboardInterrupt:
         print(" \n Ctrl + C pressed!")
 
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        raise TimeoutError()
 
-try:
-    if __name__ == "__main__":
-        error_report = main()
-        if error_report == -1:
-            print("calling Main after TimeoutError...")
-            main()
-except RuntimeError as ex:
-    client.loop_stop()
-    print("RuntimeError occur: ", ex.args)
-    main()
-except TimeoutError as ex:
-    client.loop_stop()
-    print("TimeoutError occur: ", ex.args)
-    main()
+NOT_RUNNING = True
+client.on_disconnect = on_disconnect
+while NOT_RUNNING:
+    try:
+        if __name__ == "__main__":
+            print("RUNNING...")
+            error_report = main()
+            NOT_RUNNING = False
+            if error_report == -1:
+                print("calling Main after TimeoutError...")
+                NOT_RUNNING = True
+    except RuntimeError as ex:
+        NOT_RUNNING = True
+        client.loop_stop()
+        print("RuntimeError occur: ", ex.args)
+    except TimeoutError as ex:
+        NOT_RUNNING = True
+        client.loop_stop()
+        print("TimeoutError occur: ", ex.args)
+    except OSError as ex:
+        NOT_RUNNING = True
+        print("OSError occur: ", ex.args)

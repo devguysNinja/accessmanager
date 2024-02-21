@@ -10,6 +10,8 @@ from utils.utils import publish_data, is_card_reader_json
 # Create your models here.
 class ReportType(models.Model):
     report_type = models.CharField(max_length=25)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
     # by_user = models.ForeignKey(User)
 
     def __str__(self):

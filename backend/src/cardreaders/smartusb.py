@@ -13,13 +13,13 @@ def connect_to_broker():
     NOT_CONNECTED = True
     while NOT_CONNECTED:
         try:
-            client.connect(MQTT_BROKER)
+            client.connect(MQTT_BROKER,keepalive=25)
             NOT_CONNECTED = False
             print("Connected!")
             # client.loop_start()
             return True
         except Exception as ex:
-            print(f"{ex.args}\nWaiting for connection...\n")
+            print(f"{ex.args[1]}\nWaiting for connection...\n")
             NOT_CONNECTED = True
             time.sleep(DELAY)
 
@@ -58,18 +58,24 @@ def main():
     except KeyboardInterrupt:
         print("\n Ctrl+C pressed!")
 
+NOT_RUNNING = True
+while NOT_RUNNING:
+    try:
+        if __name__ == "__main__":
+            print("RUNNING...")
+            error_report = main()
+            NOT_RUNNING = False
+            if error_report == -1:
+                print("calling Main after RuntimeError...")
+                NOT_RUNNING = True
+                # main()
+    except RuntimeError as ex:
+        NOT_RUNNING = True
+        client.loop_stop()
+        print("RuntimeError occur: ", ex.args[1])
+        # main()
+    except TimeoutError as ex:
+        NOT_RUNNING = True
+        print("TimeoutError occur: ", ex.args[1])
+        # main()
 
-try:
-    if __name__ == "__main__":
-        error_report = main()
-        if error_report == -1:
-            print("calling Main after RuntimeError...")
-            main()
-except RuntimeError as ex:
-    client.loop_stop()
-    print("RuntimeError occur: ", ex.args[1])
-    main()
-    # print("waiting for an events to fire...")
-except TimeoutError as ex:
-    print("TimeoutError: ", ex.args[1])
-    main()
