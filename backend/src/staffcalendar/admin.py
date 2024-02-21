@@ -17,16 +17,16 @@ class ShiftTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(ShiftType, ShiftTypeAdmin)
 
-class EmployeeInline(admin.TabularInline):  # or admin.StackedInline
-    model = MonthlyRoster.employees.through  # Through model for ManyToManyField
-    extra = 1
+# class EmployeeInline(admin.TabularInline):  # or admin.StackedInline
+    # model = MonthlyRoster.employees.through  # Through model for ManyToManyField
+    # extra = 1
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
     # form = MonthlyRosterForm
     list_display = ["work_day","shift", "week_no"]
     list_display_links =  ["work_day","shift", "week_no"]
     # list_editable = ["shift", "start_date", "end_date"]
-    filter_horizontal = ["employees"]
+    # filter_horizontal = ["employees"]
     list_per_page = 20
     save_on_top = True
     # save_as = True
