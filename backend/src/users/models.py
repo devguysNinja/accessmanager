@@ -5,7 +5,7 @@ from django.core.exceptions import BadRequest
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from utils.utils import dummy_unique_str
-# from staffcalendar.models import ShiftManager
+from staffcalendar.models import MonthlyRoster
 
 
 def upload_image(instance,filename ):
@@ -38,7 +38,7 @@ class UserProfile(models.Model):
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
     meal_category = models.PositiveSmallIntegerField(default=1)
     department = models.CharField(max_length=225)
-    # shift = models.ForeignKey(ShiftManager, null=True, on_delete=models.SET_NULL)
+    roster = models.ManyToManyField(MonthlyRoster)
 
     def __str__(self) -> str:
         return self.user.username
