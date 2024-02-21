@@ -22,11 +22,11 @@ class EmployeeInline(admin.TabularInline):  # or admin.StackedInline
     extra = 1
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
-    form = MonthlyRosterForm
+    # form = MonthlyRosterForm
     list_display = ["shift", "start_date", "end_date"]
     list_display_links =  ["shift", "start_date", "end_date"]
     # list_editable = ["shift", "start_date", "end_date"]
-    filter_vertical = ["employees"]
+    filter_horizontal = ["employees"]
     list_per_page = 20
     save_on_top = True
     # save_as = True
