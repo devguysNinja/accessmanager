@@ -9,7 +9,7 @@ from django.db.models import Q
 import paho.mqtt.client as mqtt
 import uuid
 import json
-from utils.utils import is_card_reader_json, is_json, publish_data
+from utils.utils import is_card_reader_json, is_json, publish_data, parse_time
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mealmanager.settings.production")
@@ -48,26 +48,70 @@ def create_transaction(
     return transaction
 
 
+# def check_calendar_old(uid):
+#     try:
+#         employee_profile = UserProfile.objects.get(reader_uid=uid)
+#         current_date = timezone.now().date()
+#         current_time = timezone.now().time()
+#         monthly_roster_exists = MonthlyRoster.objects.filter(
+#             Q(employees=employee_profile)
+#             & Q(start_date__lte=current_date)
+#             & Q(end_date__gte=current_date)
+#         ).exists()
+#         if monthly_roster_exists:
+#             return ShiftType.objects.filter(
+#                 Q(monthlyroster__employees=employee_profile)
+#                 & Q(start_time__lte=current_time)
+#                 & Q(end_time__gte=current_time)
+#                 & Q(monthlyroster__start_date__lte=current_date)
+#                 & Q(monthlyroster__end_date__gte=current_date)
+#             ).exists()
+#         else:
+#             return False
+#     except UserProfile.DoesNotExist:
+#         return None
+
+
+def is_valid_shift_time(shift_times, time_now_obj):
+    is_within_interval = False
+    for start_time, end_time in shift_times:
+        if start_time <= time_now_obj <= end_time:
+            is_within_interval = True
+            break
+    if is_within_interval:
+        return is_within_interval
+    else:
+        return False
+
+
 def check_calendar(uid):
     try:
         employee_profile = UserProfile.objects.get(reader_uid=uid)
-        current_date = timezone.now().date()
+        rosters_for_employee = MonthlyRoster.objects.filter(employees=employee_profile)
+        assigned_work_days = [roster.work_days.all() for roster in rosters_for_employee]
+        if len(assigned_work_days) == 0:
+            return False
+        # current_date = timezone.now().date()
         current_time = timezone.now().time()
-        monthly_roster_exists = MonthlyRoster.objects.filter(
-            Q(employees=employee_profile)
-            & Q(start_date__lte=current_date)
-            & Q(end_date__gte=current_date)
-        ).exists()
-        if monthly_roster_exists:
-            return ShiftType.objects.filter(
-                Q(monthlyroster__employees=employee_profile)
-                & Q(start_time__lte=current_time)
-                & Q(end_time__gte=current_time)
-                & Q(monthlyroster__start_date__lte=current_date)
-                & Q(monthlyroster__end_date__gte=current_date)
-            ).exists()
+        print("TIME: ", current_time)
+        print("TYPE TIME: ", type(current_time))
+        today = timezone.now().strftime("%A")
+        print("DAY NAME: ", today)
+        employee_shift = [shift.shift.name for shift in rosters_for_employee]
+        print("SHIFTS: ", employee_shift)
+        employee_shit_interval = [
+            (shift.shift.start_time, shift.shift.end_time)
+            for shift in rosters_for_employee
+        ]
+        print("TIMES: ", employee_shit_interval)
+        work_days_objs = [work_days[::1] for work_days in assigned_work_days]
+        day_list = [day.day_symbol for days in work_days_objs for day in days]
+        print("DAYS: ", day_list)
+        if today in day_list and is_valid_shift_time(employee_shit_interval, current_time):
+            return True
         else:
             return False
+
     except UserProfile.DoesNotExist:
         return None
 
@@ -174,7 +218,7 @@ def jsondata_smartcard_handler(client, message):
                 grant_data = json.dumps(publish_data(ACCESS_DENIED))
                 client.publish(TOPIC, grant_data)
                 print("***->RETURNING.... NO USER PROFILE!")
-                return        
+                return
             is_onschedule = check_calendar(reader_uid)
             if is_onschedule is None:
                 grant_data = json.dumps(publish_data(ACCESS_DENIED))

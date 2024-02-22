@@ -1,5 +1,14 @@
+import datetime
 import json
 import random
+
+# Function to convert formatted time string to datetime object
+def parse_time(time_str):
+    return datetime.datetime.strptime(time_str, '%H:%M:%S.%f').time()
+
+# Function to convert time object to formatted string
+def format_time(time_obj):
+    return time_obj.strftime('%H:%M:%S.%f')
 
 def publish_data(grant: str, uid: str = ""):
     grant_data = {
