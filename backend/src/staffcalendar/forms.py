@@ -1,17 +1,20 @@
 from django import forms
 from users.models import UserProfile
-from .models import MonthlyRoster
+from .models import MonthlyRoster,WorkDay
 
 
 class MonthlyRosterForm(forms.ModelForm):
-    employees = forms.ModelMultipleChoiceField(
-        queryset=UserProfile.objects.all(), widget=forms.CheckboxSelectMultiple
+    work_days = forms.ModelMultipleChoiceField(
+        queryset=WorkDay.objects.all(), widget=forms.CheckboxSelectMultiple
     )
+    # employees = forms.ModelMultipleChoiceField(
+        # queryset=UserProfile.objects.all(), widget=forms.CheckboxSelectMultiple
+    # )
 
     class Meta:
         model = MonthlyRoster
         fields = "__all__"
 
     # def __init__(self, *args, **kwargs):
-        # super(MonthlyRosterForm, self).__init__(*args, **kwargs)
-        # self.fields["employees"].widget = forms.CheckboxSelectMultiple()
+    # super(MonthlyRosterForm, self).__init__(*args, **kwargs)
+    # self.fields["employees"].widget = forms.CheckboxSelectMultiple()

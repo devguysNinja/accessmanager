@@ -1,14 +1,14 @@
 from django.contrib import admin
-from .models import ShiftType, MonthlyRoster
+from .models import ShiftType, MonthlyRoster, WorkDay
 from .forms import MonthlyRosterForm
 
 # Register your models here.
 
 
 class ShiftTypeAdmin(admin.ModelAdmin):
-    list_display = ['shift_type',"name", "start_time", "end_time"]
-    list_display_links =None # ["name"]
-    list_editable = ["name", "start_time","end_time"]
+    list_display = ["shift_type", "name", "start_time", "end_time"]
+    list_display_links = None  # ["name"]
+    list_editable = ["name", "start_time", "end_time"]
     list_per_page = 20
 
     def shift_type(self, obj):
@@ -17,21 +17,44 @@ class ShiftTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(ShiftType, ShiftTypeAdmin)
 
-class EmployeeInline(admin.TabularInline):  # or admin.StackedInline
-    model = MonthlyRoster.employees.through  # Through model for ManyToManyField
-    extra = 1
+
+class WorkDayAdmin(admin.ModelAdmin):
+    list_display = ["day_symbol", "day_code"]
+    list_display_links = None
+    list_editable = ["day_symbol", "day_code"]
+
+
+admin.site.register(WorkDay, WorkDayAdmin)
+
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
-    # form = MonthlyRosterForm
-    list_display = ["work_day","shift", "week_no"]
-    list_display_links =  ["work_day","shift", "week_no"]
+    form = MonthlyRosterForm
+    list_display = [
+        "shift_days",
+        "shift",
+        "week_no",
+        "shift_members",
+        "description"
+    ]
+    list_display_links = ["shift_days", "shift", "week_no",]
     # list_editable = ["shift", "start_date", "end_date"]
     filter_horizontal = ["employees"]
     list_per_page = 20
     save_on_top = True
-    # save_as = True
-    # view_on_site = False
-    # inlines = [EmployeeInline]  # Add the inline class here
+
+    def shift_members(self, obj):
+        members = [members.user.username for members in obj.employees.all()]
+        print("****Members: ", members)
+        return f"{', '.join(members)}"
+
+    shift_members.short_description = "Members"
+
+    def shift_days(self, obj):
+        work_days = [days.day_symbol for days in obj.work_days.all()]
+        print("Work-days: ", work_days)
+        return f"{', '.join(work_days)}"
+
+    shift_days.short_description = "Shift days"
 
 
 admin.site.register(MonthlyRoster, MonthlyRosterAdmin)
