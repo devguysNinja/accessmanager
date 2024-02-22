@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import ShiftType, MonthlyRoster, WorkDay
 from .forms import MonthlyRosterForm
 
@@ -45,7 +46,13 @@ class MonthlyRosterAdmin(admin.ModelAdmin):
     def shift_members(self, obj):
         members = [members.user.username for members in obj.employees.all()]
         print("****Members: ", members)
-        return f"{', '.join(members)}"
+        html = ""
+        for mem in members:
+            html += f"<b>{mem}</b><br>"
+        print( "&&&&&&&&HTML",html)
+
+        return format_html(html)
+        # return f"{', '.join(members)}"
 
     shift_members.short_description = "Members"
 
