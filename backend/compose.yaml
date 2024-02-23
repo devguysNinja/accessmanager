@@ -53,6 +53,8 @@ services:
       - /app/node_modules
     environment:
       REACT_APP_API_DOMAIN: "${REACT_APP_API_DOMAIN}"
+      REACT_APP_LOGIN_URL: "${REACT_APP_LOGIN_URL}"
+      REACT_APP_API_ADMIN: "${REACT_APP_API_ADMIN}"
     networks: 
       - back-to-front
 
