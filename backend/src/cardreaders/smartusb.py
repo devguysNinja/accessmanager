@@ -1,6 +1,7 @@
 import time
 import paho.mqtt.client as mqtt
 from random import randrange, uniform
+import sys
 
 DELAY = 1.2
 TIMEOUT = 1.2
@@ -29,7 +30,12 @@ def main():
         is_connected = connect_to_broker()
         client.loop_start()
         while True:
-            payload = input("Flash your card :")
+            payload = input("Flash your card: ")
+            print("Payload: ",payload)
+            if payload.startswith("0"):
+                payload = payload[1:]
+                print("Stripped Payload: ",payload)
+            # payload = sys.argv[1] if len(sys.argv) > 1 else ""
             if payload != "" and is_connected:
                 response = client.publish(
                     TOPIC,

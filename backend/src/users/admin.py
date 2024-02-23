@@ -68,6 +68,7 @@ class EmployeeBatchUploadAdmin(admin.ModelAdmin):
 
     def populate_with_batch_data(self, request, queryset):
         response = bulk_create(request=request)
+        
         print("###...THIS IS BULK", response)
         if response.status_code != 200:
             self.message_user(

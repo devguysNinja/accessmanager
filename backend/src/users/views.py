@@ -51,7 +51,7 @@ class LoginView(APIView):
 
         payload = {
             "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=365 * 10),
             "iat": datetime.datetime.utcnow(),
         }
         token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
@@ -211,12 +211,12 @@ class UploadProfileImageView(APIView):
 def bulk_create(request):
     # payload: dict[str, str] | Any = user_auth(request)
     # if payload.get("auth_error", None):
-        # return Response(payload, status=status.HTTP_403_FORBIDDEN)
+    # return Response(payload, status=status.HTTP_403_FORBIDDEN)
     # _user: Any = User.objects.filter(id=payload["id"]).first()
     # if not _user.is_superuser or not _user.is_staff:
-        # return Response(
-            # data={"error": "User is not an Admin!"}, status=status.HTTP_401_UNAUTHORIZED
-        # )
+    # return Response(
+    # data={"error": "User is not an Admin!"}, status=status.HTTP_401_UNAUTHORIZED
+    # )
     try:
         batch_file: Any = EmployeeBatchUpload.objects.get(
             batch_file__icontains="employee_batch"
@@ -226,8 +226,8 @@ def bulk_create(request):
             data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
         )
     wb: Workbook = load_workbook(filename=batch_file)
-    ws_user: Worksheet = wb.worksheets[0]
-    ws_profile: Worksheet = wb.worksheets[1]
+    ws_user = wb.worksheets[0]
+    ws_profile = wb.worksheets[1]
     imported_user_counter = 0
     skipped_user_counter = 0
     imported_profile_counter = 0
@@ -255,19 +255,17 @@ def bulk_create(request):
         "password": "...",
     }
 
-    user_rows: Generator[tuple[Cell, ...], None, None] = ws_user.iter_rows(min_row=2)
-    profile_rows: Generator[tuple[Cell, ...], None, None] = ws_profile.iter_rows(
-        min_row=2
-    )
+    user_rows = ws_user.iter_rows(min_row=2)
+    profile_rows = ws_profile.iter_rows(min_row=2)
     for index, user_row in enumerate(user_rows, start=1):
-        user_row_values: list[_CellValue | None] = [cell.value for cell in user_row[1:]]
-        user_row_dict: dict[str, _CellValue | None] = dict(
-            zip(ws_user_columns, user_row_values)
-        )
-        user_serializer: UserSerializer = UserSerializer(data=user_row_dict)
+        user_row_values = [cell.value for cell in user_row[1:]]
+        user_row_dict = dict(zip(ws_user_columns, user_row_values))
+        print("@@@@ Total User From excel: ", len(user_row_dict.keys()))
+        user_serializer = UserSerializer(data=user_row_dict)
         if user_serializer.is_valid():
-            print("@@@@ VALID USER:")
+            print("@@@@ VALID USER: ")
             user_serializer.save()
+            print("@@@@ VALID USER DATA: ", user_serializer.data)
             imported_user_counter += 1
         else:
             print("@@@@ NOT VALID USER:", user_serializer.errors)
@@ -275,46 +273,64 @@ def bulk_create(request):
 
     for index, profile_row in enumerate(profile_rows, start=1):
         profile_row_values = [cell.value for cell in profile_row[1:]]
+        print("#### PROFILE ROLE VALUES: ", profile_row_values)
         email = profile_row_values.pop()
         try:
             user = User.objects.get(email=email)
+
             u_serializer = UserSerializer(user)
             user_schema_column["id"] = u_serializer.data["id"]
             profile_row_values.append(user_schema_column)
             profile_row_values.append(u_serializer.data["id"])
-            # print("$$$$ ROW VALUES:", profile_row_values)
+            print("$$$$ ROW VALUES:", profile_row_values)
 
             profile_row_dict = dict(zip(ws_profile_columns, profile_row_values))
             print("%%%%%%%%- ROW DICT:", profile_row_dict)
 
             p_serializer = BatchUploadUserProfileSerializer(data=profile_row_dict)
             if p_serializer.is_valid():
-                # print("@@@@  VALID PROFILE:")
+                print("@@@@  VALID PROFILE:")
                 p_serializer.save()
                 imported_profile_counter += 1
-                # print("####  imported PROFILE:", imported_profile_counter)
+                print("####  imported PROFILE:", imported_profile_counter)
             else:
                 print("@@@@ NOT VALID PROFILE:", p_serializer.errors)
                 skipped_profile_counter += 1
-                # print("#### skipped PROFILE:", skipped_profile_counter)
+                print("#### skipped PROFILE:", skipped_profile_counter)
         except User.DoesNotExist:
+            error = {"error": f"user with email: {email} was not found!"}
             return Response(
-                data={"error": f"user with email: {email} was not found!"},
+                data=error,
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            print("PROFILE EXCEPTION @291:", e)
+            print("PROFILE EXCEPTION @310:", e)
             return Response(
                 data={"error": e.args[0]},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-    if skipped_user_counter > 0 or skipped_profile_counter > 0:
+    if skipped_user_counter > 1 or skipped_profile_counter > 0:
+        data = {
+            "total_user_failed": skipped_user_counter,
+            "total_profile_failed": skipped_profile_counter,
+        }
+        print("Skiped User Count: ", skipped_user_counter)
         return Response(
-            data={
-                "total_user_failed": skipped_user_counter,
-                "total_profile_failed": skipped_profile_counter,
-            },
+            data=data,
             status=status.HTTP_400_BAD_REQUEST,
+        )
+    if imported_user_counter == imported_profile_counter and (
+        imported_user_counter > 0 and imported_profile_counter > 0
+    ):
+        data = (
+            {
+                "total_uploaded_users": imported_user_counter,
+                "total_uploaded_profiles": imported_profile_counter,
+            },
+        )
+        return Response(
+            data=data,
+            status=status.HTTP_200_OK,
         )
     return Response(
         data={

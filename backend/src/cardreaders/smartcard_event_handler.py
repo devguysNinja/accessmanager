@@ -75,9 +75,15 @@ def create_transaction(
 def is_valid_shift_time(shift_times, time_now_obj):
     is_within_interval = False
     for start_time, end_time in shift_times:
+        # Check if start_time <= given_time <= end_time for intervals not spanning midnight
         if start_time <= time_now_obj <= end_time:
             is_within_interval = True
             break
+        # Check if given_time is within the night shift interval spanning midnight
+        elif start_time > end_time:
+            if time_now_obj >= start_time or time_now_obj <= end_time:
+                is_within_interval = True
+                break
     if is_within_interval:
         return is_within_interval
     else:
