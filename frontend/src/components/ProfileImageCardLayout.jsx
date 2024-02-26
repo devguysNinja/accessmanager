@@ -21,7 +21,14 @@ export default function ProfileImageCardLayout() {
   const IMAGE_PATH = userProfile?.profile_image;
 
   useEffect(() => {
+    if (IMAGE_PATH === undefined) {
+      setProfilePix("headmug.jpeg");
+  
+      }
+    else{
     setProfilePix(`${BASE_URL}${IMAGE_PATH}`);
+
+    }
   }, [IMAGE_PATH]);
 
   const getFile = (e) => {
@@ -33,7 +40,7 @@ export default function ProfileImageCardLayout() {
       const fileObjUrl = URL.createObjectURL(e.target.files[0]);
       setProfilePix(fileObjUrl);
     } catch (error) {
-      setProfilePix("");
+      setProfilePix("headmug.jpeg");
     }
   };
 
@@ -51,22 +58,24 @@ export default function ProfileImageCardLayout() {
     const { profile_image } = await response.json();
     const new_profile = { ...userProfile, profile_image };
     localStorage.setItem("profile", JSON.stringify(new_profile));
+    if (profile_image == undefined ||"") {
+    setProfilePix("headmug.jpeg");
+
+    }
     setProfilePix(`${BASE_URL}${profile_image}`);
+    
   };
 
   return (
     <Card>
       <Image
-        src={profilePix || "headmug.jpeg"}
+        src={profilePix }
         roundedCircle
         width={profilePix ? 170 : 150}
         height={profilePix ? 170 : 150}
         style={{ marginRight: "auto", marginLeft: "auto" }}
       />
       <Card.Body>
-        <Card.Text>
-          <em>Avatar</em>
-        </Card.Text>
         <Form onSubmit={uploadPix}>
           <Form.Group controlId="formFileSm" className="mb-3">
             {/* <Form.Label>Avatar</Form.Label> */}
@@ -80,7 +89,7 @@ export default function ProfileImageCardLayout() {
           </Form.Group>
 
           <Button
-            variant="primary"
+            variant="warning"
             type="submit"
             style={{
               width: "100%",

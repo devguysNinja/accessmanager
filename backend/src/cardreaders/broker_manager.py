@@ -18,9 +18,9 @@ class BrokerEventManager:
             usb_smartcard_handler(client, message)
             return
 
-        if is_card_reader_json(event_message):
-        print("$$$$$...Calling jsondata_smartcard_handler")
-        jsondata_smartcard_handler(client, message)
+        # if is_card_reader_json(event_message):
+        # print("$$$$$...Calling jsondata_smartcard_handler")
+        # jsondata_smartcard_handler(client, message)
 
 DELAY = 1.2
 TIMEOUT = 1.2
