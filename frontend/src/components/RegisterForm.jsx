@@ -67,7 +67,7 @@ function RegisterForm(props) {
       </Form.Group>
 
       <Button
-        variant="primary"
+        variant="warning"
         type="submit"
         style={{
           width: "100%",

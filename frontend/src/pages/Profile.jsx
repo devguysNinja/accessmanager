@@ -13,14 +13,16 @@ import ReportSelectorForm from "../components/ReportSelectorForm";
 function Profile(props) {
   // const [fiterQuery, setFiterQuery] = useState(null);
   return (
-    <div>
-      {props?.profile?.username
-        ? `Hi ${props?.profile?.username}`
-        : props?.profile?.user
-        ? `Hi ${props?.profile?.user?.username}`
-        : "You are not authenticated"}
-      <Container>
-        <Row className="" style={{ backgroundColor: "#726d6d" }}>
+    <div className="auth-container">
+      <div className="auth-text">
+        {props?.profile?.username
+          ? ` 👋 Hi ${props?.profile?.username}`
+          : props?.profile?.user
+          ? `Hi ${props?.profile?.user?.username}`
+          : "You are not authenticated "} &#128542;
+      </div>
+      <Container >
+        <Row style={{ backgroundColor: "none" }}>
           <Col>
             <LeftCardLayout>
               <ProfileForm />
@@ -30,7 +32,7 @@ function Profile(props) {
             <ProfileImageCardLayout />
           </Col>
         </Row>
-        <Row className="" style={{ backgroundColor: "#726d6d" }}>
+        <Row style={{ backgroundColor: "none" }}>
           <Col>
             <TransactionListTableLayout>
               <TransactionTable userprofile={props?.profile} />

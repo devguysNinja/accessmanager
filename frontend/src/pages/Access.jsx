@@ -81,18 +81,19 @@ function Access() {
   let { username } = ownerDetails || "";
 
   return (
-    <div>
+    <div style={{backgroundColor:"#555"}}>
       {" "}
-      <Container>
+      <Container >
         <div
           style={{
             textAlign: "center",
             fontSize: "110px",
+            color: "#ffd700"
           }}
         >
           <b>{"Daily Access"}</b>
         </div>
-        <Row className="" style={{ backgroundColor: "#726d6d" }}>
+        <Row className="" style={{ backgroundColor: "none" }}>
           <Col>
             <LeftCardLayout>
               <AccessRightFeeder userData={ownerDetails} />

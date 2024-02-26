@@ -45,32 +45,30 @@ function PageNavbar(props) {
   //   window.location.assign(ApiRoute.FRONTEND_DOMAIN);
   // }
   return (
-    <Navbar className="bg-body-tertiary">
+    <Navbar className="navbar-container">
       <Container>
         <Navbar.Brand href="#home">Meal Manager</Navbar.Brand>
         <Navbar.Toggle />
-        <Navbar.Collapse className="justify-content-end">
-          <Navbar.Text>
-            <ButtonGroup aria-label="Basic example" size="sm" className="mb-2">
-              <Button variant="secondary" onClick={accessBoard}>
+        <Navbar.Collapse className="justify-content-end" >
+          <Navbar.Text className="ml-auto" >
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={accessBoard} >
                 Access Board
               </Button>
-              <Button variant="secondary" onClick={gotoAdmin}>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
                 Admin
               </Button>
-              <Button variant="secondary" onClick={profile}>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={profile}>
                 Profile
               </Button>
-              <Button variant="secondary" onClick={register}>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}}  onClick={register}>
                 Register
               </Button>
-              <Button variant="secondary" onClick={login}>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={login}>
                 Login
               </Button>
-              <Button variant="secondary" onClick={logout}>
+              <Button variant="outline-secondary"  style={{color:'black', margin: '5px'}} onClick={logout}>
                 Logout
               </Button>
-            </ButtonGroup>
           </Navbar.Text>
         </Navbar.Collapse>
       </Container>

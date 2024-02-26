@@ -87,104 +87,94 @@ function ProfileForm(props) {
   };
 
   return (
-    <Form onSubmit={submit}>
-      <Row className="mb-3">
-        <Form.Group as={Col} controlId="formGridFirstName">
-          <Form.Label>First Name</Form.Label>
-          <Form.Control
-            type="text"
-            value={first_name}
-            placeholder="First Name"
-            disabled={!!disabledAll}
-            onChange={(e) => setFirstName(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group as={Col} controlId="formGridLastName">
-          <Form.Label>Last Name</Form.Label>
-          <Form.Control
-            type="text"
-            value={last_name}
-            placeholder="Last Name"
-            disabled={disabledAll ? true : false}
-            onChange={(e) => setLastName(e.target.value)}
-          />
-        </Form.Group>
-      </Row>
-
-      <Row className="mb-3">
-        <Form.Group as={Col} controlId="formGridDepartment">
-          <Form.Label>Department</Form.Label>
-          <Form.Control
-            type="text"
-            value={department}
-            placeholder="Department"
-            disabled={disabledAll ? true : false}
-            onChange={(e) => setDeptartment(e.target.value)}
-          />
-        </Form.Group>
-
-        <Form.Group as={Col} controlId="formReaderUid">
-          <Form.Label>UID</Form.Label>
-          <Form.Control
-            type="text"
-            value={reader_uid}
-            placeholder="UID"
-            disabled={disabledOne || disabledAll}
-            onChange={(e) => setReaderUid(e.target.value)}
-          />
-        </Form.Group>
-
-        {/* <Form.Group as={Col} controlId="formGridMealCategory">
-          <Form.Label>Meal Category</Form.Label>
-          <Form.Select
-            // defaultValue={meal_category || "Choose..."}
-            value={meal_category}
-            disabled={disabledOne || disabledAll}
-            onChange={(e) => setMealCategory(e.target.value)}
-          >
-            <option>Choose...</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>5</option>
-          </Form.Select>
-        </Form.Group> */}
-
-        <Form.Group as={Col} controlId="formGridMealCategory">
-          <Form.Label>Meal Category</Form.Label>
-          <Form.Control
-            type="number"
-            value={meal_category}
-            placeholder="Meal Category"
-            disabled={disabledOne || disabledAll}
-            onChange={(e) => setMealCategory(e.target.value)}
-          />
-        </Form.Group>
-        
-      </Row>
-
-      <Button
-        variant="primary"
-        type="submit"
-        disabled={disabledAll ? true : false}
-      >
-        Submit
-      </Button>
-
-      <Form.Check // prettier-ignore
-        // disabled={switchStatus}
-        // value={switchStatus}
-        type="switch"
-        label="Edit profile"
-        id="disabled-custom-switch"
-        onClick={editSwitch}
-        style={{
-          float: "right",
-        }}
+  <Form onSubmit={submit} style={{ padding: '20px', borderRadius: '10px' }}>
+  <Row className="mb-3">
+    <Form.Group as={Col} controlId="formGridFirstName">
+      <Form.Label>First Name</Form.Label>
+      <Form.Control
+        type="text"
+        value={first_name}
+        placeholder="First Name"
+        disabled={!!disabledAll}
+        onChange={(e) => setFirstName(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       />
-    </Form>
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formGridLastName">
+      <Form.Label>Last Name</Form.Label>
+      <Form.Control
+        type="text"
+        value={last_name}
+        placeholder="Last Name"
+        disabled={disabledAll ? true : false}
+        onChange={(e) => setLastName(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+  </Row>
+
+  <Row className="mb-3">
+    <Form.Group as={Col} controlId="formGridDepartment">
+      <Form.Label>Department</Form.Label>
+      <Form.Control
+        type="text"
+        value={department}
+        placeholder="Department"
+        disabled={disabledAll ? true : false}
+        onChange={(e) => setDeptartment(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formReaderUid">
+      <Form.Label>UID</Form.Label>
+      <Form.Control
+        type="text"
+        value={reader_uid}
+        placeholder="UID"
+        disabled={disabledOne || disabledAll}
+        onChange={(e) => setReaderUid(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formGridMealCategory">
+      <Form.Label>Meal Category</Form.Label>
+      <Form.Control
+        type="number"
+        value={meal_category}
+        placeholder="Meal Category"
+        disabled={disabledOne || disabledAll}
+        onChange={(e) => setMealCategory(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+
+  </Row>
+
+  <Button
+    variant="warning"
+    type="submit"
+    disabled={disabledAll ? true : false}
+    style={{ color: 'black' }}
+  >
+    Submit
+  </Button>
+
+  <Form.Check
+    type="switch"
+    label="Edit profile"
+    onstyle="outline-warning" offstyle="outline-info"
+    id="disabled-custom-switch"
+    onClick={editSwitch}
+    style={{
+      float: 'right',
+      color: 'black',
+    }}
+  />
+</Form>
+
   );
 }
 
