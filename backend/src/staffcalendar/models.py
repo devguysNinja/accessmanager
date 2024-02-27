@@ -41,7 +41,8 @@ class MonthlyRoster(models.Model):
     # ("Sunday", "Sunday"),
     # ]
     work_days = models.ManyToManyField(WorkDay)
-    shift = models.ForeignKey("ShiftType", null=True, on_delete=models.SET_NULL)
+    shifts = models.ManyToManyField("ShiftType",)
+    # shift = models.ForeignKey("ShiftType", null=True, on_delete=models.SET_NULL)
     week_no = models.PositiveIntegerField()
     employees = models.ManyToManyField(UserProfile)
     description = models.CharField(max_length=120)
@@ -52,4 +53,5 @@ class MonthlyRoster(models.Model):
         verbose_name = "Employees' roster"
 
     def __str__(self):
-        return f"{self.shift.name.capitalize()} | Week-{self.week_no}"
+        return f"{self.description} | Week-{self.week_no}"
+        # return f"{self.shift.name.capitalize()} | Week-{self.week_no}"

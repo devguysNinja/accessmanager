@@ -32,16 +32,21 @@ class MonthlyRosterAdmin(admin.ModelAdmin):
     form = MonthlyRosterForm
     list_display = [
         "shift_days",
-        "shift",
+        "shift_types",
         "week_no",
         "shift_members",
         "description"
     ]
-    list_display_links = ["shift_days", "shift", "week_no",]
+    list_display_links = [
+                          "shift_days", 
+                          # "shifts", 
+        "week_no",]
     # list_editable = ["shift", "start_date", "end_date"]
-    filter_horizontal = ["employees"]
+    filter_horizontal = ["employees",]
     list_per_page = 20
     save_on_top = True
+    save_as = True
+    save_as_continue = False
 
     def shift_members(self, obj):
         members = [members.user.username for members in obj.employees.all()]
@@ -62,6 +67,12 @@ class MonthlyRosterAdmin(admin.ModelAdmin):
         return f"{', '.join(work_days)}"
 
     shift_days.short_description = "Shift days"
+    
+    def shift_types(self, obj):
+        _shift = [shift.name for shift in obj.shifts.all()]
+        print("", _shift)
+        return f"{', '.join(_shift)}"
+    shift_types.short_description ="Shift types"
 
 
 admin.site.register(MonthlyRoster, MonthlyRosterAdmin)

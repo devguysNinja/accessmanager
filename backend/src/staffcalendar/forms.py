@@ -1,6 +1,6 @@
 from django import forms
 from users.models import UserProfile
-from .models import MonthlyRoster,WorkDay
+from .models import MonthlyRoster,WorkDay,ShiftType
 
 
 class MonthlyRosterForm(forms.ModelForm):
@@ -10,6 +10,9 @@ class MonthlyRosterForm(forms.ModelForm):
     # employees = forms.ModelMultipleChoiceField(
         # queryset=UserProfile.objects.all(), widget=forms.CheckboxSelectMultiple
     # )
+    shifts = forms.ModelMultipleChoiceField(
+        queryset=ShiftType.objects.all(), widget=forms.CheckboxSelectMultiple
+    )
 
     class Meta:
         model = MonthlyRoster
