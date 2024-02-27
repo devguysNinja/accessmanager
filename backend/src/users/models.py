@@ -22,7 +22,7 @@ def upload_xlsx(instance, filename):
 
 # Create your models here.
 class User(AbstractUser):
-    middle_name = models.CharField(max=50, blank=True, null=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
     username = models.CharField(max_length=50,unique=True)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
