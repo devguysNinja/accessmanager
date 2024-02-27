@@ -22,12 +22,13 @@ def upload_xlsx(instance, filename):
 
 # Create your models here.
 class User(AbstractUser):
-    username = models.CharField(max_length=255,unique=True)
+    middle_name = models.CharField(max_length=50, blank=True, null=True)
+    username = models.CharField(max_length=50,unique=True)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
 
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'password']
+    # USERNAME_FIELD = 'email'
+    # REQUIRED_FIELDS = ['username', 'password']
 
 
 class UserProfile(models.Model):
@@ -36,12 +37,28 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     reader_uid = models.CharField(max_length=128,default=dummy_unique_str, unique=True)
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
-    meal_category = models.PositiveSmallIntegerField(default=1)
+    category = models.ForeignKey("EmployeeCategory", null=True, on_delete=models.SET_NULL)
     department = models.CharField(max_length=225)
+    location = models.ForeignKey("Location", null=True, on_delete=models.SET_NULL)
     # shift = models.ForeignKey(ShiftManager, null=True, on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return self.user.username
+
+class Location(models.Model):
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return f"{self.name}"
+
+class EmployeeCategory(models.Model):
+    cat_name = models.CharField(max_length=125)
+    allowed_meal_access = models.PositiveSmallIntegerField(default=1)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.cat_name}"
 
 
 class EmployeeBatchUpload(models.Model):
