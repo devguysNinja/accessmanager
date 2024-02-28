@@ -1,7 +1,7 @@
 from rest_framework.exceptions import NotFound
 from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from .models import Department, EmployeeStatus, Location, User, UserProfile
+from .models import User, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -19,7 +19,9 @@ class UserSerializer(serializers.ModelSerializer):
         ]
         extra_kwargs = {
             "password": {"write_only": True},
+            # 'id': {'read_only': True}
         }
+
     def create(self, validated_data):
         password = validated_data.pop("password", None)
         instance = self.Meta.model(**validated_data)
@@ -28,72 +30,67 @@ class UserSerializer(serializers.ModelSerializer):
         instance.set_password(password)
         instance.save()
         return instance
-        
+
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)
-        validated_data.pop("username", None)
-        validated_data.pop("email", None)
         if password is not None:
             instance.set_password(password)
         instance.first_name = validated_data.pop("first_name", instance.first_name)
         instance.last_name = validated_data.pop("last_name", instance.last_name)
-        instance.middle_name = validated_data.pop("middle_name", instance.middle_name)
         instance.save(
-            update_fields=["first_name", "last_name", "middle_name", "password"]
+            update_fields=[
+                "first_name",
+                "last_name",
+            ]
         )
         return instance
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    user_id = serializers.IntegerField()
+    # reader_uid = serializers.CharField()
+
     class Meta:
         model = UserProfile
         fields = [
             "id",
+            "user_id",
             "user",
-            "reader_uid",
-            "category",
+            # "reader_uid",
+            "meal_category",
             "profile_image",
             "department",
-            "location",
-            "staff_status",
         ]
         extra_kwargs = {
             "id": {"read_only": True},
             # "reader_uid": {"read_only": True},
         }
 
+    def create(self, validated_data):
+        print("**** 1st Validated_data****:", validated_data)
+        user = validated_data.pop("user", None)  # pass  pk value as user
+        user_id = validated_data.pop("user_id")  #
+        print("**** 2nd Validated_data****:", validated_data)
+        profile = self.Meta.model(**validated_data)
+        if user_id is None or user is None:
+            raise NotFound("User id is required!")
+        auth_user = User.objects.get(id=user_id)
+        profile.user = auth_user
+        profile.save()
+        return profile
+
     def update(self, instance, validated_data):
-        instance.category = validated_data.get("category", instance.category)
+        # user = validated_data.pop('user', None) # pass  pk value as user
+        instance.meal_category = validated_data.get(
+            "meal_category", instance.meal_category
+        )
+        # instance.reader_uid = validated_data.get(
+        #     "reader_uid", instance.reader_uid
+        # )
         instance.department = validated_data.get("department", instance.department)
-        instance.location = validated_data.get("location", instance.location)
-        instance.staff_status = validated_data.get("staff_status", instance.staff_status)
-        instance.reader_uid = validated_data.get("reader_uid", instance.reader_uid)
         instance.save()
         return instance
-        
-
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = "__all__"
-
-
-class DepartmentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Department
-        fields = "__all__"
-
-
-class EmployeeStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeStatus
-        fields = "__all__"
-
-
-class EmployeeCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EmployeeStatus
-        fields = "__all__"
 
 
 class BatchUploadUserProfileSerializer(serializers.ModelSerializer):
