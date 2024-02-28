@@ -88,114 +88,106 @@ class LogoutView(APIView):
 
 
 class UserProfileView(APIView):
+    def get(self, request, pk=None):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        try:
+            if pk is not None:
+                profile = UserProfile.objects.select_related("user").get(user=pk)
+                profile_serialiser = UserProfileSerializer(profile)
+                return Response(data=profile_serialiser.data)
+            else:
+                profiles = UserProfile.objects.select_related("user").all()
+                profiles_serializer = UserProfileSerializer(profiles, many=True)
+                return Response(data=profiles_serializer.data)
+        except UserProfile.DoesNotExist as e:
+            return Response(
+                data={"no_profile_error": e.args[0]}, status=status.HTTP_400_BAD_REQUEST
+            )
 
-    def get(self, request, format=None):
-        profiles = UserProfile.objects.all()
-        serializer = UserProfileSerializer(profiles, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, format=None):
-        request_user = request.data.pop("user", None)
-        auth_user = User.objects.get(pk=request_user["id"])
+    def post(self, request):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        auth_user = User.objects.get(id=payload["id"])
         user_data = {
-            "first_name": request_user.pop("first_name", ""),
-            "last_name": request_user.pop("last_name", ""),
-            "middle_name": request_user.pop("middle_name", ""),
+            "first_name": request.data.pop("first_name"),
+            "last_name": request.data.pop("last_name"),
             "email": auth_user.email,
             "username": auth_user.username,
             "password": auth_user.password,
         }
+        ###...Update related User before creating Profile
         user_serializer = UserSerializer(instance=auth_user, data=user_data)
-        modified_data = {**request.data, "user": request_user["id"]}
-        profile_serializer = UserProfileSerializer(data=modified_data)
-        
-        if profile_serializer.is_valid() and user_serializer.is_valid():
+        profile_data = {**request.data}
+        print("#####Profile Data:", profile_data)
+        profile_data["user"] = {
+            "id": auth_user.id,
+            "email": "...",
+            "username": "...",
+            "password": "...",
+        }
+        profile_data["user_id"] = auth_user.id
+        profile_data["reader_uid"] = ""
+        print("%%%%%%:", profile_data["user_id"])
+
+        profile_serialiser = UserProfileSerializer(data=profile_data)
+        if profile_serialiser.is_valid() and user_serializer.is_valid():
+            # ....this suite is a candidate for DB Transaction
             user_serializer.save()
-            profile_serializer.save()
-            response_data = {
-                **profile_serializer.data,
-                "user": {**user_serializer.data},
+            profile_serialiser.save()
+            print("****CreatedData****:", profile_serialiser.data)
+            created_data = {
+                **profile_serialiser.data,
             }
-            return Response(response_data, status=status.HTTP_201_CREATED)
-        profile_serializer.is_valid()
-        user_serializer.is_valid()
-        response = Response(
-            {
-                "errors": {
-                    "profile": {**profile_serializer.errors},
-                    "user": {**user_serializer.errors},
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
-        return response
+            return Response(data=created_data, status=status.HTTP_200_OK)
+        else:
+            profile_serialiser.is_valid()
+            user_serializer.is_valid()
+            errors = [profile_serialiser.errors, user_serializer.errors]
+            return Response(data=errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class UserProfileDetailAPIView(APIView):
-    def get_object(self, pk):
-        # lookup_field = 'id'
-        try:
-            profile = UserProfile.objects.get(id=pk)
-            return profile
-        except UserProfile.DoesNotExist:
-            return None
-
-    def get(self, request, pk, format=None):
-        profile = self.get_object(pk)
-        serializer = UserProfileSerializer(profile)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def patch(self, request, pk, format=None):
-        request_user = request.data.pop("user", None)
-        if request_user is None:
-            return Response(
-                {"error": "User.id field is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        try:
-            auth_user = User.objects.get(pk=request_user["id"])
-        except User.DoesNotExist:
-            return Response({
-                "errors":f"User with id {request_user['id']} not found!"
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+    def patch(self, request, format=None):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        auth_user = User.objects.get(id=payload["id"])
         user_data = {
-            "first_name": request_user.pop("first_name", auth_user.first_name),
-            "last_name": request_user.pop("last_name", auth_user.last_name),
-            "middle_name": request_user.pop("middle_name", auth_user.middle_name),
+            "first_name": request.data.pop("first_name", auth_user.first_name),
+            "last_name": request.data.pop("last_name", auth_user.last_name),
             "email": auth_user.email,
             "username": auth_user.username,
             "password": auth_user.password,
         }
-        user_serializer = UserSerializer(instance=auth_user, data=user_data)
-        profile = self.get_object(pk)
-        if profile is None:
-            return Response(
-                {"error": f"User profile with id <{pk}> not found!"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        modified_data = {**request.data, "user": request_user["id"]}
-        profile_serializer = UserProfileSerializer(instance=profile, data=modified_data)
-        if profile_serializer.is_valid() and user_serializer.is_valid():
-            user_serializer.save()
-            profile_serializer.save()
-            response_data = {
-                **profile_serializer.data,
-                "user": {**user_serializer.data},
+        user_serialiser = UserSerializer(instance=auth_user, data=user_data)
+
+        profile = UserProfile.objects.get(user=auth_user.pk)
+        profile_data = {**request.data}
+        profile_data["user"] = {
+            "id": auth_user.id,
+            "email": "...",
+            "username": "...",
+            "password": "...",
+        }
+        profile_data["user_id"] = auth_user.id
+        profile_data["reader_uid"] = profile.reader_uid
+        print("****MergeData****:", profile_data)
+        profile_serialiser = UserProfileSerializer(instance=profile, data=profile_data)
+        if profile_serialiser.is_valid() and user_serialiser.is_valid():
+            user_serialiser.save()
+            profile_serialiser.save()
+            print("****UpdateData****:", profile_serialiser.data)
+            updated_data = {
+                **profile_serialiser.data,
             }
-            return Response(response_data, status=status.HTTP_200_OK)
-        profile_serializer.is_valid()
-        user_serializer.is_valid()
-        return Response(
-            {
-                "error": {
-                    "profile": {**profile_serializer.errors},
-                    "user": {**user_serializer.errors},
-                }
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+            return Response(data=updated_data, status=status.HTTP_200_OK)
+        else:
+            print("Profile PATCH ERROR: ", profile_serialiser.errors)
+            return Response(
+                data=profile_serialiser.errors,
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 class UploadProfileImageView(APIView):
