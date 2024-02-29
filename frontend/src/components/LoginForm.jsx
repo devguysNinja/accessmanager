@@ -27,6 +27,7 @@ function LoginForm(props) {
   const submit = async (e) => {
     e.preventDefault();
     const LOGIN_URL = ApiRoute.LOGIN_URL;
+    console.log("LOGIN_URL...",LOGIN_URL)
     const payLoad = {
       email,
       password,
@@ -48,7 +49,8 @@ function LoginForm(props) {
        setError(content?.invalid_user_error);
      }
  } catch (error) {
-  await ApiLogout();
+  console.log("Login ERROR...",error)
+  // await ApiLogout();
  }
   };
   //...Get the logged-in user and set the profile object in LocalStorage
@@ -94,7 +96,7 @@ function LoginForm(props) {
       </Form.Group>
 
       <Button
-        variant="primary"
+        variant="warning"
         type="submit"
         style={{
           width: "100%",

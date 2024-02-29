@@ -16,7 +16,7 @@ function Access() {
   } = useContext(Context);
   const [brokerMessage, setBrokerMessage] = useState(null);
   const [ownerDetails, setOwnerDetails] = useState(null);
-
+  
   const BASE_URL = ApiRoute.API_DOMAIN;
   const DETAILS_URL = ApiRoute.TRANSACTION_OWNER_DETAILS_URL;
 
@@ -32,6 +32,7 @@ function Access() {
       };
     }
   }, [mqttclient]);
+
 
   //...Assemble the Payload
   let payLoad;
@@ -99,11 +100,12 @@ function Access() {
               <AccessRightFeeder userData={ownerDetails} />
               <div
                 style={{
-                  textAlign: "center",
-                  fontSize: "123px",
+                  fontSize: "57px",
+                  color:"#000"
                 }}
               >
-                <b>{Capitalize(username)}</b>
+                <b >{Capitalize(username)}</b>
+                <b><p>Department</p></b>
               </div>
             </LeftCardLayout>
           </Col>
