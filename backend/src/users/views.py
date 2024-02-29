@@ -31,12 +31,11 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data["email"]
+        username = request.data["username"]
         password = request.data["password"]
 
-        user = User.objects.filter(email=email).first()
+        user = User.objects.filter(username=username).first()
         if user is None:
-            # raise AuthenticationFailed("User not found!")
             return Response(
                 {"invalid_user_error": "User not found!"},
                 status=status.HTTP_403_FORBIDDEN,
@@ -49,20 +48,22 @@ class LoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        payload = {
+        
+        if user.is_superuser:
+            payload = {
             "id": user.id,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(days=365 * 10),
             "iat": datetime.datetime.utcnow(),
         }
+            token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
+            return Response({"jwt": token}, status=status.HTTP_200_OK)
+        payload = {
+            "id": user.id,
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=2),
+            "iat": datetime.datetime.utcnow(),
+        }   
         token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
-
-        response = Response()
-
-        response.set_cookie(key="jwt", value=token, httponly=True)
-        response.data = {"jwt": token}
-
-        return response
-
+        return Response({"jwt": token}, status=status.HTTP_200_OK)
 
 class AuthUserView(APIView):
     def get(self, request, pk=None):
