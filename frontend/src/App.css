@@ -10,13 +10,10 @@
     margin-right: auto;
 }
 
-.auth-container {
-    background-color: #555;
-}
 
 .auth-text {
     text-align: center;
-    color: #ffd700;
+    color: #000;
     margin: 15px 4px;
     font-size: 40px;
     font-weight: 700;
