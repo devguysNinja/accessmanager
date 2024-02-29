@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Access from "./pages/Access";
+import DrinksAcess from "./pages/DrinksAcess";
 import { connect } from "./config/mqttService";
 
 export const Context = React.createContext("");
@@ -67,6 +68,7 @@ function App() {
         <Route path="/login" component={() => <Login />} />
         <Route path="/register" component={Register} />
         <Route path="/access-gate" component={() => <Access />} />
+        <Route path="/drinks-access-gate" component={() => <DrinksAcess/>} />
         </ReportContext.Provider>
       </Context.Provider>
     </BrowserRouter>

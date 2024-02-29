@@ -31,10 +31,11 @@ export default function ReportSelectorForm(props) {
     });
   };
 
-  const { admin } = props;
+  const {admin } = props
 
   return (
-    <Card>
+    admin && (
+      <Card>
       <Card.Body>
         <Card.Text>Report Selector</Card.Text>
 
@@ -80,5 +81,6 @@ export default function ReportSelectorForm(props) {
         </Form>
       </Card.Body>
     </Card>
+    )
   );
 }
