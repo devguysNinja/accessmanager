@@ -41,6 +41,11 @@ function PageNavbar(props) {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/access-gate`);
   };
 
+   //...Drinks Access-board Handler
+   const drinksAccessBoard = (e) => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/drinks-access-gate`);
+  };
+
   // if (redirect) {
   //   window.location.assign(ApiRoute.FRONTEND_DOMAIN);
   // }
@@ -53,6 +58,9 @@ function PageNavbar(props) {
           <Navbar.Text className="ml-auto" >
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={accessBoard} >
                 Access Board
+              </Button>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={drinksAccessBoard} >
+               Drinks Access Board
               </Button>
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
                 Admin

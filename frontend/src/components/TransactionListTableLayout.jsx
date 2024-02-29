@@ -1,14 +1,16 @@
-import React from "react";
+import React, {useState} from "react";
 import Card from "react-bootstrap/Card";
 
+
 export default function TransactionListTableLayout(props) {
+  const {admin} = props;
   return (
-    <Card>
-      <Card.Body>
-        
-        {/* <Card.Text></Card.Text> */}
-        {props.children}
-      </Card.Body>
-    </Card>
+    admin && (
+      <Card>
+        <Card.Body>
+          {props.children}
+        </Card.Body>
+      </Card>
+    )
   );
 }

@@ -12,14 +12,14 @@ export default function AccessRightFeeder({ userData }) {
 
   console.log("@@@ASCR_URL:", srcUrl)
   return (
-    <Card style={{ height: "172px"}} >
-      <Image
-        src={srcUrl || "headmug.jpeg"}
-        roundedCircle
-        width={avatar ? 170 : 150}
-        height={avatar ? 170 : 150}
-        style={{ marginRight: "auto", marginLeft: "auto" }}
-      />
-    </Card>
+      <div style={{textAlign: "center"}}>
+        <Image
+          src={srcUrl || "headmug.jpeg"}
+          roundedCircle
+          width={avatar ? 170 : 150}
+          height={avatar ? 170 : 150}
+          style={{ marginRight: "auto", marginLeft: "auto" }}
+        />
+      </div>
   );
 }
