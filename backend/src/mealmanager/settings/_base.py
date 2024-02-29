@@ -172,8 +172,11 @@ AUTH_USER_MODEL = "users.User"
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
-JWT_SALT = get_secret("JWT_SALT")
 
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+
+JWT_SALT = get_secret("JWT_SALT")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "sandbox.smtp.mailtrap.io"
