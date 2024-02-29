@@ -38,7 +38,10 @@ SECRET_KEY = get_secret("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "11e4-102-219-155-4.ngrok-free.app",
+    "localhost",
+]
 
 
 # Application definition
@@ -142,7 +145,7 @@ LANGUAGE_CODE = "en-us"
 
 # TIME_ZONE = "UTC"
 
-TIME_ZONE = 'Africa/Lagos'
+TIME_ZONE = "Africa/Lagos"
 
 USE_I18N = True
 
@@ -180,7 +183,7 @@ JWT_SALT = get_secret("JWT_SALT")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "sandbox.smtp.mailtrap.io"
-EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_PASSWORD = get_secret("EMAIL_HOST_PASSWORD")
 EMAIL_HOST_USER = "046b79560c33ab"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True

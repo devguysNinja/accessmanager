@@ -3,13 +3,13 @@ import { Redirect } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Context } from "../App";
-import ApiRoute, {ApiLogout} from "../config/ApiSettings";
+import ApiRoute, { ApiLogout } from "../config/ApiSettings";
 
 function LoginForm(props) {
   const {
     profile: [userProfile, setUserProfile],
   } = useContext(Context);
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState(null);
@@ -27,38 +27,41 @@ function LoginForm(props) {
   const submit = async (e) => {
     e.preventDefault();
     const LOGIN_URL = ApiRoute.LOGIN_URL;
-    console.log("LOGIN_URL...",LOGIN_URL)
+    console.log("LOGIN_URL...", LOGIN_URL);
     const payLoad = {
-      email,
+      username,
       password,
     };
- try {
-     const response = await fetch(LOGIN_URL, {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       credentials: "include",
-       body: JSON.stringify(payLoad),
-     });
-     const content = await response.json();
-     //...Login is successful but will call getUser()
-     if (content?.jwt?.length > 0) {
-       await getUser();
-     } else if (content?.password_error) {
-       setError(content?.password_error);
-     } else if (content?.invalid_user_error) {
-       setError(content?.invalid_user_error);
-     }
- } catch (error) {
-  console.log("Login ERROR...",error)
-  // await ApiLogout();
- }
+    try {
+      const response = await fetch(LOGIN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payLoad),
+      });
+      const content = await response.json();
+      //...Login is successful but will call getUser()
+      if (content?.jwt?.length > 0) {
+        localStorage.setItem("jwt", JSON.stringify(content.jwt));
+        console.log("AUTH TOKEN", content);
+        await getUser(content.jwt);
+      } else if (content?.password_error) {
+        setError(content?.password_error);
+      } else if (content?.invalid_user_error) {
+        setError(content?.invalid_user_error);
+      }
+    } catch (error) {
+      console.log("Login ERROR...", error);
+      // await ApiLogout();
+    }
   };
   //...Get the logged-in user and set the profile object in LocalStorage
-  const getUser = async () => {
+  const getUser = async (token) => {
     const PROFILE_URL = ApiRoute.AUTH_USER_URL;
     const response = await fetch(PROFILE_URL, {
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
     });
     const content = await response.json();
     if (content?.username || content?.user?.username) {
@@ -75,19 +78,19 @@ function LoginForm(props) {
   return (
     <Form onSubmit={submit}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Email address</Form.Label>
+        <Form.Label>Username</Form.Label>
         <Form.Control
-          type="email"
-          placeholder="Enter email"
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Enter username"
+          onChange={(e) => setUsername(e.target.value)}
         />
-        <Form.Text className="text-muted">
-          We'll never share your email with anyone else.
-        </Form.Text>
+        {/* <Form.Text className="text-muted">
+          We'll never share your data with anyone else.
+        </Form.Text> */}
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
+        <Form.Label>Enter password</Form.Label>
         <Form.Control
           type="password"
           placeholder="Password"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import PageNavbar from "./components/PageNavbar";
 import Profile from "./pages/Profile";
@@ -16,7 +16,8 @@ export const ReportContext = React.createContext("");
 function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [client, setClient] = useState(null);
-  const [fiterQuery, setFiterQuery] = useState(null)
+  const [filterQuery, setFilterQuery] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
 
   const TOPIC = "orinlakantobad";
 
@@ -25,6 +26,14 @@ function App() {
     const profile = JSON.parse(localStorage.getItem("profile"));
     if (profile) {
       setUserProfile(profile);
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = JSON.parse(localStorage.getItem("jwt"));
+    if (token) {
+      console.log("APP TOKEN: ", token);
+      setAuthToken(token);
     }
   }, []);
 
@@ -48,30 +57,35 @@ function App() {
     };
   }, []);
 
+  const contextValue = useMemo(
+    () => ({
+      profile: [userProfile, setUserProfile],
+      mqttclient: client,
+      auth_token: authToken,
+    }),
+    [userProfile, client, authToken]
+  );
+
   return (
     <BrowserRouter>
-    <div style={{ maxWidth: "100%", overflowX: "hidden" }}>
-      <Context.Provider
-        value={{ profile: [userProfile, setUserProfile], mqttclient: client }}
-      >
-      <ReportContext.Provider value={[fiterQuery, setFiterQuery]}>
-        <PageNavbar setProfile={setUserProfile} />
-        <Route path="/" exact component={() => <Home />} />
-        <Route
-          path="/profile"
-          component={() => (
-            <Profile
-              username={userProfile?.username}
-              setName={setUserProfile}
-              profile={userProfile}
-            />
-          )}
-        />
-        <Route path="/login" component={() => <Login />} />
-        <Route path="/register" component={Register} />
-        <Route path="/access-gate" component={() => <Access />} />
-        <Route path="/drinks-access-gate" component={() => <DrinksAcess/>} />
-        <Footer/>
+      <Context.Provider value={contextValue}>
+        <ReportContext.Provider value={[filterQuery, setFilterQuery]}>
+          <PageNavbar setProfile={setUserProfile} />
+          <Route path="/" exact component={() => <Home />} />
+          <Route
+            path="/profile"
+            component={() => (
+              <Profile
+                username={userProfile?.username}
+                setName={setUserProfile}
+                profile={userProfile}
+              />
+            )}
+          />
+          <Route path="/login" component={() => <Login />} />
+          <Route path="/register" component={Register} />
+          <Route path="/access-gate" component={() => <Access />} />
+          <Route path="/drinks-access-gate" component={() => <DrinksAcess />} />
         </ReportContext.Provider>
       </Context.Provider>
       </div>
@@ -79,4 +93,4 @@ function App() {
   );
 }
 
-export default memo(App);
+export default App;

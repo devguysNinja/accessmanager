@@ -56,6 +56,7 @@ class LoginView(APIView):
             "iat": datetime.datetime.utcnow(),
         }
             token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
+            print("####...SUPER", token)
             return Response({"jwt": token}, status=status.HTTP_200_OK)
         payload = {
             "id": user.id,
@@ -63,6 +64,7 @@ class LoginView(APIView):
             "iat": datetime.datetime.utcnow(),
         }   
         token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
+        print("####....OTHERS", token)
         return Response({"jwt": token}, status=status.HTTP_200_OK)
 
 class AuthUserView(APIView):
@@ -74,8 +76,8 @@ class AuthUserView(APIView):
         try:
             user_serializer = UserSerializer(user)
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
-            profile_serialiser = UserProfileSerializer(profile)
-            return Response(data=profile_serialiser.data)
+            profile_serializer = UserProfileSerializer(profile)
+            return Response(data=profile_serializer.data)
         except UserProfile.DoesNotExist:
             return Response(data=user_serializer.data, status=status.HTTP_200_OK)
 
@@ -97,7 +99,15 @@ class UserProfileView(APIView):
 
     def post(self, request, format=None):
         request_user = request.data.pop("user", None)
-        auth_user = User.objects.get(pk=request_user["id"])
+        if request_user is None:
+            return Response(
+                {"error": "User.id field is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        auth_user = User.objects.filter(id=payload["id"]).first()
         user_data = {
             "first_name": request_user.pop("first_name", ""),
             "last_name": request_user.pop("last_name", ""),
