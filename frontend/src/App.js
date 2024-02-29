@@ -88,7 +88,7 @@ function App() {
           <Route path="/drinks-access-gate" component={() => <DrinksAcess />} />
         </ReportContext.Provider>
       </Context.Provider>
-      </div>
+      {/* </div> */}
     </BrowserRouter>
   );
 }
