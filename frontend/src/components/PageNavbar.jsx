@@ -5,6 +5,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
+import  Image  from "react-bootstrap/Image";
 
 function PageNavbar(props) {
   // const [redirect, setRedirect] = useState(false);
@@ -52,7 +53,7 @@ function PageNavbar(props) {
   return (
     <Navbar className="navbar-container">
       <Container>
-        <Navbar.Brand href="#home">Meal Manager</Navbar.Brand>
+        <Image src="/diageo.jpeg" style={{height: "70px", width: "70px", display: "block", borderRadius: "5px"}} />
         <Navbar.Toggle />
         <Navbar.Collapse className="justify-content-end" >
           <Navbar.Text className="ml-auto" >
@@ -68,9 +69,9 @@ function PageNavbar(props) {
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={profile}>
                 Profile
               </Button>
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}}  onClick={register}>
+              {/* <Button variant="outline-secondary" style={{color:'black', margin: '5px'}}  onClick={register}>
                 Register
-              </Button>
+              </Button> */}
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={login}>
                 Login
               </Button>

@@ -1,18 +1,20 @@
-import { Container, Row, Col } from "react-bootstrap";
-import React from 'react'
+import React from 'react';
 
 function Footer() {
   return (
-    <Container>
-      <h1
-       style={{
-        color: "#73D7FF",
-        textAlign: "center",
-        marginTop: "10px",
-    }}
-      >Powered by Sky-Blue Technologies</h1>
-    </Container>
-  )
+    <footer style={{
+      backgroundColor: "#87CEFA",
+      color: "#000",
+      textAlign: "center",
+      padding: "5px 20px",
+      position: "fixed",
+      left: "0",
+      bottom: "0",
+      width: "100%",
+    }}>
+      <p>Powered by Sky-Blue Technologies</p>
+    </footer>
+  );
 }
 
-export default Footer
+export default Footer;

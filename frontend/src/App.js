@@ -8,6 +8,7 @@ import Home from "./pages/Home";
 import Access from "./pages/Access";
 import DrinksAcess from "./pages/DrinksAcess";
 import { connect } from "./config/mqttService";
+import Footer from "./pages/Footer";
 
 export const Context = React.createContext("");
 export const ReportContext = React.createContext("");
@@ -49,6 +50,7 @@ function App() {
 
   return (
     <BrowserRouter>
+    <div style={{ maxWidth: "100%", overflowX: "hidden" }}>
       <Context.Provider
         value={{ profile: [userProfile, setUserProfile], mqttclient: client }}
       >
@@ -69,8 +71,10 @@ function App() {
         <Route path="/register" component={Register} />
         <Route path="/access-gate" component={() => <Access />} />
         <Route path="/drinks-access-gate" component={() => <DrinksAcess/>} />
+        <Footer/>
         </ReportContext.Provider>
       </Context.Provider>
+      </div>
     </BrowserRouter>
   );
 }

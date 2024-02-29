@@ -13,7 +13,7 @@ import ReportSelectorForm from "../components/ReportSelectorForm";
 function Profile(props) {
   // const [fiterQuery, setFiterQuery] = useState(null);
   return (
-    <div className="auth-container">
+    <div >
       <div className="auth-text">
         {props?.profile?.username
           ? ` 👋 Hi ${props?.profile?.username}`

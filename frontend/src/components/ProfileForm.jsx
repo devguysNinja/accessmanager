@@ -154,7 +154,7 @@ function ProfileForm(props) {
   </Row>
 
   <Button
-    variant="warning"
+    variant="light"
     type="submit"
     disabled={disabledAll ? true : false}
     style={{ color: 'black' }}
