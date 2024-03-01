@@ -3,7 +3,7 @@ import { Redirect } from "react-router-dom";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Context } from "../App";
-import ApiRoute, { ApiLogout } from "../config/ApiSettings";
+import ApiRoute, {ApiLogout} from "../config/ApiSettings";
 
 function LoginForm(props) {
   const {
@@ -38,6 +38,8 @@ function LoginForm(props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payLoad),
       });
+      console.log("&&&&&&...GET AUTH RESPONSE", response);
+
       const content = await response.json();
       //...Login is successful but will call getUser()
       if (content?.jwt?.length > 0) {
@@ -56,6 +58,7 @@ function LoginForm(props) {
   };
   //...Get the logged-in user and set the profile object in LocalStorage
   const getUser = async (token) => {
+    // console.log("&&&&&&...GET USER TOKEN", token);
     const PROFILE_URL = ApiRoute.AUTH_USER_URL;
     const response = await fetch(PROFILE_URL, {
       headers: {
@@ -63,8 +66,8 @@ function LoginForm(props) {
         Authorization: "Bearer " + token,
       },
     });
-    console.log("#####...USER RESPONSE: ", response);
     const content = await response.json();
+    // console.log("&&&&&&...GET USER TOKEN", content);
     if (content?.username || content?.user?.username) {
       localStorage.setItem("profile", JSON.stringify(content));
       setUserProfile(content);
@@ -76,14 +79,16 @@ function LoginForm(props) {
     return <Redirect to="/profile" />;
   }
 
+
   return (
     <Form onSubmit={submit}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
-        <Form.Label>Username</Form.Label>
+      <Form.Label>Username</Form.Label>
         <Form.Control
           type="text"
           placeholder="Enter username"
           onChange={(e) => setUsername(e.target.value)}
+
         />
         {/* <Form.Text className="text-muted">
           We'll never share your data with anyone else.
@@ -91,7 +96,7 @@ function LoginForm(props) {
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Enter password</Form.Label>
+      <Form.Label>Enter password</Form.Label>
         <Form.Control
           type="password"
           placeholder="Password"

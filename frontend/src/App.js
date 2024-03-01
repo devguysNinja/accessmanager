@@ -17,7 +17,7 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [client, setClient] = useState(null);
   const [filterQuery, setFilterQuery] = useState(null);
-  const [authToken, setAuthToken] = useState(null);
+  const [authToken, setAuthToken] = useState(null)
 
   const TOPIC = "orinlakantobad";
 
@@ -35,7 +35,7 @@ function App() {
       console.log("APP TOKEN: ", token);
       setAuthToken(token);
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     //...Connect to MQTT broker on component mount
@@ -67,8 +67,10 @@ function App() {
   );
 
   return (
+    
     <BrowserRouter>
-      <Context.Provider value={contextValue}>
+    <div style={{ maxWidth: "100%", overflowX: "hidden" }}>
+    <Context.Provider value={contextValue}>
         <ReportContext.Provider value={[filterQuery, setFilterQuery]}>
           <PageNavbar setProfile={setUserProfile} />
           <Route path="/" exact component={() => <Home />} />
@@ -86,9 +88,10 @@ function App() {
           <Route path="/register" component={Register} />
           <Route path="/access-gate" component={() => <Access />} />
           <Route path="/drinks-access-gate" component={() => <DrinksAcess />} />
-        </ReportContext.Provider>
+
+      </ReportContext.Provider>
       </Context.Provider>
-      {/* </div> */}
+      </div>
     </BrowserRouter>
   );
 }
