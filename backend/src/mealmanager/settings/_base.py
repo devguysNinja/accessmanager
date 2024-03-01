@@ -38,12 +38,19 @@ SECRET_KEY = get_secret("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# ALLOWED_HOSTS = [
+    # "*",
+# ]
+
 ALLOWED_HOSTS = [
-    "11e4-102-219-155-4.ngrok-free.app",
-    "localhost",
+    "namely-ace-beetle.ngrok-free.app",
+"localhost",
+"localhost:3000"
 ]
-
-
+# ALLOWED_HOSTS = [
+# "localhost"
+# "127.0.0.1"
+# ]
 # Application definition
 
 INSTALLED_APPS = [
@@ -67,6 +74,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # "users.middleware.CustomMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",

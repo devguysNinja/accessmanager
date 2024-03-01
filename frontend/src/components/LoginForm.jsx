@@ -66,7 +66,6 @@ function LoginForm(props) {
         Authorization: "Bearer " + token,
       },
     });
-    console.log("&&&&&&...GET USER RESPONSE", response);
     const content = await response.json();
     // console.log("&&&&&&...GET USER TOKEN", content);
     if (content?.username || content?.user?.username) {
