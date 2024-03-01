@@ -7,17 +7,24 @@ import { Context } from "../App";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
 
 function ProfileForm(props) {
-  const { auth_token } = useContext(Context);
+  const { auth_token , choice_fields} = useContext(Context);
+  console.log("@@choice_fields",choice_fields)
   const {
     profile: [userProfile, setUserProfile],
   } = useContext(Context);
   const [first_name, setFirstName] = useState("");
   const [last_name, setLastName] = useState("");
   const [reader_uid, setReaderUid] = useState("");
-  const [department, setDeptartment] = useState("");
+  const [dept, setDept] = useState("");
+  const [middle_name, setMiddleName] = useState("")
+  const [staff_id, setStaffId] = useState("");
+  const [catg, setCatg] = useState("")
+  const [staff_status, setStaffStatus] = useState("")
   const [meal_category, setMealCategory] = useState(1);
   const [disabledOne, setDisabledOne] = useState(true);
   const [disabledAll, setDisableAll] = useState(true);
+  const [loc, setLoc] = useState("");
+  const [gender, setGender] = useState("")
 
   // useEffect(()=>{
   //   const profile = JSON.parse(localStorage.getItem("profile"));
@@ -26,13 +33,16 @@ function ProfileForm(props) {
   //   }
   // },[userProfile, setUserProfile])
 
+  const {location, department, emp_status,category } = choice_fields || {}
+
+
   useEffect(() => {
     console.log("State Context @Profile Form:", userProfile);
 
     if (userProfile?.user) {
       setFirstName(userProfile?.user?.first_name);
       setLastName(userProfile?.user?.last_name);
-      setDeptartment(userProfile?.department);
+      // setDeptartment(userProfile?.department);
       setReaderUid(userProfile?.reader_uid);
       setMealCategory(userProfile?.meal_category);
     } else if (userProfile?.username) {
@@ -91,7 +101,7 @@ function ProfileForm(props) {
   };
 
   return (
-  <Form onSubmit={submit} style={{ padding: '20px', borderRadius: '10px' }}>
+  <Form onSubmit={submit} style={{ padding: '20px', borderRadius: '10px', }}>
   <Row className="mb-3">
     <Form.Group as={Col} controlId="formGridFirstName">
       <Form.Label>First Name</Form.Label>
@@ -101,6 +111,18 @@ function ProfileForm(props) {
         placeholder="First Name"
         disabled={!!disabledAll}
         onChange={(e) => setFirstName(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formGridFirstName">
+      <Form.Label>Middle Name</Form.Label>
+      <Form.Control
+        type="text"
+        value={middle_name}
+        placeholder="Middle Name"
+        disabled={!!disabledAll}
+        onChange={(e) => setMiddleName(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       />
     </Form.Group>
@@ -120,23 +142,29 @@ function ProfileForm(props) {
 
   <Row className="mb-3">
     <Form.Group as={Col} controlId="formGridDepartment">
-      <Form.Label>Department</Form.Label>
-      <Form.Control
+      <Form.Label>Staff Status</Form.Label>
+      <Form.Select
         type="text"
-        value={department}
-        placeholder="Department"
+        value={staff_status}
+        placeholder="Staff Status"
         disabled={disabledAll ? true : false}
-        onChange={(e) => setDeptartment(e.target.value)}
+        onChange={(e) => setStaffStatus(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
-      />
+      >
+        {emp_status?.map((empStatus) => (
+          <option value={empStatus.id} key={empStatus.id}>{empStatus.status}</option>
+        ))}
+        
+       
+      </Form.Select>
     </Form.Group>
 
     <Form.Group as={Col} controlId="formReaderUid">
-      <Form.Label>UID</Form.Label>
+      <Form.Label>Card Code</Form.Label>
       <Form.Control
         type="text"
         value={reader_uid}
-        placeholder="UID"
+        placeholder="Card Code"
         disabled={disabledOne || disabledAll}
         onChange={(e) => setReaderUid(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
@@ -144,16 +172,109 @@ function ProfileForm(props) {
     </Form.Group>
 
     <Form.Group as={Col} controlId="formGridMealCategory">
-      <Form.Label>Meal Category</Form.Label>
+      <Form.Label>Privilege</Form.Label>
       <Form.Control
         type="number"
         value={meal_category}
-        placeholder="Meal Category"
+        placeholder="Privilege"
         disabled={disabledOne || disabledAll}
         onChange={(e) => setMealCategory(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       />
     </Form.Group>
+
+  </Row>
+
+  <Row className="mb-3">
+    <Form.Group as={Col} controlId="formGridDepartment">
+      <Form.Label>Department</Form.Label>
+      <Form.Select
+            value={dept}
+            onChange={(e) => setDept(e.target.value)}
+            disabled={disabledAll ? true : false}
+            style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+          >
+            {department?.map((staffDept) => (
+              <option value={staffDept.id} key={staffDept.id}>{staffDept.dept_name}</option>
+            ))}
+            
+           
+          </Form.Select>
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formReaderUid">
+      <Form.Label>Category</Form.Label>
+      <Form.Select
+        type="text"
+        value={catg}
+        placeholder="Category"
+        ddisabled={disabledAll ? true : false}
+        onChange={(e) => setCatg(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      > 
+      {category?.map((staffCategory) => (
+        <option value={staffCategory.id} key={staffCategory.id}>{staffCategory.cat_name}</option>
+      ))}
+      </Form.Select>
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formGridMealCategory">
+      <Form.Label>Staff ID</Form.Label>
+      <Form.Control
+        type="text"
+        value={staff_id}
+        placeholder="Staff ID"
+        disabled={disabledAll ? true : false}
+        onChange={(e) => setStaffId(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group>
+
+  </Row>
+  {/* kk */}
+  
+  <Row className="mb-3">
+    <Form.Group as={Col} controlId="formGridDepartment">
+      <Form.Label>Location</Form.Label>
+      <Form.Select
+        type="text"
+        value={loc}
+        placeholder="Location"
+        disabled={disabledAll ? true : false}
+        onChange={(e) => setLoc(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      >
+        {location?.map((staffLocation) => (
+          <option value={staffLocation.id} key={staffLocation.id}>{staffLocation.name}</option>
+        ))}
+      </Form.Select>
+    </Form.Group>
+
+    <Form.Group as={Col} controlId="formReaderUid">
+      <Form.Label>Gender</Form.Label>
+      <Form.Select
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
+            disabled={disabledAll ? true : false}
+            style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </Form.Select>
+    </Form.Group>
+
+    {/* <Form.Group as={Col} controlId="formGridMealCategory">
+      <Form.Label>Staff ID</Form.Label>
+      <Form.Control
+        type="text"
+        value={staff_id}
+        placeholder="Staff ID"
+        disabled={disabledOne || disabledAll}
+        onChange={(e) => setStaffId(e.target.value)}
+        style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
+      />
+    </Form.Group> */}
 
   </Row>
 
