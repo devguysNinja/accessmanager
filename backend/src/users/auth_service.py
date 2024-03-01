@@ -16,6 +16,7 @@ from rest_framework.response import Response
 
 def user_auth(req):
     auth_header = req.headers.get("Authorization")
+    print("@@@@@...AUTH HEADER", auth_header)
     if not auth_header or not auth_header.startswith("Bearer "):
         return {"auth_error": "Token not present!"}
     token = auth_header.split(" ")[1]
