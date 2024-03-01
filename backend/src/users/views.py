@@ -48,13 +48,12 @@ class LoginView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        
         if user.is_superuser:
             payload = {
-            "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=365 * 10),
-            "iat": datetime.datetime.utcnow(),
-        }
+                "id": user.id,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(days=365 * 10),
+                "iat": datetime.datetime.utcnow(),
+            }
             token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
             print("####...SUPER", token)
             return Response({"jwt": token}, status=status.HTTP_200_OK)
@@ -62,10 +61,11 @@ class LoginView(APIView):
             "id": user.id,
             "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=2),
             "iat": datetime.datetime.utcnow(),
-        }   
+        }
         token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
         print("####....OTHERS", token)
         return Response({"jwt": token}, status=status.HTTP_200_OK)
+
 
 class AuthUserView(APIView):
     def get(self, request, pk=None):
@@ -77,9 +77,12 @@ class AuthUserView(APIView):
             user_serializer = UserSerializer(user)
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
             profile_serializer = UserProfileSerializer(profile)
-            return Response(data=profile_serializer.data)
+            return Response(data=profile_serializer.data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
-            return Response(data=user_serializer.data, status=status.HTTP_200_OK)
+            return Response(
+                data=user_serializer.data,
+                status=status.HTTP_200_OK,
+            )
 
 
 class LogoutView(APIView):
@@ -119,7 +122,7 @@ class UserProfileView(APIView):
         user_serializer = UserSerializer(instance=auth_user, data=user_data)
         modified_data = {**request.data, "user": request_user["id"]}
         profile_serializer = UserProfileSerializer(data=modified_data)
-        
+
         if profile_serializer.is_valid() and user_serializer.is_valid():
             user_serializer.save()
             profile_serializer.save()
@@ -155,7 +158,7 @@ class UserProfileDetailAPIView(APIView):
         profile = self.get_object(pk)
         serializer = UserProfileSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def patch(self, request, pk, format=None):
         request_user = request.data.pop("user", None)
         if request_user is None:
@@ -166,11 +169,10 @@ class UserProfileDetailAPIView(APIView):
         try:
             auth_user = User.objects.get(pk=request_user["id"])
         except User.DoesNotExist:
-            return Response({
-                "errors":f"User with id {request_user['id']} not found!"
-            },
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+            return Response(
+                {"errors": f"User with id {request_user['id']} not found!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         user_data = {
             "first_name": request_user.pop("first_name", auth_user.first_name),
             "last_name": request_user.pop("last_name", auth_user.last_name),

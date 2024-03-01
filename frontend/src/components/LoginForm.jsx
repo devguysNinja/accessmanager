@@ -63,6 +63,7 @@ function LoginForm(props) {
         Authorization: "Bearer " + token,
       },
     });
+    console.log("#####...USER RESPONSE: ", response);
     const content = await response.json();
     if (content?.username || content?.user?.username) {
       localStorage.setItem("profile", JSON.stringify(content));
