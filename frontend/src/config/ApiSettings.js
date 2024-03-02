@@ -8,6 +8,7 @@ class ApiRoute {
   static BASE_PATH = "/api/v1";
   static BASE_URL = `${ApiRoute.API_DOMAIN}${ApiRoute.BASE_PATH}`;
   static PROFILE_URL = `${ApiRoute.BASE_URL}/profiles`;
+  static PROFILE_CHOICES_URL = `${ApiRoute.BASE_URL}/profile-choices`;
   // static PROFILE_DETAILS_URL = `${ApiRoute.BASE_URL}/profiles/${id}`;
   static LOGIN_URL = `${ApiRoute.BASE_URL}/login`;
   static AUTH_USER_URL = `${ApiRoute.BASE_URL}/auth-user`;
