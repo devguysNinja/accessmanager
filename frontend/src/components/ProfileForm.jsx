@@ -18,12 +18,12 @@ function ProfileForm(props) {
   const [dept, setDept] = useState("");
   const [middle_name, setMiddleName] = useState("")
   const [staff_id, setStaffId] = useState("");
-  const [catg, setCatg] = useState("")
+  const [staff_catg, setStaff_Catg] = useState("")
   const [staff_status, setStaffStatus] = useState("")
-  const [meal_category, setMealCategory] = useState(1);
+  const [privilege, setPrivilege] = useState(1);
   const [disabledOne, setDisabledOne] = useState(true);
   const [disabledAll, setDisableAll] = useState(true);
-  const [loc, setLoc] = useState("");
+  const [staff_loc, setStaff_Loc] = useState("");
   const [gender, setGender] = useState("")
 
   // useEffect(()=>{
@@ -42,9 +42,9 @@ function ProfileForm(props) {
     if (userProfile?.user) {
       setFirstName(userProfile?.user?.first_name);
       setLastName(userProfile?.user?.last_name);
-      // setDeptartment(userProfile?.department);
+      setDept(userProfile?.department);
       setReaderUid(userProfile?.reader_uid);
-      setMealCategory(userProfile?.meal_category);
+      setPrivilege(userProfile?.privilege);
     } else if (userProfile?.username) {
       setFirstName(userProfile?.first_name);
       setLastName(userProfile?.last_name);
@@ -69,10 +69,16 @@ function ProfileForm(props) {
     e.preventDefault();
     const PROFILE_URL = ApiRoute.PROFILE_URL;
     const payLoad = {
-      user: { first_name, last_name },
-      department,
-      meal_category,
+      user: { id:userProfile.id,first_name,middle_name, last_name },
+      dept,
+      privilege,
       reader_uid,
+      staff_loc,
+      gender,
+      staff_catg,
+      staff_id,
+      staff_status,
+
     };
     try {
       const REQUEST_METHOD = userProfile?.user ? "PATCH" : "POST";
@@ -165,7 +171,7 @@ function ProfileForm(props) {
         type="text"
         value={reader_uid}
         placeholder="Card Code"
-        disabled={disabledOne || disabledAll}
+        disabled={disabledAll ? true : false}
         onChange={(e) => setReaderUid(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       />
@@ -175,10 +181,10 @@ function ProfileForm(props) {
       <Form.Label>Privilege</Form.Label>
       <Form.Control
         type="number"
-        value={meal_category}
+        value={privilege}
         placeholder="Privilege"
         disabled={disabledOne || disabledAll}
-        onChange={(e) => setMealCategory(e.target.value)}
+        onChange={(e) => setPrivilege(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       />
     </Form.Group>
@@ -206,10 +212,10 @@ function ProfileForm(props) {
       <Form.Label>Category</Form.Label>
       <Form.Select
         type="text"
-        value={catg}
+        value={staff_catg}
         placeholder="Category"
-        ddisabled={disabledAll ? true : false}
-        onChange={(e) => setCatg(e.target.value)}
+        disabled={disabledAll ? true : false}
+        onChange={(e) => setStaff_Catg(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       > 
       {category?.map((staffCategory) => (
@@ -238,10 +244,10 @@ function ProfileForm(props) {
       <Form.Label>Location</Form.Label>
       <Form.Select
         type="text"
-        value={loc}
+        value={staff_loc}
         placeholder="Location"
         disabled={disabledAll ? true : false}
-        onChange={(e) => setLoc(e.target.value)}
+        onChange={(e) => setStaff_Loc(e.target.value)}
         style={{ backgroundColor: 'transparent', color: 'black', border: 'none', borderBottom: '1px solid black' }}
       >
         {location?.map((staffLocation) => (

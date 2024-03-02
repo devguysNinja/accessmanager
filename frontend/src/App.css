@@ -3,7 +3,7 @@
 *{
   font-family: "Raleway", sans-serif;
   font-optical-sizing: auto;
-  font-style: normal;
+  font-size: 18px;
 }
 .middle-place {
     margin-left: auto;
@@ -43,6 +43,7 @@
 
 .drink-container {
   margin-top: 20px;
+  font-size: 20px;
 }
 
 .drink-item {
