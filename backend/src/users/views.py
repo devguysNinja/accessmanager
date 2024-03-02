@@ -119,6 +119,7 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
+        print("CREATE PROFILE DATA: ",request.data)
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(

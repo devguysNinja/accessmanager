@@ -37,6 +37,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "category",
         "department",
         "staff_status",
+        "employee_id",
         "location",
         "profile_image",
     ]
