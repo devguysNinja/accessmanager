@@ -1,5 +1,11 @@
 from typing import Any
 import jwt, datetime
+from .field_choices_serializers import (
+    DepartmentField,
+    EmployeeCategoryField,
+    EmployeeStatusField,
+    LocationField,
+)
 from mealmanager.settings._base import JWT_SALT
 from django.core.exceptions import ObjectDoesNotExist
 from openpyxl import Workbook, load_workbook
@@ -12,11 +18,23 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from .serializers import (
     BatchUploadUserProfileSerializer,
+    DepartmentSerializer,
+    EmployeeCategorySerializer,
+    EmployeeStatusSerializer,
+    LocationSerializer,
     UserSerializer,
     UserProfileSerializer,
     AvatarSerializer,
 )
-from .models import User, UserProfile, EmployeeBatchUpload
+from .models import (
+    Department,
+    EmployeeCategory,
+    EmployeeStatus,
+    Location,
+    User,
+    UserProfile,
+    EmployeeBatchUpload,
+)
 from .auth_service import user_auth
 
 
@@ -209,6 +227,31 @@ class UserProfileDetailAPIView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+
+class ProfileFieldChoicesView(APIView):
+    def get(self, request, format=None):
+        locations = Location.objects.all()  # .values("id", "name")
+        print("Location: ", locations)
+        departments = Department.objects.all()
+        emp_status = EmployeeStatus.objects.all()
+        categories = EmployeeCategory.objects.all()
+
+        loc_serializer = LocationField(locations, many=True)
+        departments_serializer = DepartmentField(departments, many=True)
+        emp_status_serializer = EmployeeStatusField(emp_status, many=True)
+        categories_serializer = EmployeeCategoryField(categories, many=True)
+
+        choice_dict_values = [
+            loc_serializer.data,
+            departments_serializer.data,
+            emp_status_serializer.data,
+            categories_serializer.data,
+        ]
+        choice_dict_keys = ["location", "department", "emp_status", "category"]
+        choice_dict = dict(zip(choice_dict_keys, choice_dict_values))
+
+        return Response(data=choice_dict, status=status.HTTP_200_OK)
 
 
 class UploadProfileImageView(APIView):
