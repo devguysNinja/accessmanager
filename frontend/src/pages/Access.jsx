@@ -79,7 +79,7 @@ function Access() {
     }
   }, [brokerMessage]);
 
-  let { username } = ownerDetails || "";
+  let { username, department } = ownerDetails || "";
 
   return (
     <div style={{ marginBottom: "40px"}}>
@@ -104,8 +104,8 @@ function Access() {
                   color:"#000"
                 }}
               >
-                <b >{Capitalize(username)}</b>
-                <b><p>Department</p></b>
+                <b >{Capitalize(username)}</b> <br />
+                <b>{Capitalize(department)}</b>
               </div>
             </LeftCardLayout>
           </Col>

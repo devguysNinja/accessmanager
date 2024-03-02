@@ -51,6 +51,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "reader_uid",
+            "employee_id",
+            "gender",
             "category",
             "profile_image",
             "department",
@@ -63,10 +65,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         }
 
     def update(self, instance, validated_data):
-        instance.category = validated_data.get("category", instance.category)
-        instance.department = validated_data.get("department", instance.department)
-        instance.location = validated_data.get("location", instance.location)
-        instance.staff_status = validated_data.get("staff_status", instance.staff_status)
+        instance.category = int(validated_data.get("category", instance.category))
+        instance.department = int(validated_data.get("department", instance.department))
+        instance.location = int(validated_data.get("location", instance.location))
+        instance.staff_status = int(validated_data.get("staff_status", instance.staff_status))
+        instance.employee_id = validated_data.get("employee_id", instance.employee_id)
+        instance.gender = validated_data.get("gender", instance.gender)
         instance.reader_uid = validated_data.get("reader_uid", instance.reader_uid)
         instance.save()
         return instance

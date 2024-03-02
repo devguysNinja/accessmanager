@@ -87,7 +87,7 @@ function DrinksAccess() {
                         selectedCategory === category ? " active" : ""
                       }`}
                       onClick={() => handleCategorySelect(category)}
-                      style={{ margin: "5px" }}
+                      style={{ margin: "5px", fontSize:"20px" }}
                     >
                       {category}
                     </button>

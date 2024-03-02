@@ -12,7 +12,7 @@ export default function AccessRightFeeder({ userData }) {
 
   console.log("@@@ASCR_URL:", srcUrl)
   return (
-      <div style={{textAlign: "center"}}>
+      <div style={{textAlign: "center", height: "165px"}}>
         <Image
           src={srcUrl || "headmug.jpeg"}
           roundedCircle
