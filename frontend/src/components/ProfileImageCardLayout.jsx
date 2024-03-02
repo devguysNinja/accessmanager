@@ -58,7 +58,7 @@ export default function ProfileImageCardLayout() {
     const { profile_image } = await response.json();
     const new_profile = { ...userProfile, profile_image };
     localStorage.setItem("profile", JSON.stringify(new_profile));
-    if (profile_image == undefined ||"") {
+    if (profile_image === undefined ||"") {
     setProfilePix("headmug.jpeg");
 
     }
@@ -67,7 +67,7 @@ export default function ProfileImageCardLayout() {
   };
 
   return (
-    <Card>
+    <Card style={{width: "350px", height: "330px"}}>
       <Image
         src={profilePix }
         roundedCircle
@@ -77,7 +77,7 @@ export default function ProfileImageCardLayout() {
       />
       <Card.Body>
         <Form onSubmit={uploadPix}>
-          <Form.Group controlId="formFileSm" className="mb-3">
+          <Form.Group controlId="formFileSm" className="mb-4">
             {/* <Form.Label>Avatar</Form.Label> */}
             <Form.Control
               type="file"
