@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Redirect } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
 import  Image  from "react-bootstrap/Image";
+import { Context } from "../App";
 
 function PageNavbar(props) {
   // const [redirect, setRedirect] = useState(false);
@@ -23,9 +24,9 @@ function PageNavbar(props) {
   };
 
   //...register Handler
-  const register = (e) => {
-    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/register`);
-  };
+  // const register = (e) => {
+  //   window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/register`);
+  // };
 
   //...Profile Handler
   const profile = (e) => {
@@ -50,6 +51,12 @@ function PageNavbar(props) {
   // if (redirect) {
   //   window.location.assign(ApiRoute.FRONTEND_DOMAIN);
   // }
+
+  // get user profile
+  const {
+    profile: [userProfile, setUserProfile],
+  } = useContext(Context);
+
   return (
     <Navbar className="navbar-container">
       <Container>
@@ -66,18 +73,32 @@ function PageNavbar(props) {
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
                 Admin
               </Button>
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={profile}>
-                Profile
-              </Button>
-              {/* <Button variant="outline-secondary" style={{color:'black', margin: '5px'}}  onClick={register}>
-                Register
-              </Button> */}
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={login}>
+              {userProfile ? (
+              <>
+                <Button
+                  variant="outline-secondary"
+                  style={{ color: "black", margin: "5px" }}
+                  onClick={profile}
+                >
+                  Profile
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  style={{ color: "black", margin: "5px" }}
+                  onClick={logout}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="outline-secondary"
+                style={{ color: "black", margin: "5px" }}
+                onClick={login}
+              >
                 Login
               </Button>
-              <Button variant="outline-secondary"  style={{color:'black', margin: '5px'}} onClick={logout}>
-                Logout
-              </Button>
+            )}
           </Navbar.Text>
         </Navbar.Collapse>
       </Container>

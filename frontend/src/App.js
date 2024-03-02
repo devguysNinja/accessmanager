@@ -9,6 +9,7 @@ import Access from "./pages/Access";
 import DrinksAcess from "./pages/DrinksAcess";
 import { connect } from "./config/mqttService";
 import Footer from "./pages/Footer";
+import ApiRoute from "./config/ApiSettings";
 
 export const Context = React.createContext("");
 export const ReportContext = React.createContext("");
@@ -18,10 +19,12 @@ function App() {
   const [client, setClient] = useState(null);
   const [filterQuery, setFilterQuery] = useState(null);
   const [authToken, setAuthToken] = useState(null)
+  const [profileFields, setProfileFields] = useState(null)
 
   const TOPIC = "orinlakantobad";
 
   console.log("App @UserProfile:", userProfile);
+  console.log("#####...App @UserProfileChoiceField:", profileFields);
   useEffect(() => {
     const profile = JSON.parse(localStorage.getItem("profile"));
     if (profile) {
@@ -36,6 +39,27 @@ function App() {
       setAuthToken(token);
     }
   }, [])
+
+ const  PROFILE_CHOICES_URL = ApiRoute.PROFILE_CHOICES_URL
+ useEffect(() => {
+  const fetchProfileChoices = async () => {
+    try {
+      const response = await fetch(PROFILE_CHOICES_URL, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const content = await response.json();
+      if (content) {
+        setProfileFields(content);
+      }
+    } catch (error) {
+      console.error("Error fetching profile choices:", error);
+    }
+  };
+
+  fetchProfileChoices();
+}, []);
 
   useEffect(() => {
     //...Connect to MQTT broker on component mount
@@ -62,10 +86,10 @@ function App() {
       profile: [userProfile, setUserProfile],
       mqttclient: client,
       auth_token: authToken,
+      choice_fields: profileFields
     }),
-    [userProfile, client, authToken]
+    [userProfile, client, authToken, profileFields]
   );
-
   return (
     
     <BrowserRouter>
@@ -88,7 +112,7 @@ function App() {
           <Route path="/register" component={Register} />
           <Route path="/access-gate" component={() => <Access />} />
           <Route path="/drinks-access-gate" component={() => <DrinksAcess />} />
-
+          <Footer/>
       </ReportContext.Provider>
       </Context.Provider>
       </div>

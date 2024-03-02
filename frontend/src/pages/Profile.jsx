@@ -19,7 +19,7 @@ function Profile(props) {
           ? ` 👋 Hi ${props?.profile?.username}`
           : props?.profile?.user
           ? `Hi ${props?.profile?.user?.username}`
-          : "You are not authenticated "};
+          : "You are not authenticated "}
       </div>
       <Container >
         <Row style={{ backgroundColor: "none" }}>
