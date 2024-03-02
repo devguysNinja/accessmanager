@@ -1,7 +1,7 @@
 from rest_framework.exceptions import NotFound
 from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from .models import Department, EmployeeStatus, Location, User, UserProfile
+from .models import Department, EmployeeCategory, EmployeeStatus, Location, User, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -92,7 +92,7 @@ class EmployeeStatusSerializer(serializers.ModelSerializer):
 
 class EmployeeCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = EmployeeStatus
+        model = EmployeeCategory
         fields = "__all__"
 
 
