@@ -67,7 +67,7 @@ function LoginForm(props) {
       },
     });
     const content = await response.json();
-    // console.log("&&&&&&...GET USER TOKEN", content);
+    // console.log("&&&&&&...GET USER OBJECT", content);
     if (content?.username || content?.user?.username) {
       localStorage.setItem("profile", JSON.stringify(content));
       setUserProfile(content);
