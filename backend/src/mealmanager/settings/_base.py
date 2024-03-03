@@ -39,14 +39,10 @@ SECRET_KEY = get_secret("DJANGO_SECRET_KEY")
 DEBUG = True
 
 # ALLOWED_HOSTS = [
-    # "*",
+# "*",
 # ]
 
-ALLOWED_HOSTS = [
-    "namely-ace-beetle.ngrok-free.app",
-"localhost",
-"localhost:3000"
-]
+ALLOWED_HOSTS = ["namely-ace-beetle.ngrok-free.app", "localhost", "localhost:3000"]
 # ALLOWED_HOSTS = [
 # "localhost"
 # "127.0.0.1"

@@ -51,6 +51,7 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data["username"]
         password = request.data["password"]
+        print("PASSWORD: ", password)
 
         user = User.objects.filter(username=username).first()
         if user is None:
@@ -95,7 +96,9 @@ class AuthUserView(APIView):
             user_serializer = UserSerializer(user)
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
             profile_serializer = UserProfileSerializer(profile)
-            return Response(data=profile_serializer.data, status=status.HTTP_200_OK)
+            profile_serializer.data['user'] = user_serializer.data
+            response_data = {**profile_serializer.data, "user":{**user_serializer.data}}
+            return Response(data=response_data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response(
                 data=user_serializer.data,
@@ -119,7 +122,7 @@ class UserProfileView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        print("CREATE PROFILE DATA: ",request.data)
+        print("CREATE PROFILE DATA: ", request.data)
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(
@@ -149,6 +152,7 @@ class UserProfileView(APIView):
                 **profile_serializer.data,
                 "user": {**user_serializer.data},
             }
+            print("###...RESPONSE PROFILE DATA", response_data)
             return Response(response_data, status=status.HTTP_201_CREATED)
         profile_serializer.is_valid()
         user_serializer.is_valid()

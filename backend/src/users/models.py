@@ -49,7 +49,7 @@ class UserProfile(models.Model):
         "Department", null=True, on_delete=models.SET_NULL
     )
     location = models.ForeignKey("Location", null=True, on_delete=models.SET_NULL)
-    staff_status = models.ForeignKey("EmployeeStatus", null=True, on_delete=models.SET_NULL)
+    employee_status = models.ForeignKey("EmployeeStatus", null=True, on_delete=models.SET_NULL)
     # shift = models.ForeignKey(ShiftManager, null=True, on_delete=models.SET_NULL)
     
 
