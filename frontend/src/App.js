@@ -59,7 +59,7 @@ function App() {
   };
 
   fetchProfileChoices();
-}, []);
+}, [PROFILE_CHOICES_URL]);
 
   useEffect(() => {
     //...Connect to MQTT broker on component mount
