@@ -48,6 +48,10 @@ function PageNavbar(props) {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/drinks-access-gate`);
   };
 
+  const schedule = (e) => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/schedule`);
+  };
+
   // if (redirect) {
   //   window.location.assign(ApiRoute.FRONTEND_DOMAIN);
   // }
@@ -72,6 +76,9 @@ function PageNavbar(props) {
               </Button>
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
                 Admin
+              </Button>
+              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={schedule}>
+                Schedule
               </Button>
               {userProfile ? (
               <>

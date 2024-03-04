@@ -1,0 +1,65 @@
+.schedule-container {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .schedule-header {
+    margin-bottom: 20px;
+  }
+  
+  .date-picker-container {
+    display: inline-block;
+  }
+  
+  .error-message {
+    color: red;
+  }
+  
+  .group-select-container {
+    margin-bottom: 20px;
+  }
+  
+  .shift-selection {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .shift-day {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  /* Styling for select dropdown */
+  select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+
+  }
+  
+  /* Styling for options inside select dropdown */
+  select option {
+    background-color: white;
+    color: black;
+  }
+
+ 
+
+  label {
+    font-size: 23px;
+    
+  }
+  
+  button {
+    margin-top: 60px;
+    border-radius: 5px;
+    padding: 10px;
+  }
+
+  button:hover {
+    background-color: gold;
+  }
+  

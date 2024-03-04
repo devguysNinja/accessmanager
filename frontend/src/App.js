@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Access from "./pages/Access";
 import DrinksAcess from "./pages/DrinksAcess";
+import Schedule from "./pages/Schedule";
 import { connect } from "./config/mqttService";
 import Footer from "./pages/Footer";
 import ApiRoute from "./config/ApiSettings";
@@ -112,6 +113,7 @@ function App() {
           <Route path="/register" component={Register} />
           <Route path="/access-gate" component={() => <Access />} />
           <Route path="/drinks-access-gate" component={() => <DrinksAcess />} />
+          <Route path="/schedule" component={() => <Schedule/>}/>
           <Footer/>
       </ReportContext.Provider>
       </Context.Provider>
