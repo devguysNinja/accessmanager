@@ -36,7 +36,7 @@ class User(AbstractUser):
 
 class UserProfile(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
-    id = models.UUIDField(default=uuid4, editable=False)
+    id = models.UUIDField(default=uuid4, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     employee_id = models.CharField(max_length=128, default=dummy_unique_str, unique=True)
     reader_uid = models.CharField(max_length=128, default=dummy_unique_str, unique=True)

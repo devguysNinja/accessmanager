@@ -81,9 +81,12 @@ function ProfileForm(props) {
   //...handles Form submission Events
   const submit = async (e) => {
     e.preventDefault();
-    const PROFILE_URL = ApiRoute.PROFILE_URL;
+    const PROFILE_URL = userProfile?.user
+      ? `${ApiRoute.PROFILE_URL}/${userProfile?.id}`
+      : ApiRoute.PROFILE_URL;
+    const userObjId = userProfile?.user ? userProfile.user.id :userProfile.id 
     const payLoad = {
-      user: { id: userProfile.id, first_name, middle_name, last_name },
+      user: { id: userObjId, first_name, middle_name, last_name },
       department: dept,
       privilege,
       reader_uid,
