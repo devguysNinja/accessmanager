@@ -63,12 +63,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "id": {"read_only": True},
             # "reader_uid": {"read_only": True},
         }
+        lookup_url_kwargs = 'reader_uid'
 
     def update(self, instance, validated_data):
-        instance.category = int(validated_data.get("category", instance.category))
-        instance.department = int(validated_data.get("department", instance.department))
-        instance.location = int(validated_data.get("location", instance.location))
-        instance.staff_status = int(validated_data.get("staff_status", instance.staff_status))
+        instance.category = (validated_data.get("category", instance.category))
+        instance.department = (validated_data.get("department", instance.department))
+        instance.location = (validated_data.get("location", instance.location))
+        instance.staff_status = (validated_data.get("staff_status", instance.employee_status))
         instance.employee_id = validated_data.get("employee_id", instance.employee_id)
         instance.gender = validated_data.get("gender", instance.gender)
         instance.reader_uid = validated_data.get("reader_uid", instance.reader_uid)
