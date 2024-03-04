@@ -1,5 +1,6 @@
 from typing import Any
 import jwt, datetime
+
 from .field_choices_serializers import (
     DepartmentField,
     EmployeeCategoryField,
@@ -16,6 +17,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
+from django.shortcuts import get_object_or_404
 from .serializers import (
     BatchUploadUserProfileSerializer,
     DepartmentSerializer,
@@ -96,8 +98,12 @@ class AuthUserView(APIView):
             user_serializer = UserSerializer(user)
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
             profile_serializer = UserProfileSerializer(profile)
-            profile_serializer.data['user'] = user_serializer.data
-            response_data = {**profile_serializer.data, "user":{**user_serializer.data}}
+            profile_serializer.data["user"] = user_serializer.data
+            response_data = {
+                **profile_serializer.data,
+                "user": {**user_serializer.data},
+            }
+            response_data["id"] = str(response_data["id"]).replace("-", "")
             return Response(data=response_data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response(
@@ -115,7 +121,6 @@ class LogoutView(APIView):
 
 
 class UserProfileView(APIView):
-
     def get(self, request, format=None):
         profiles = UserProfile.objects.all()
         serializer = UserProfileSerializer(profiles, many=True)
@@ -168,21 +173,32 @@ class UserProfileView(APIView):
         return response
 
 
-class UserProfileDetailAPIView(APIView):
-    def get_object(self, pk):
-        # lookup_field = 'id'
-        try:
-            profile = UserProfile.objects.get(id=pk)
-            return profile
-        except UserProfile.DoesNotExist:
-            return None
 
-    def get(self, request, pk, format=None):
-        profile = self.get_object(pk)
-        serializer = UserProfileSerializer(profile)
+
+
+def get_object_by_lookup_field(model, lookup_field, lookup_value):
+    """
+    Retrieve an object using the specified lookup field and value.
+    """
+    lookup_kwargs = {lookup_field: lookup_value}
+    return get_object_or_404(model, **lookup_kwargs)
+
+
+class UserProfileDetailAPIView(APIView):
+    lookup_url_kwargs = "id"
+    lookup_field = "id"
+    
+    def get(self, request, id, format=None):
+        profile_instance = get_object_by_lookup_field(
+                UserProfile, self.lookup_field, id
+            )
+        serializer = UserProfileSerializer(profile_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, pk, format=None):
+    def patch(self, request, id, format=None):
+        profile_instance = get_object_by_lookup_field(
+            UserProfile, self.lookup_field, id
+        )
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(
@@ -205,14 +221,13 @@ class UserProfileDetailAPIView(APIView):
             "password": auth_user.password,
         }
         user_serializer = UserSerializer(instance=auth_user, data=user_data)
-        profile = self.get_object(pk)
-        if profile is None:
+        if profile_instance is None:
             return Response(
-                {"error": f"User profile with id <{pk}> not found!"},
+                {"error": f"User profile with id <{id}> not found!"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         modified_data = {**request.data, "user": request_user["id"]}
-        profile_serializer = UserProfileSerializer(instance=profile, data=modified_data)
+        profile_serializer = UserProfileSerializer(instance=profile_instance, data=modified_data)
         if profile_serializer.is_valid() and user_serializer.is_valid():
             user_serializer.save()
             profile_serializer.save()
@@ -232,7 +247,6 @@ class UserProfileDetailAPIView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
-
 
 class ProfileFieldChoicesView(APIView):
     def get(self, request, format=None):
