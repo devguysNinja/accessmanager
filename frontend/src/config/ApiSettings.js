@@ -2,8 +2,8 @@ class ApiRoute {
   static API_ADMIN = process.env.REACT_APP_API_ADMIN;
   static FRONTEND_DOMAIN = window.location.origin;
 
-  //  static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app" 
-  static API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
+   static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app" 
+  // static API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
 
   static BASE_PATH = "/api/v1";
   static BASE_URL = `${ApiRoute.API_DOMAIN}${ApiRoute.BASE_PATH}`;
@@ -28,10 +28,14 @@ export async function ApiLogout(url = ApiRoute.LOGOUT_URL, metd = "POST", cred =
       credentials: cred ? "include" : "omit",
     });
     localStorage.removeItem("profile");
+    localStorage.removeItem("jwt");
+
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/login`);
   } catch (error) {
     console.log("!!!!!!!!!!!!!!!API Logout Error: ", error.message);
     localStorage.removeItem("profile");
+    localStorage.removeItem("jwt");
+
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/`);
   }
 }
