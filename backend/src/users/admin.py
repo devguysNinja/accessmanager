@@ -36,7 +36,8 @@ class UserProfileAdmin(admin.ModelAdmin):
         "reader_uid",
         "category",
         "department",
-        "staff_status",
+        "employee_status",
+        "employee_id",
         "location",
         "profile_image",
     ]

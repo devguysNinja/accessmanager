@@ -1,5 +1,12 @@
 from typing import Any
 import jwt, datetime
+
+from .field_choices_serializers import (
+    DepartmentField,
+    EmployeeCategoryField,
+    EmployeeStatusField,
+    LocationField,
+)
 from mealmanager.settings._base import JWT_SALT
 from django.core.exceptions import ObjectDoesNotExist
 from openpyxl import Workbook, load_workbook
@@ -10,13 +17,26 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
+from django.shortcuts import get_object_or_404
 from .serializers import (
     BatchUploadUserProfileSerializer,
+    DepartmentSerializer,
+    EmployeeCategorySerializer,
+    EmployeeStatusSerializer,
+    LocationSerializer,
     UserSerializer,
     UserProfileSerializer,
     AvatarSerializer,
 )
-from .models import User, UserProfile, EmployeeBatchUpload
+from .models import (
+    Department,
+    EmployeeCategory,
+    EmployeeStatus,
+    Location,
+    User,
+    UserProfile,
+    EmployeeBatchUpload,
+)
 from .auth_service import user_auth
 
 
@@ -33,6 +53,7 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data["username"]
         password = request.data["password"]
+        print("PASSWORD: ", password)
 
         user = User.objects.filter(username=username).first()
         if user is None:
@@ -77,7 +98,13 @@ class AuthUserView(APIView):
             user_serializer = UserSerializer(user)
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
             profile_serializer = UserProfileSerializer(profile)
-            return Response(data=profile_serializer.data, status=status.HTTP_200_OK)
+            profile_serializer.data["user"] = user_serializer.data
+            response_data = {
+                **profile_serializer.data,
+                "user": {**user_serializer.data},
+            }
+            response_data["id"] = str(response_data["id"]).replace("-", "")
+            return Response(data=response_data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
             return Response(
                 data=user_serializer.data,
@@ -94,13 +121,13 @@ class LogoutView(APIView):
 
 
 class UserProfileView(APIView):
-
     def get(self, request, format=None):
         profiles = UserProfile.objects.all()
         serializer = UserProfileSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
+        print("CREATE PROFILE DATA: ", request.data)
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(
@@ -130,6 +157,7 @@ class UserProfileView(APIView):
                 **profile_serializer.data,
                 "user": {**user_serializer.data},
             }
+            print("###...RESPONSE PROFILE DATA", response_data)
             return Response(response_data, status=status.HTTP_201_CREATED)
         profile_serializer.is_valid()
         user_serializer.is_valid()
@@ -145,21 +173,32 @@ class UserProfileView(APIView):
         return response
 
 
-class UserProfileDetailAPIView(APIView):
-    def get_object(self, pk):
-        # lookup_field = 'id'
-        try:
-            profile = UserProfile.objects.get(id=pk)
-            return profile
-        except UserProfile.DoesNotExist:
-            return None
 
-    def get(self, request, pk, format=None):
-        profile = self.get_object(pk)
-        serializer = UserProfileSerializer(profile)
+
+
+def get_object_by_lookup_field(model, lookup_field, lookup_value):
+    """
+    Retrieve an object using the specified lookup field and value.
+    """
+    lookup_kwargs = {lookup_field: lookup_value}
+    return get_object_or_404(model, **lookup_kwargs)
+
+
+class UserProfileDetailAPIView(APIView):
+    lookup_url_kwargs = "id"
+    lookup_field = "id"
+    
+    def get(self, request, id, format=None):
+        profile_instance = get_object_by_lookup_field(
+                UserProfile, self.lookup_field, id
+            )
+        serializer = UserProfileSerializer(profile_instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, pk, format=None):
+    def patch(self, request, id, format=None):
+        profile_instance = get_object_by_lookup_field(
+            UserProfile, self.lookup_field, id
+        )
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(
@@ -182,14 +221,13 @@ class UserProfileDetailAPIView(APIView):
             "password": auth_user.password,
         }
         user_serializer = UserSerializer(instance=auth_user, data=user_data)
-        profile = self.get_object(pk)
-        if profile is None:
+        if profile_instance is None:
             return Response(
-                {"error": f"User profile with id <{pk}> not found!"},
+                {"error": f"User profile with id <{id}> not found!"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         modified_data = {**request.data, "user": request_user["id"]}
-        profile_serializer = UserProfileSerializer(instance=profile, data=modified_data)
+        profile_serializer = UserProfileSerializer(instance=profile_instance, data=modified_data)
         if profile_serializer.is_valid() and user_serializer.is_valid():
             user_serializer.save()
             profile_serializer.save()
@@ -209,6 +247,30 @@ class UserProfileDetailAPIView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
+class ProfileFieldChoicesView(APIView):
+    def get(self, request, format=None):
+        locations = Location.objects.all()  # .values("id", "name")
+        print("Location: ", locations)
+        departments = Department.objects.all()
+        emp_status = EmployeeStatus.objects.all()
+        categories = EmployeeCategory.objects.all()
+
+        loc_serializer = LocationField(locations, many=True)
+        departments_serializer = DepartmentField(departments, many=True)
+        emp_status_serializer = EmployeeStatusField(emp_status, many=True)
+        categories_serializer = EmployeeCategoryField(categories, many=True)
+
+        choice_dict_values = [
+            loc_serializer.data,
+            departments_serializer.data,
+            emp_status_serializer.data,
+            categories_serializer.data,
+        ]
+        choice_dict_keys = ["location", "department", "emp_status", "category"]
+        choice_dict = dict(zip(choice_dict_keys, choice_dict_values))
+
+        return Response(data=choice_dict, status=status.HTTP_200_OK)
 
 
 class UploadProfileImageView(APIView):

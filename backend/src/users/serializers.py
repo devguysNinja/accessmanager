@@ -1,7 +1,7 @@
 from rest_framework.exceptions import NotFound
 from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from .models import Department, EmployeeStatus, Location, User, UserProfile
+from .models import Department, EmployeeCategory, EmployeeStatus, Location, User, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -33,13 +33,13 @@ class UserSerializer(serializers.ModelSerializer):
         password = validated_data.pop("password", None)
         validated_data.pop("username", None)
         validated_data.pop("email", None)
-        if password is not None:
-            instance.set_password(password)
+        # if password is not None:
+        #     instance.set_password(password)
         instance.first_name = validated_data.pop("first_name", instance.first_name)
         instance.last_name = validated_data.pop("last_name", instance.last_name)
         instance.middle_name = validated_data.pop("middle_name", instance.middle_name)
         instance.save(
-            update_fields=["first_name", "last_name", "middle_name", "password"]
+            update_fields=["first_name", "last_name", "middle_name", ]
         )
         return instance
 
@@ -51,22 +51,27 @@ class UserProfileSerializer(serializers.ModelSerializer):
             "id",
             "user",
             "reader_uid",
+            "employee_id",
+            "gender",
             "category",
             "profile_image",
             "department",
             "location",
-            "staff_status",
+            "employee_status",
         ]
         extra_kwargs = {
             "id": {"read_only": True},
             # "reader_uid": {"read_only": True},
         }
+        lookup_url_kwargs = 'reader_uid'
 
     def update(self, instance, validated_data):
-        instance.category = validated_data.get("category", instance.category)
-        instance.department = validated_data.get("department", instance.department)
-        instance.location = validated_data.get("location", instance.location)
-        instance.staff_status = validated_data.get("staff_status", instance.staff_status)
+        instance.category = (validated_data.get("category", instance.category))
+        instance.department = (validated_data.get("department", instance.department))
+        instance.location = (validated_data.get("location", instance.location))
+        instance.staff_status = (validated_data.get("staff_status", instance.employee_status))
+        instance.employee_id = validated_data.get("employee_id", instance.employee_id)
+        instance.gender = validated_data.get("gender", instance.gender)
         instance.reader_uid = validated_data.get("reader_uid", instance.reader_uid)
         instance.save()
         return instance
@@ -92,7 +97,7 @@ class EmployeeStatusSerializer(serializers.ModelSerializer):
 
 class EmployeeCategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = EmployeeStatus
+        model = EmployeeCategory
         fields = "__all__"
 
 
