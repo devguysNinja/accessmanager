@@ -18,7 +18,7 @@ function Profile(props) {
         {props?.profile?.username
           ? ` 👋 Hi ${props?.profile?.username}`
           : props?.profile?.user
-          ? `Hi ${props?.profile?.user?.username}`
+          ? `👋 Hi ${props?.profile?.user?.username}`
           : "You are not authenticated "}
       </div>
       <Container >

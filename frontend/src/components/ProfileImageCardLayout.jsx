@@ -21,7 +21,7 @@ export default function ProfileImageCardLayout() {
   const IMAGE_PATH = userProfile?.profile_image;
 
   useEffect(() => {
-    if (IMAGE_PATH === undefined) {
+    if (IMAGE_PATH === undefined ) {
       setProfilePix("headmug.jpeg");
   
       }
