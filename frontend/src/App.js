@@ -38,7 +38,7 @@ function App() {
       console.log("APP TOKEN: ", token);
       setAuthToken(token);
     }
-  }, [])
+  }, [userProfile])
 
  const  PROFILE_CHOICES_URL = ApiRoute.PROFILE_CHOICES_URL
  useEffect(() => {

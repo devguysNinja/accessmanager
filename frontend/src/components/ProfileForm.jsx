@@ -44,10 +44,10 @@ function ProfileForm(props) {
       setMiddleName(userProfile?.user?.middle_name);
       setReaderUid(userProfile?.reader_uid);
       setEmployeeId(userProfile?.employee_id);
-      setPrivilege(userProfile?.privilege);
+      setPrivilege(userProfile?.category?.privilege);
       setEmployeeStatus(userProfile?.employee_status);
       setDept(userProfile?.department);
-      setEmpCategory(userProfile?.category);
+      setEmpCategory(userProfile?.category.id);
       setEmpLocation(userProfile?.location);
       setGender(userProfile?.gender);
     } else if (userProfile?.username) {
@@ -121,6 +121,8 @@ function ProfileForm(props) {
       await ApiLogout();
     }
   };
+
+  
 
   return (
     <Form onSubmit={submit} style={{ padding: "20px", borderRadius: "10px" }}>
