@@ -80,7 +80,7 @@ class LoginView(APIView):
             return Response({"jwt": token}, status=status.HTTP_200_OK)
         payload = {
             "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=2),
+            "exp": datetime.datetime.utcnow() + datetime.timedelta(days=1),
             "iat": datetime.datetime.utcnow(),
         }
         token = jwt.encode(payload, JWT_SALT, algorithm="HS256")
@@ -99,10 +99,18 @@ class AuthUserView(APIView):
             profile = UserProfile.objects.select_related("user").get(user=user.pk)
             profile_serializer = UserProfileSerializer(profile)
             profile_serializer.data["user"] = user_serializer.data
+            category_obj = EmployeeCategory.objects.filter(
+                id=profile_serializer.data["category"]
+            ).first()
             response_data = {
                 **profile_serializer.data,
+                "category": {
+                    "id": category_obj.id,
+                    "privilege": category_obj.meal_access,
+                },
                 "user": {**user_serializer.data},
             }
+
             response_data["id"] = str(response_data["id"]).replace("-", "")
             return Response(data=response_data, status=status.HTTP_200_OK)
         except UserProfile.DoesNotExist:
@@ -153,8 +161,15 @@ class UserProfileView(APIView):
         if profile_serializer.is_valid() and user_serializer.is_valid():
             user_serializer.save()
             profile_serializer.save()
+            category_obj = EmployeeCategory.objects.filter(
+                id=profile_serializer.data["category"]
+            ).first()
             response_data = {
                 **profile_serializer.data,
+                "category": {
+                    "id": category_obj.id,
+                    "privilege": category_obj.meal_access,
+                },
                 "user": {**user_serializer.data},
             }
             print("###...RESPONSE PROFILE DATA", response_data)
@@ -173,9 +188,6 @@ class UserProfileView(APIView):
         return response
 
 
-
-
-
 def get_object_by_lookup_field(model, lookup_field, lookup_value):
     """
     Retrieve an object using the specified lookup field and value.
@@ -187,18 +199,50 @@ def get_object_by_lookup_field(model, lookup_field, lookup_value):
 class UserProfileDetailAPIView(APIView):
     lookup_url_kwargs = "id"
     lookup_field = "id"
-    
-    def get(self, request, id, format=None):
-        profile_instance = get_object_by_lookup_field(
-                UserProfile, self.lookup_field, id
-            )
-        serializer = UserProfileSerializer(profile_instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, id, format=None):
+    def get(self, request, id, format=None):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        user = User.objects.filter(id=payload["id"]).first()
+
         profile_instance = get_object_by_lookup_field(
             UserProfile, self.lookup_field, id
         )
+        user_serializer = UserSerializer(user)
+        profile_serializer = UserProfileSerializer(profile_instance)
+        category_obj = EmployeeCategory.objects.filter(
+            id=profile_serializer.data["category"]
+        ).first()
+        response_data = {
+            **profile_serializer.data,
+            "category": {
+                "id": category_obj.id,
+                "privilege": category_obj.meal_access,
+            },
+            "user": {**user_serializer.data},
+        }
+        return Response(data=response_data, status=status.HTTP_200_OK)
+
+    def patch(self, request, id, format=None):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
+        user = User.objects.filter(id=payload["id"]).first()
+
+        profile_instance = get_object_by_lookup_field(
+            UserProfile, self.lookup_field, id
+        )
+        print("*********")
+        print("PROFILE INSTANCE USER: ", profile_instance.user)
+        print("USER INSTANCE USER: ", user)
+        print("*********")
+        if profile_instance.user != user and not user.is_superuser:
+            return Response(
+                data={"access_error": "You are not allowed to modify profile"},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
         request_user = request.data.pop("user", None)
         if request_user is None:
             return Response(
@@ -227,14 +271,24 @@ class UserProfileDetailAPIView(APIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
         modified_data = {**request.data, "user": request_user["id"]}
-        profile_serializer = UserProfileSerializer(instance=profile_instance, data=modified_data)
+        profile_serializer = UserProfileSerializer(
+            instance=profile_instance, data=modified_data
+        )
         if profile_serializer.is_valid() and user_serializer.is_valid():
             user_serializer.save()
             profile_serializer.save()
+            category_obj = EmployeeCategory.objects.filter(
+                id=profile_serializer.data["category"]
+            ).first()
             response_data = {
                 **profile_serializer.data,
+                "category": {
+                    "id": category_obj.id,
+                    "privilege": category_obj.meal_access,
+                },
                 "user": {**user_serializer.data},
             }
+
             return Response(response_data, status=status.HTTP_200_OK)
         profile_serializer.is_valid()
         user_serializer.is_valid()
@@ -247,6 +301,7 @@ class UserProfileDetailAPIView(APIView):
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
+
 
 class ProfileFieldChoicesView(APIView):
     def get(self, request, format=None):
