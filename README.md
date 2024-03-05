@@ -1,26 +1,10 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const ScheduleTable = () => {
-  const [dayArray] = useState([
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ]);
-  const [shiftArray] = useState([
-    "off",
-    "night",
-    "morning",
-    "afternoon",
-    "mid-day",
-  ]);
+  const [dayArray] = useState(["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]);
+  const [shiftArray] = useState(["off", "night", "morning", "afternoon", "mid-day"]);
   const [groupArray, setGroupArray] = useState(["g1", "g2", "g3"]);
-  const [rows, setRows] = useState([
-    { group: "", shifts: dayArray.map(() => "") },
-  ]);
+  const [rows, setRows] = useState([{ group: '', shifts: dayArray.map(() => '') }]);
 
   function handleGroupChange(index, event) {
     const newRows = [...rows];
@@ -35,7 +19,33 @@ const ScheduleTable = () => {
   }
 
   function handleAddRow() {
-    setRows([...rows, { group: "", shifts: dayArray.map(() => "") }]);
+    setRows([...rows, { group: '', shifts: dayArray.map(() => '') }]);
+  }
+
+  function generatePayload() {
+    const payload = rows.map(row => {
+      return {
+        group: row.group,
+        shifts: row.shifts
+      };
+    });
+    return payload;
+  }
+
+  // Example function to send payload to backend
+  function sendPayloadToBackend() {
+    const payload = generatePayload();
+    // Example fetch call to send payload to backend
+    fetch('backend-url', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
   }
 
   return (
@@ -59,9 +69,7 @@ const ScheduleTable = () => {
                 >
                   <option value="">Select Group</option>
                   {groupArray.map((group, index) => (
-                    <option key={index} value={group}>
-                      {group}
-                    </option>
+                    <option key={index} value={group}>{group}</option>
                   ))}
                 </select>
               </td>
@@ -69,14 +77,10 @@ const ScheduleTable = () => {
                 <td key={dayIndex}>
                   <select
                     value={shift}
-                    onChange={(event) =>
-                      handleShiftChange(rowIndex, dayIndex, event)
-                    }
+                    onChange={(event) => handleShiftChange(rowIndex, dayIndex, event)}
                   >
                     {shiftArray.map((shiftOption, index) => (
-                      <option key={index} value={shiftOption}>
-                        {shiftOption}
-                      </option>
+                      <option key={index} value={shiftOption}>{shiftOption}</option>
                     ))}
                   </select>
                 </td>
@@ -86,8 +90,9 @@ const ScheduleTable = () => {
         </tbody>
       </table>
       <button onClick={handleAddRow}>Add</button>
+      <button onClick={sendPayloadToBackend}>Send Payload to Backend</button>
     </div>
   );
-};
+}
 
 export default ScheduleTable;
