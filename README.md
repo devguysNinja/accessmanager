@@ -96,3 +96,42 @@ const ScheduleTable = () => {
 }
 
 export default ScheduleTable;
+===================================Sample payloads===================================
+[
+    {
+        "group": "g1",
+        "shifts": {
+            "Sunday": "morning",
+            "Monday": "morning",
+            "Tuesday": "",
+            "Wednesday": "",
+            "Thursday": "night",
+            "Friday": "night",
+            "Saturday": "afternoon"
+        }
+    },
+    {
+        "group": "g2",
+        "shifts": {
+            "Sunday": "night",
+            "Monday": "night",
+            "Tuesday": "",
+            "Wednesday": "",
+            "Thursday": "afternoon",
+            "Friday": "afternoon",
+            "Saturday": "night"
+        }
+    },
+    {
+        "group": "g3",
+        "shifts": {
+            "Sunday": "morning",
+            "Monday": "morning",
+            "Tuesday": "off",
+            "Wednesday": "afternoon",
+            "Thursday": "afternoon",
+            "Friday": "off",
+            "Saturday": "night"
+        }
+    }
+]
