@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 # from re import S
 from django.contrib import admin
 from django.utils.html import format_html
@@ -12,9 +13,23 @@ from import_export.admin import (
 from import_export.widgets import ForeignKeyWidget
 
 from users.models import UserProfile
-from .models import Transaction, ReportType
+from .models import Transaction, ReportType, Drink, DrinkCategory
 from .forms import CustomExportForm
 from .reports import report
+
+
+class DrinksAdmin(admin.ModelAdmin):
+    list_display = ["drink", "type"]
+
+
+admin.site.register(Drink, DrinksAdmin)
+
+
+class DrinkCategoryAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+
+
+admin.site.register(DrinkCategory, DrinkCategoryAdmin)
 
 
 class ReportTypeAdmin(admin.ModelAdmin):
@@ -93,18 +108,18 @@ class TransactionAdmin(ExportMixin, admin.ModelAdmin):
     resource_classes = [TransactionResouce]
     export_form_class = CustomExportForm
     list_per_page = 20
-    search_fields = ['grant_type','date']
+    search_fields = ["grant_type", "date"]
     list_filter = ["grant_type", "date", "owner"]
     show_full_result_count = False
-    date_hierarchy = 'date'
+    date_hierarchy = "date"
 
     def access_grant_type(self, obj):
-        if obj.grant_type == 'ACCESS DENIED':
+        if obj.grant_type == "ACCESS DENIED":
             return format_html(f"<span style='color:red;'>{obj.grant_type}</span>")
-        if obj.grant_type == 'ACCESS GRANTED':
+        if obj.grant_type == "ACCESS GRANTED":
             return format_html(f"<span style='color:green;'>{obj.grant_type}</span>")
-    access_grant_type.admin_order_field = 'grant_type'
 
+    access_grant_type.admin_order_field = "grant_type"
 
     def get_export_resource_kwargs(self, request, *args, **kwargs):
         export_form = kwargs["export_form"]
