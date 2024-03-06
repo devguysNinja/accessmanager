@@ -10,11 +10,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import TransactionSerializer
-from .models import Transaction
+from .serializers import DrinkCategoryListSerializer, TransactionSerializer
+from .models import DrinkCategory, Transaction
 from users.models import User, UserProfile
 from users.auth_service import user_auth
 from .reports import report
+
+
+@api_view(["GET"])
+def get_drink_list(request):
+    # payload = user_auth(request)
+    # if payload.get("auth_error", None):
+    #     return Response(payload, status=status.HTTP_403_FORBIDDEN)
+    drink_categories = DrinkCategory.objects.all()
+    serializer = DrinkCategoryListSerializer(drink_categories, many=True)
+    return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
 # Create your views here.

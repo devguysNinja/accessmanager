@@ -1,9 +1,28 @@
 from rest_framework.exceptions import NotFound
 from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from .models import Transaction
+from .models import Drink, DrinkCategory, Transaction
 from users.serializers import UserProfileSerializer
 from users.models import UserProfile
+
+
+class DrinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Drink
+        fields = ["drink"]
+
+
+class DrinkCategoryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DrinkCategory
+        fields = [
+            "name",
+        ]
+
+    def to_representation(self, obj):
+        representation = super().to_representation(obj)
+        representation["drink_list"] = DrinkSerializer(obj.drink_set, many=True).data
+        return representation
 
 
 class TransactionSerializer(serializers.ModelSerializer):

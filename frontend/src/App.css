@@ -2,8 +2,6 @@
 
 *{
   font-family: "Raleway", sans-serif;
-  font-optical-sizing: auto;
-  font-size: 18px;
 }
 .middle-place {
     margin-left: auto;
@@ -75,6 +73,7 @@
   margin-top: 90px;
   border: 1px solid #ccc;
   border-radius: 15px;
+  border: 1px solid blue;
   padding: 10px;
 }
 
