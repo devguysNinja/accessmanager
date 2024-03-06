@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../ScheduleLayout.css";
+import ApiRoute from "../config/ApiSettings";
+import { AiOutlineDelete } from "react-icons/ai";
+import { AiOutlineEdit } from "react-icons/ai";
 
 const ScheduleLayout = () => {
   const [startDate, setStartDate] = useState(null);
@@ -21,7 +24,7 @@ const ScheduleLayout = () => {
     "afternoon",
     "mid-day",
   ]);
-  const [groupArray, setGroupArray] = useState(["g1", "g2", "g3"]);
+  const [groupArray, setGroupArray] = useState(["Batch A", "Batch B", "Batch C"]);
   const [rows, setRows] = useState([
     { group: "", shifts: dayArray.map(() => "") },
   ]);
@@ -30,6 +33,8 @@ const ScheduleLayout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [shiftsData, setShiftsData] = useState([]);
+  const [payloadData, setPayloadData] = useState(null)
 
   const handleDateChange = (date) => {
     // Ensure start date is a Sunday
@@ -56,52 +61,97 @@ const ScheduleLayout = () => {
     setRows([...rows, { group: "", shifts: dayArray.map(() => "") }]);
   }
 
+  const handleRemoveShift = (rowIndex) => {
+    const newRows = [...rows];
+    newRows.splice(rowIndex, 1); 
+    setRows(newRows);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`${ROSTERS_URL}${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+    
+      setShiftsData(prevShiftsData => prevShiftsData.filter(shift => shift.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+  
   const generatePayload = () => {
-    const payload = {
-      startDate: startDate, 
-      schedule: rows.map(row => {
+    if (!startDate) {
+      setIsLoading(false)
+      return;
+    }
+
+    for (const row of rows) {
+      if (!row.group) {
+        alert("Please select a group for all rows.");
+        return null;
+      }
+    }
+    
+    const exactStartDate = new Date(startDate);
+    const payload = rows.map(row => {
         const shiftsByDay = {};
         dayArray.forEach((day, index) => {
-          shiftsByDay[day] = row.shifts[index];
+          shiftsByDay[day] = row.shifts[index] || "Off";
         });
         return {
+          start_date: exactStartDate.toISOString(), 
+
           group: row.group,
           shifts: shiftsByDay
         };
       })
-    };
     return payload;
   };
   
 
-  function sendPayloadToBackend() {
-    setIsLoading(true); 
+  const ROSTERS_URL = `${ApiRoute.ROSTERS_URL}`
   
+  const postPayload = async () => {
     const payload = generatePayload();
-    console.log("########");
-    console.log(payload);
-    console.log("#######");
+    try {
+      const response = await fetch(ROSTERS_URL, {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload)
 
-    // Example fetch call to send payload to backend
-    fetch('backend-url', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    })
-    .then(response => response.json())
-    .then(data => {
-      setIsLoading(false); // Reset loading state
-      setSuccessMessage("Schedule submitted successfully");
-      console.log(data);
-    })
-    .catch(error => {
-      setIsLoading(false); // Reset loading state
-      setErrorMessage("Failed to submit schedule");
-      console.error('Error:', error);
-    });
-  }
+      });
+     
+      const data = await response.json();
+      setPayloadData(data);
+    } catch (error) {
+      console.error("Error Posting payload:", error.message);
+    }
+  };
+
+  useEffect(() => {
+    const fetchShifts = async () => {
+      try {
+        const response = await fetch(ROSTERS_URL);
+       
+        const shiftdata = await response.json();
+        setShiftsData(shiftdata);
+      } catch (error) {
+        console.error("Error fetching Schedule:", error.message);
+      }
+    };
+
+    fetchShifts();
+  }, []);
+
 
   return (
     <div className="schedule-container">
@@ -128,6 +178,7 @@ const ScheduleLayout = () => {
               {dayArray.map((day, index) => (
                 <th key={index}>{day}</th>
               ))}
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -162,6 +213,13 @@ const ScheduleLayout = () => {
                     </select>
                   </td>
                 ))}
+                <td>
+                  {rows.length > 1 && (
+                    <span>
+                       <AiOutlineDelete onClick={() => handleRemoveShift(rowIndex)}/>
+                    </span>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -171,7 +229,41 @@ const ScheduleLayout = () => {
       {isLoading && <div className="loading-spinner">Loading...</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
       {errorMessage && <div className="error-message">{errorMessage}</div>}
-      <button className="submit-button" onClick={sendPayloadToBackend} >Submit Schedule</button>
+      <button className="submit-button" onClick={postPayload} >Submit Schedule</button>
+
+      <div style={{ marginTop: "30px", marginBottom: "30px", maxHeight: "300px", overflowY: "auto" }}>
+        <table style={{ marginBottom: "60px" }} >
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Day</th>
+              <th>Shift</th>
+              <th>Group</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody style={{padding:"5px"}}>
+            {shiftsData.map((shift) => (
+              <tr key={shift.id} style={{fontWeight:"500"}}>
+                <td>{shift.shift_date}</td>
+                <td style={{fontWeight:"700"}}>{shift.work_day}</td>
+                <td>{shift.shift}</td>
+                <td style={{fontWeight:"700"}}>{shift.batch}</td>
+                <td style={{fontSize:"20px", cursor:"pointer"}}>
+            <span style={{marginRight:"20px"}}>
+              <AiOutlineEdit />
+            </span>
+            <span>
+              <AiOutlineDelete  onClick={() => handleDelete(shift.id)}/>
+            </span>
+          </td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   );
 };
