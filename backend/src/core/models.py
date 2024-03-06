@@ -7,7 +7,29 @@ import paho.mqtt.publish as mqtt_publish
 from users.models import UserProfile
 from utils.utils import publish_data, is_card_reader_json
 
+
 # Create your models here.
+class DrinkCategory(models.Model):
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        verbose_name_plural = "Drink Categories"
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Drink(models.Model):
+    drink = models.CharField(max_length=50)
+    type = models.ForeignKey(DrinkCategory, on_delete=models.CASCADE)
+
+    class Meta:
+        verbose_name_plural = "Drinks"
+
+    def __str__(self) -> str:
+        return self.drink
+
+
 class ReportType(models.Model):
     report_type = models.CharField(max_length=25)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -16,7 +38,6 @@ class ReportType(models.Model):
 
     def __str__(self):
         return f"{self.report_type}"
-
 
 
 class Transaction(models.Model):
