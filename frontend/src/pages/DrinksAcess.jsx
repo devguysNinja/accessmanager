@@ -1,49 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import ApiRoute from "../config/ApiSettings";
 
 function DrinksAccess() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [cart, setCart] = useState([]);
-
-  // Dummy drinks data
-  const dummyDrinks = [
-    {
-      id: 1,
-      name: "Gordons",
-      category: "Spirit",
-      image: "/gordons-gin-and-tonic.webp",
-    },
-    {
-      id: 2,
-      name: "Baileys",
-      category: "Spirit",
-      image: "/baileys-min.webp",
-    },
-    {
-      id: 3,
-      name: "Guinness",
-      category: "Beer",
-      image: "/holding-glass-guinness.webp",
-    },
-    {
-      id: 4,
-      name: "Johnie-Walker",
-      category: "Spirit",
-      image: "/johnnie-walker-black-label-cocktail.webp",
-    },
-    {
-      id: 5,
-      name: "Smirnoff",
-      category: "Spirit",
-      image: "/smirnoff-min.webp",
-    },
-  ];
+  const [drinks, setDrinks] = useState([]);
 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
   };
 
   const addToCart = (drink) => {
-    const existingDrinkIndex = cart.findIndex((item) => item.id === drink.id);
+    const existingDrinkIndex = cart.findIndex((item) => item.drink === drink);
     // Check if the drink already exists in the cart
     if (existingDrinkIndex !== -1) {
       const updatedCart = [...cart];
@@ -54,13 +22,13 @@ function DrinksAccess() {
         alert("You can't add more than 2 drinks to the cart");
       } else {
         // add the drink to the cart with count = 1
-        setCart([...cart, { ...drink, count: 1 }]);
+        setCart([...cart, { drink: drink, count: 1 }]);
       }
     }
   };
 
   const removeFromCart = (drinkToRemove) => {
-    const updatedCart = cart.filter((drink) => drink.id !== drinkToRemove.id);
+    const updatedCart = cart.filter((drink) => drink.drink !== drinkToRemove);
     setCart(updatedCart);
   };
 
@@ -68,8 +36,25 @@ function DrinksAccess() {
     return cart.reduce((total, drink) => total + drink.count, 0);
   };
 
+  useEffect(() => {
+    const fetchDrinks = async () => {
+      try {
+        const response = await fetch(`${ApiRoute.BASE_URL}/drink-list`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch drinks");
+        }
+        const data = await response.json();
+        setDrinks(data);
+      } catch (error) {
+        console.error("Error fetching drinks:", error.message);
+      }
+    };
+
+    fetchDrinks();
+  }, []);
+
   const filteredDrinks = selectedCategory
-    ? dummyDrinks.filter((drink) => drink.category === selectedCategory)
+    ? drinks.find((category) => category.name === selectedCategory)?.drink_list || []
     : [];
 
   return (
@@ -79,20 +64,18 @@ function DrinksAccess() {
           <nav className="navbar navbar-light bg-light">
             <div className="container-fluid">
               <div className="d-flex">
-                {["Spirit", "Beer", "Wine", "Soft Drinks"].map(
-                  (category, index) => (
-                    <button
-                      key={index}
-                      className={`btn btn-outline-primary${
-                        selectedCategory === category ? " active" : ""
-                      }`}
-                      onClick={() => handleCategorySelect(category)}
-                      style={{ margin: "5px", fontSize:"20px" }}
-                    >
-                      {category}
-                    </button>
-                  )
-                )}
+                {drinks.map((category, index) => (
+                  <button
+                    key={index}
+                    className={`btn btn-outline-primary${
+                      selectedCategory === category.name ? " active" : ""
+                    }`}
+                    onClick={() => handleCategorySelect(category.name)}
+                    style={{ margin: "5px", fontSize: "20px" }}
+                  >
+                    {category.name}
+                  </button>
+                ))}
               </div>
             </div>
           </nav>
@@ -101,15 +84,16 @@ function DrinksAccess() {
               <div>
                 {filteredDrinks.length > 0 ? (
                   <div className="row">
-                    {filteredDrinks.map((drink) => (
-                      <div className="col-md-3" key={drink.id}>
+                    {filteredDrinks.map((drink, index) => (
+                      <div className="col-md-3" key={index}>
                         <div className="drink-item">
-                          <p className="drink-name">{drink.name}</p>
+                          <p className="drink-name">{drink.drink}</p>
                           <div className="col-sm">
+                            {/* Use default image path if drink does not have its own image */}
                             <img
-                              src={drink.image}
-                              alt={drink.name}
-                              onClick={() => addToCart(drink)}
+                              src={drink.image || "/baileys-min.webp"}
+                              alt={drink.drink}
+                              onClick={() => addToCart(drink.drink)}
                               className="drink-image"
                               style={{
                                 width: "100%",
@@ -123,9 +107,7 @@ function DrinksAccess() {
                     ))}
                   </div>
                 ) : (
-                  <p className="no-drinks">
-                    No drinks found in the selected category
-                  </p>
+                  <p className="no-drinks">No drinks found in the selected category</p>
                 )}
               </div>
             ) : (
@@ -138,12 +120,12 @@ function DrinksAccess() {
             <h2 className="cart-title">Cart</h2>
             {cart.length > 0 ? (
               <ul className="list-group">
-                {cart.map((item) => (
-                  <li className="list-group-item cart-item" key={item.id}>
-                    {item.name}{" "}
+                {cart.map((item, index) => (
+                  <li className="list-group-item cart-item" key={index}>
+                    {item.drink}{" "}
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.image || "/baileys-min.webp"}
+                      alt={item.drink}
                       style={{
                         width: "30px",
                         height: "30px",
@@ -154,7 +136,7 @@ function DrinksAccess() {
                     <span className="cart-item-count">x{item.count}</span>{" "}
                     <button
                       className="btn btn-danger btn-sm float-end"
-                      onClick={() => removeFromCart(item)}
+                      onClick={() => removeFromCart(item.drink)}
                     >
                       Remove
                     </button>
