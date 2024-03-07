@@ -194,4 +194,5 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 LOGIN_URL = "http://localhost:3000/login"
+APPEND_SLASH = True
 # SITE_ID = 1

@@ -25,7 +25,10 @@ def upload_xlsx(instance, filename):
 
 # Create your models here.
 class User(AbstractUser):
-    middle_name = models.CharField(max_length=50, blank=True,)
+    middle_name = models.CharField(
+        max_length=50,
+        blank=True,
+    )
     username = models.CharField(max_length=50, unique=True)
     email = models.CharField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
@@ -34,24 +37,40 @@ class User(AbstractUser):
     # REQUIRED_FIELDS = ['username', 'password']
 
 
+class Batch(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    
+    class Meta:
+        verbose_name_plural = "Batches"
+
+    def __str__(self):
+        return self.name
+
+
 class UserProfile(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
     id = models.UUIDField(default=uuid4, editable=False, unique=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    employee_id = models.CharField(max_length=128, default=dummy_unique_str, unique=True)
+    employee_id = models.CharField(
+        max_length=128, default=dummy_unique_str, unique=True
+    )
     reader_uid = models.CharField(max_length=128, default=dummy_unique_str, unique=True)
-    gender = models.CharField(max_length=50,)
+    gender = models.CharField(
+        max_length=50,
+    )
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
     category = models.ForeignKey(
         "EmployeeCategory", null=True, on_delete=models.SET_NULL
     )
-    department = models.ForeignKey(
-        "Department", null=True, on_delete=models.SET_NULL
-    )
+    department = models.ForeignKey("Department", null=True, on_delete=models.SET_NULL)
     location = models.ForeignKey("Location", null=True, on_delete=models.SET_NULL)
-    employee_status = models.ForeignKey("EmployeeStatus", null=True, on_delete=models.SET_NULL)
+    employee_status = models.ForeignKey(
+        "EmployeeStatus", null=True, on_delete=models.SET_NULL
+    )
+    batch = models.ForeignKey(
+        Batch, related_name="users", null=True, on_delete=models.SET_NULL
+    )
     # shift = models.ForeignKey(ShiftManager, null=True, on_delete=models.SET_NULL)
-    
 
     def __str__(self) -> str:
         return self.user.username
@@ -67,20 +86,21 @@ class Location(models.Model):
 
 class Department(models.Model):
     dept_name = models.CharField(max_length=55)
-    
+
     def __str__(self):
         return f"{self.dept_name}"
+
 
 class EmployeeStatus(models.Model):
     status = models.CharField(max_length=50)
     description = models.CharField(max_length=255, blank=True, null=True)
-    
+
     class Meta:
         verbose_name_plural = "Employees' status"
-        
-        
+
     def __str__(self):
         return f"{self.status}"
+
 
 class EmployeeCategory(models.Model):
     cat_name = models.CharField(max_length=125)
