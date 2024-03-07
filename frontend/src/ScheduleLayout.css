@@ -1,0 +1,84 @@
+.schedule-container {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.schedule-header {
+ 
+  margin-bottom: 20px;
+}
+
+.date-picker-container {
+  display: flex;
+  align-items: center;
+}
+
+
+.table-container {
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.add-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.add-button:hover {
+  background-color: #0056b3;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+
+select {
+  width: 100%;
+  padding: 5px;
+}
+
+.submit-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #218838;
+}
+
+.success-message {
+  text-align: center;
+  color: green;
+  font-weight: bold;
+}
+
+.error-message {
+  text-align: center;
+  color: red;
+  font-weight: bold;
+}
+
+.loading-spinner {
+  font-size: 25px;
+  text-align: center;
+}
