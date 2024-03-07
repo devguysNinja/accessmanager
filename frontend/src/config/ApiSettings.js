@@ -51,5 +51,7 @@ export function Capitalize(params) {
     return "Staff";
   }
 }
+const auth_token = JSON.parse(localStorage.getItem('jwt'))
+export const BEARER = `Bearer ${auth_token}`
 
 export default ApiRoute;
