@@ -29,6 +29,7 @@ urlpatterns = [
     path('accounts/reset/', views.PasswordResetCompleteView.as_view(), name="password_reset_complete"),
     path('api/v1/', include('users.urls')),
     path('api/v1/', include('core.urls')),
+    path('api/v1/', include('staffcalendar.urls')),
     path('', index, name="index"),
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

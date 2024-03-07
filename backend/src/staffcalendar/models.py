@@ -1,6 +1,6 @@
 from django.db import models
 
-from users.models import UserProfile
+from users.models import Batch, UserProfile
 
 # from users.models import UserProfile
 
@@ -23,7 +23,7 @@ class WorkDay(models.Model):
     day_code = models.PositiveSmallIntegerField()
 
     class Meta:
-        unique_together = ("day_symbol","day_code")
+        unique_together = (("day_symbol", "day_code"),)
         ordering = ["day_code"]
 
     def __str__(self):
@@ -31,25 +31,15 @@ class WorkDay(models.Model):
 
 
 class MonthlyRoster(models.Model):
-    # WORK_DAYS_CHOICES = [
-    # ("Monday", "Monday"),
-    # ("Tuesday", "Tuesday"),
-    # ("Wednesday", "Wednesday"),
-    # ("Thursday", "Thursday"),
-    # ("Friday", "Friday"),
-    # ("Saturday", "Saturday"),
-    # ("Sunday", "Sunday"),
-    # ]
-    work_days = models.ManyToManyField(WorkDay)
+    work_day = models.ForeignKey(WorkDay, null=True, on_delete=models.SET_NULL)
     shift = models.ForeignKey("ShiftType", null=True, on_delete=models.SET_NULL)
-    week_no = models.PositiveIntegerField()
-    employees = models.ManyToManyField(UserProfile)
-    description = models.CharField(max_length=120)
-    # start_date = models.DateField()
-    # end_date = models.DateField()
+    week_start_date = models.DateField()
+    batch = models.ForeignKey(Batch, related_name="roster", on_delete=models.CASCADE)
+    shift_date = models.DateField()
 
     class Meta:
         verbose_name = "Employees' roster"
+        unique_together = (("shift_date", "work_day", "shift"),)
 
     def __str__(self):
-        return f"{self.shift.name.capitalize()} | Week-{self.week_no}"
+        return f"{self.shift.name.capitalize()} | Week-{self.batch}"
