@@ -5,6 +5,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
+import Dashboard from "./MyAdmin";
 import  Image  from "react-bootstrap/Image";
 import { Context } from "../App";
 
@@ -35,7 +36,7 @@ function PageNavbar(props) {
 
   //...Admin Handler
   const gotoAdmin = (e) => {
-    window.location.assign(`${ApiRoute.API_ADMIN}`);
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/admin`);
   };
 
   //...Access-board Handler
@@ -77,9 +78,9 @@ function PageNavbar(props) {
               <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
                 Admin
               </Button>
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={schedule}>
+              {/* <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={schedule}>
                 Schedule
-              </Button>
+              </Button> */}
               {userProfile ? (
               <>
                 <Button

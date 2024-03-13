@@ -1,12 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../ScheduleLayout.css";
-import ApiRoute from "../config/ApiSettings";
+import ApiRoute, { BEARER } from "../config/ApiSettings";
 import { AiOutlineDelete } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
+import EditRoster from "./EditRoster";
+import  toast, {Toaster}  from 'react-hot-toast';
+import { Context } from "../App";
 
 const ScheduleLayout = () => {
+  const { auth_token} = useContext(Context);
+
+
   const [startDate, setStartDate] = useState(null);
   const [dayArray] = useState([
     "Sunday",
@@ -26,7 +32,7 @@ const ScheduleLayout = () => {
   ]);
   const [groupArray, setGroupArray] = useState(["Batch A", "Batch B", "Batch C"]);
   const [rows, setRows] = useState([
-    { group: "", shifts: dayArray.map(() => "") },
+    { id: 1, group: "", shifts: dayArray.map(() => "") },
   ]);
 
   // State variables for loading, success message, and error message
@@ -35,11 +41,14 @@ const ScheduleLayout = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [shiftsData, setShiftsData] = useState([]);
   const [payloadData, setPayloadData] = useState(null)
+  const [editingRow, setEditingRow] = useState(null); 
+  
+ 
 
   const handleDateChange = (date) => {
     // Ensure start date is a Sunday
     if (date.getDay() !== 0) {
-      alert("Start date must be a Sunday");
+      toast.error("Start date must be a Sunday");
       return;
     }
     setStartDate(date);
@@ -58,7 +67,8 @@ const ScheduleLayout = () => {
   }
 
   function handleAddRow() {
-    setRows([...rows, { group: "", shifts: dayArray.map(() => "") }]);
+    const newRow = { id: rows.length + 1, group: "", shifts: dayArray.map(() => "") };
+    setRows([...rows, newRow]);
   }
 
   const handleRemoveShift = (rowIndex) => {
@@ -73,6 +83,7 @@ const ScheduleLayout = () => {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: BEARER,
         }
       });
 
@@ -81,20 +92,23 @@ const ScheduleLayout = () => {
       }
     
       setShiftsData(prevShiftsData => prevShiftsData.filter(shift => shift.id !== id));
+      toast.success('Roster successfully deleted');
     } catch (error) {
       console.error('Error deleting item:', error);
+      toast.error('Failed to delete roster');
     }
   };
   
   const generatePayload = () => {
     if (!startDate) {
       setIsLoading(false)
+      toast.error("start date must be present")
       return;
     }
 
     for (const row of rows) {
       if (!row.group) {
-        alert("Please select a group for all rows.");
+        toast.error("Please select a group for all rows.");
         return null;
       }
     }
@@ -125,6 +139,7 @@ const ScheduleLayout = () => {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
+          Authorization: BEARER,
         },
         body: JSON.stringify(payload)
 
@@ -152,10 +167,51 @@ const ScheduleLayout = () => {
     fetchShifts();
   }, []);
 
+  const handleEdit = (row) => {
+    setEditingRow(row);
+  };
+
+  const handleEditSubmit = async (editedRow) => {
+    try {
+      const response = await fetch(`${ApiRoute.ROSTERS_URL}${editedRow.id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: BEARER,
+        },
+        body: JSON.stringify(editedRow),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to edit roster');
+      }
+  
+     // Update rows state with edited data
+    const updatedRows = [...rows];
+    updatedRows[editingRow] = editedRow;
+    setRows(updatedRows);
+
+     // Refetch the data to update shiftsData
+     const updatedShiftDataResponse = await fetch(ROSTERS_URL);
+     const updatedShiftData = await updatedShiftDataResponse.json();
+     setShiftsData(updatedShiftData);
+  
+      setEditingRow(null);
+      toast.success('Roster successfully updated');
+    } catch (error) {
+      toast.error('Failed to update roster');
+
+    }
+  };
+  
+  const cancelEditing = () => {
+    setEditingRow(null);
+  };
 
   return (
     <div className="schedule-container">
       <div className="schedule-header">
+        
         <h1>Employees Schedule</h1>
         <div className="date-picker-container">
           <label htmlFor="startDate" style={{fontSize:"23px" }}>Start Date:</label>
@@ -171,6 +227,7 @@ const ScheduleLayout = () => {
         <button className="add-button" onClick={handleAddRow}>
           Add Shift
         </button>
+      
         <table>
           <thead>
             <tr>
@@ -181,8 +238,10 @@ const ScheduleLayout = () => {
               <th>Action</th>
             </tr>
           </thead>
+          
           <tbody>
             {rows.map((row, rowIndex) => (
+              
               <tr key={rowIndex}>
                 <td>
                   <select
@@ -251,7 +310,7 @@ const ScheduleLayout = () => {
                 <td style={{fontWeight:"700"}}>{shift.batch}</td>
                 <td style={{fontSize:"20px", cursor:"pointer"}}>
             <span style={{marginRight:"20px"}}>
-              <AiOutlineEdit />
+              <AiOutlineEdit onClick={() => handleEdit(shift)} />
             </span>
             <span>
               <AiOutlineDelete  onClick={() => handleDelete(shift.id)}/>
@@ -262,8 +321,18 @@ const ScheduleLayout = () => {
             ))}
           </tbody>
         </table>
+        
       </div>
-
+      {editingRow && (
+            <div className="edit-roster-overlay" >
+              <EditRoster
+                rowData={editingRow}
+                onSubmit={handleEditSubmit}
+                onCancel={cancelEditing}
+              />
+            </div>
+        )}
+     <Toaster/>
     </div>
   );
 };
