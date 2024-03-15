@@ -19,7 +19,7 @@ from django.utils import timezone
 from django.db import models
 from core.models import Transaction
 from users.models import User, UserProfile
-from staffcalendar.models import ShiftType, MonthlyRoster
+from staffcalendar.models import ShiftType, MonthlyRoster, WorkDay
 
 
 TOPIC = "orinlakantobad"
@@ -92,30 +92,34 @@ def is_valid_shift_time(shift_times, time_now_obj):
 
 def check_calendar(uid):
     try:
+        t_day = timezone.now().strftime("%A")
+        t_date = timezone.now().date().strftime("%Y-%m-%d")
         employee_profile = UserProfile.objects.get(reader_uid=uid)
-        rosters_for_employee = MonthlyRoster.objects.filter(employees=employee_profile)
-        assigned_work_days = [roster.work_day.all() for roster in rosters_for_employee]
-        if len(assigned_work_days) == 0:
-            return False
+        meal_access = employee_profile.category.meal_access
+        batch = employee_profile.batch
+        work_day = WorkDay.objects.filter(day_symbol=t_day.capitalize()).first()
+        batch_rosters = MonthlyRoster.objects.filter(
+            batch=batch.id, work_day=work_day.id, shift_date=t_date
+        )
+        # assigned_work_days = [roster.work_day.all() for roster in rosters_for_employee]
+        # if len(assigned_work_days) == 0:
+        # 	return False
         # current_date = timezone.now().date()
         current_time = timezone.now().time()
         print("TIME: ", current_time)
         print("TYPE TIME: ", type(current_time))
-        today = timezone.now().strftime("%A")
-        print("DAY NAME: ", today)
-        employee_shift = [shift.shift.name for shift in rosters_for_employee]
+        # today = timezone.now().strftime("%A")
+        print("DAY NAME: ", t_day)
+        employee_shift = [roster.shift.name for roster in batch_rosters]
         print("SHIFTS: ", employee_shift)
         employee_shit_interval = [
-            (shift.shift.start_time, shift.shift.end_time)
-            for shift in rosters_for_employee
+            (roster.shift.start_time, roster.shift.end_time) for roster in batch_rosters
         ]
         print("TIMES: ", employee_shit_interval)
-        work_days_objs = [work_days[::1] for work_days in assigned_work_days]
-        day_list = [day.day_symbol for days in work_days_objs for day in days]
-        print("DAYS: ", day_list)
-        if today in day_list and is_valid_shift_time(
-            employee_shit_interval, current_time
-        ):
+        # work_days_objs = [work_days[::1] for work_days in assigned_work_days]
+        # day_list = [day.day_symbol for days in work_days_objs for day in days]
+        # print("DAYS: ", day_list)
+        if is_valid_shift_time(employee_shit_interval, current_time):
             return True
         else:
             return False
@@ -124,7 +128,7 @@ def check_calendar(uid):
         return None
 
 
-def usb_smartcard_handler(client, message):
+def smartcard_handler_for_restaurant(client, message):
     reader_message = message.payload.decode("UTF-8")
     print(f'Recieved message: {str(message.payload.decode("utf-8"))}')
     print("IS JSON: ", is_json(reader_message))
@@ -136,13 +140,13 @@ def usb_smartcard_handler(client, message):
             client.publish(TOPIC, grant_data)
             print("***->RETURNING.... NO USER PROFILE!")
             return
-        is_onschedule = check_calendar(reader_uid)
-        if is_onschedule is None:
+        on_schedule = check_calendar(reader_uid)
+        if on_schedule is None:
             grant_data = json.dumps(publish_data(ACCESS_DENIED))
             client.publish(TOPIC, grant_data)
             print("***->RETURNING.... NO USER PROFILE!")
             return
-        elif not is_onschedule:
+        elif not on_schedule:
             grant_data = json.dumps(publish_data(ACCESS_DENIED))
             client.publish(TOPIC, grant_data)
             print("***->RETURNING....  EMPLOYEE NOT ON SCHEDULE!")
@@ -156,11 +160,14 @@ def usb_smartcard_handler(client, message):
             print("THIS IS THE TRANSACTION OBJECT:", today_transaction)
             # ...No transactions exist yet today for this user
             if today_transaction.first() is None:
-                raise ObjectDoesNotExist("No transaction exists yet for this owner")
+                raise Transaction.DoesNotExist(
+                    "No transaction exists yet for this owner"
+                )
 
             # ...transactions exists for this user
             transaction_count = today_transaction.count()
-            meal_category = today_transaction.first().owner.meal_category
+            # meal_category = today_transaction.first().owner.meal_category
+            meal_category = owner_profile.category.meal_access
             SWIPE_COUNT = transaction_count
             if SWIPE_COUNT < meal_category:
                 SWIPE_COUNT += 1
@@ -190,7 +197,7 @@ def usb_smartcard_handler(client, message):
                 ).save()
                 print("***->RETURNING....YOU HAD ENOUGH MEAL TODAY!")
                 return
-        except ObjectDoesNotExist as e:
+        except Transaction.DoesNotExist as e:
             print("ObjectDoesNotExist: ", e)
             if owner_profile:
                 SWIPE_COUNT = 1
@@ -207,8 +214,11 @@ def usb_smartcard_handler(client, message):
         else:
             grant_data = json.dumps(publish_data(ACCESS_DENIED))
             client.publish(TOPIC, grant_data)
-            print("User profile not found!")
+            print("User Profile not found!")
 
+
+def smartcard_handler_for_bar(client, message):
+    return
 
 def jsondata_smartcard_handler(client, message):
     reader_message = message.payload.decode("UTF-8")
@@ -252,7 +262,8 @@ def jsondata_smartcard_handler(client, message):
 
                 # ...transactions exists for this user
                 transaction_count = today_transaction.count()
-                meal_category = today_transaction.first().owner.meal_category
+                # meal_category = today_transaction.first().owner.meal_category
+                meal_category = owner_profile.category.meal_access
                 SWIPE_COUNT = transaction_count
                 if SWIPE_COUNT < meal_category:
                     SWIPE_COUNT += 1
