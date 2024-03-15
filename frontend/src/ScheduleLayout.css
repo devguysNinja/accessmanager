@@ -16,6 +16,8 @@
 
 .table-container {
   margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
 }
 
 .add-button {
@@ -80,3 +82,4 @@ select {
   font-size: 25px;
   text-align: center;
 }
+

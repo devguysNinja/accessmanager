@@ -8,6 +8,7 @@ from .models import (
     Location,
     Department,
     EmployeeBatchUpload,
+    Batch
 )
 from .views import bulk_create
 
@@ -40,6 +41,7 @@ class UserProfileAdmin(admin.ModelAdmin):
         "employee_id",
         "location",
         "profile_image",
+        "batch"
     ]
 
 
@@ -62,6 +64,13 @@ class UserProfileAdmin(admin.ModelAdmin):
 #     employee_shift.short_description = "Shift days"
 admin.site.register(UserProfile, UserProfileAdmin)
 
+
+
+class BatchAdmin(admin.ModelAdmin):
+    list_display = ["name", ]
+
+
+admin.site.register(Batch, BatchAdmin)
 
 class LocationAdmin(admin.ModelAdmin):
     list_display = ["name", "address"]

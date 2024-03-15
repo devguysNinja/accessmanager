@@ -1,0 +1,72 @@
+/* EditRoster.css */
+
+
+.edit-roster-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+  }
+  
+  .edit-roster-form {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+  }
+  
+  .edit-roster-form h2 {
+    margin-bottom: 20px;
+  }
+  
+  .edit-roster-form label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .edit-roster-form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+  }
+  
+  .edit-roster-buttons {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .edit-roster-buttons button {
+    padding: 8px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .edit-roster-buttons button:first-child {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .edit-roster-buttons button:first-child:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-roster-buttons button:last-child {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  .edit-roster-buttons button:last-child:hover {
+    background-color: #545b62;
+  }
+  

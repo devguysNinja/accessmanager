@@ -29,39 +29,47 @@ admin.site.register(WorkDay, WorkDayAdmin)
 
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
-    form = MonthlyRosterForm
+    # form = MonthlyRosterForm
     list_display = [
-        "shift_days",
+        # "shift_days",
+        "work_day",
         "shift",
-        "week_no",
-        "shift_members",
-        "description"
+        "batch",
+        # "shift_members",
+        "week_start_date",
+        "shift_date"
     ]
-    list_display_links = ["shift_days", "shift", "week_no",]
+    list_display_links = [
+        "shift_date",
+        "shift",
+        #   "week_no",
+    ]
     # list_editable = ["shift", "start_date", "end_date"]
-    filter_horizontal = ["employees"]
+    # filter_horizontal = ["employees"]
     list_per_page = 20
     save_on_top = True
 
-    def shift_members(self, obj):
-        members = [members.user.username for members in obj.employees.all()]
-        print("****Members: ", members)
-        html = ""
-        for mem in members:
-            html += f"<b>{mem}</b><br>"
-        print( "&&&&&&&&HTML",html)
 
-        return format_html(html)
-        # return f"{', '.join(members)}"
+#
+#     def shift_members(self, obj):
+#         members = [members.user.username for members in obj.employees.all()]
+#         print("****Members: ", members)
+#         html = ""
+#         for mem in members:
+#             html += f"<b>{mem}</b><br>"
+#         print( "&&&&&&&&HTML",html)
+#
+#         return format_html(html)
+#         # return f"{', '.join(members)}"
+#
+#     shift_members.short_description = "Members"
 
-    shift_members.short_description = "Members"
-
-    def shift_days(self, obj):
-        work_days = [days.day_symbol for days in obj.work_days.all()]
-        print("Work-days: ", work_days)
-        return f"{', '.join(work_days)}"
-
-    shift_days.short_description = "Shift days"
+#     def shift_days(self, obj):
+#         work_days = [days.day_symbol for days in obj.work_days.all()]
+#         print("Work-days: ", work_days)
+#         return f"{', '.join(work_days)}"
+#
+#     shift_days.short_description = "Shift days"
 
 
 admin.site.register(MonthlyRoster, MonthlyRosterAdmin)

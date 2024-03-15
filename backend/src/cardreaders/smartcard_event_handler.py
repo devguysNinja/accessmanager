@@ -94,7 +94,7 @@ def check_calendar(uid):
     try:
         employee_profile = UserProfile.objects.get(reader_uid=uid)
         rosters_for_employee = MonthlyRoster.objects.filter(employees=employee_profile)
-        assigned_work_days = [roster.work_days.all() for roster in rosters_for_employee]
+        assigned_work_days = [roster.work_day.all() for roster in rosters_for_employee]
         if len(assigned_work_days) == 0:
             return False
         # current_date = timezone.now().date()
@@ -113,7 +113,9 @@ def check_calendar(uid):
         work_days_objs = [work_days[::1] for work_days in assigned_work_days]
         day_list = [day.day_symbol for days in work_days_objs for day in days]
         print("DAYS: ", day_list)
-        if today in day_list and is_valid_shift_time(employee_shit_interval, current_time):
+        if today in day_list and is_valid_shift_time(
+            employee_shit_interval, current_time
+        ):
             return True
         else:
             return False
