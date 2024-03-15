@@ -2,6 +2,8 @@ from django.shortcuts import render
 from rest_framework import generics,status
 from rest_framework.response import Response
 
+from users.auth_service import user_auth
+
 
 from .models import MonthlyRoster, ShiftType, WorkDay
 from .serializers import BatchCreateSerializer, BatchSerializer, RosterCreateSerializer, RosterSerializer, RosterUpdateSerializer
@@ -30,6 +32,10 @@ class RosterListCreateAPIView(generics.ListCreateAPIView):
 		return RosterSerializer
 
 	def create(self, request, *args, **kwargs):
+		payload = user_auth(request)
+		if payload.get("auth_error", None):
+			return Response(payload, status=status.HTTP_403_FORBIDDEN)
+		
 		print("######...: ", request.data)
 		modified_request_data = self.modify_request_data(request.data)
 
@@ -78,6 +84,10 @@ class RosterRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 		return RosterSerializer
 
 	def patch(self, request, *args, **kwargs):
+		payload = user_auth(request)
+		if payload.get("auth_error", None):
+			return Response(payload, status=status.HTTP_403_FORBIDDEN)
+
 		print("###...UPDATE REQUEST DATA: ", request.data)
 		batch_name = request.data.get('batch')
 		shift_name = request.data.get('shift')
@@ -92,6 +102,4 @@ class RosterRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 			request.data['work_day'] = work_day.pk
 		except (Batch.DoesNotExist, ShiftType.DoesNotExist, WorkDay.DoesNotExist) as e:
 			return Response({'error': 'Batch, shift, or work day not found'}, status=status.HTTP_400_BAD_REQUEST)
-
-		
 		return super().patch(request, *args, **kwargs)
