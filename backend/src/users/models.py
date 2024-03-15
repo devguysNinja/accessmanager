@@ -46,6 +46,19 @@ class Batch(models.Model):
     def __str__(self):
         return self.name
 
+class EmployeeCategory(models.Model):
+    cat_name = models.CharField(max_length=125)
+    meal_access = models.PositiveSmallIntegerField(default=1)
+    drink_access = models.PositiveSmallIntegerField(default=1)
+    description = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Employees' categories"
+
+    def __str__(self):
+        return f"{self.cat_name}"
+
+
 
 class UserProfile(models.Model):
     pkid = models.BigAutoField(primary_key=True, editable=False)
@@ -60,7 +73,7 @@ class UserProfile(models.Model):
     )
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
     category = models.ForeignKey(
-        "EmployeeCategory", null=True, on_delete=models.SET_NULL
+        EmployeeCategory, null=True, on_delete=models.SET_NULL
     )
     department = models.ForeignKey("Department", null=True, on_delete=models.SET_NULL)
     location = models.ForeignKey("Location", null=True, on_delete=models.SET_NULL)
@@ -101,18 +114,6 @@ class EmployeeStatus(models.Model):
     def __str__(self):
         return f"{self.status}"
 
-
-class EmployeeCategory(models.Model):
-    cat_name = models.CharField(max_length=125)
-    meal_access = models.PositiveSmallIntegerField(default=1)
-    drink_access = models.PositiveSmallIntegerField(default=1)
-    description = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = "Employees' categories"
-
-    def __str__(self):
-        return f"{self.cat_name}"
 
 
 class EmployeeBatchUpload(models.Model):
