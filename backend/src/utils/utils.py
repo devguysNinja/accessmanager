@@ -1,11 +1,10 @@
-import datetime
 from datetime import datetime, timedelta
 import json
 import random
 
 # Function to convert formatted time string to datetime object
 def parse_time(time_str):
-	return datetime.datetime.strptime(time_str, '%H:%M:%S.%f').time()
+	return datetime.strptime(time_str, '%H:%M:%S.%f').time()
 
 # Function to convert time object to formatted string
 def format_time(time_obj):
