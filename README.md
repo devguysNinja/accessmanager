@@ -135,3 +135,14 @@ export default ScheduleTable;
         }
     }
 ]
+===========================BAR===========================
+{
+  "cart_item": {
+    "coke": 3
+  },
+  "grant_type": "ACCESS GRANTED",
+  "reader_uid": "969948274",
+  "access_point": "BAR",
+  "swipe_count": 1,
+  "owner_profile": "c2c77dab-851a-4b0a-af77-dd3766e35d3d"
+}
