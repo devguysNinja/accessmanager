@@ -1,7 +1,9 @@
+import os
 import time
 import paho.mqtt.client as mqtt
 from random import randrange, uniform
 import sys
+
 
 DELAY = 1.2
 TIMEOUT = 1.2

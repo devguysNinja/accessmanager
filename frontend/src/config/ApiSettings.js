@@ -48,7 +48,7 @@ export function Capitalize(params) {
     var outputString = inputString.charAt(0).toUpperCase() + inputString.slice(1);
     return outputString;
   } catch (error) {
-    return "Staff";
+    // return "Staff";
   }
 }
 const auth_token = JSON.parse(localStorage.getItem('jwt'))
