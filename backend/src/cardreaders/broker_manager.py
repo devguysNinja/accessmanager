@@ -1,5 +1,6 @@
 import json
 import os
+import datetime
 import time
 from typing import Any
 import paho.mqtt.client as mqtt
@@ -7,7 +8,9 @@ import paho.mqtt.client as mqtt
 from smartcard_event_handler import (
 	jsondata_smartcard_handler,
 	smartcard_handler_for_restaurant,
+	smartcard_handler_for_bar
 )
+
 
 def get_secret(setting):
 	"""Get the secret variable or return explicit exception."""
@@ -17,8 +20,8 @@ def get_secret(setting):
 		error_msg = f"Set the {setting} environment variable"
 		raise ValueError(error_msg)
 
-ENV_DEPLOYMENT_LOCATION = get_secret('DEPLOYMENT_LOCATION')
-DEPLOYMENT_LOCATION = {"restaurant": "RESTAURANT", "bar": "BAR"}
+DEPLOYMENT_LOCATION = get_secret('DEPLOYMENT_LOCATION')
+ACCESS_POINT = {"restaurant": "RESTAURANT", "bar": "BAR"}
 
 class BrokerEventManager:
 	def __init__(self, client) -> None:
@@ -31,9 +34,9 @@ class BrokerEventManager:
 			# print("$$$$$...Calling usb_smartcard_handler")
 
 			# check if DEPLOYMENT_LOCATION=Restaurant
-			if ENV_DEPLOYMENT_LOCATION==DEPLOYMENT_LOCATION['restaurant']:
+			if DEPLOYMENT_LOCATION==ACCESS_POINT['restaurant']:
 				smartcard_handler_for_restaurant(client, message)
-			elif ENV_DEPLOYMENT_LOCATION==DEPLOYMENT_LOCATION['restaurant']:
+			elif DEPLOYMENT_LOCATION==ACCESS_POINT['bar']:
 				smartcard_handler_for_bar(client, message)
 
 

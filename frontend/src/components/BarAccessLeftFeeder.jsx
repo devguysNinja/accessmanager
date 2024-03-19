@@ -5,10 +5,10 @@ import Image from "react-bootstrap/Image";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
 import { Context } from "../App";
 
-export default function AccessLeftFeeder({ userData }) {
-	const { meal_category, used_count, balance } = userData || {};
-	const { grant_type } = userData || {};
-	const { drink_category } = userData || {};
+export default function BarAccessLeftFeeder({ userData }) {
+	console.log("USer Data: ", userData)
+	const { drink_category, used_count, balance } = userData || "";
+	const { grant_type } = userData || "";
 	const ACCESS_GRANTED = "ACCESS GRANTED";
 	return (
 		<div style={{ height: "335px" }}>
@@ -16,7 +16,7 @@ export default function AccessLeftFeeder({ userData }) {
 				<b style={{ fontSize: "xx-large", color:"#000", marginRight:"30px" }}>Access Allowed</b>
 			</div>{" "}
 			<Badge bg={"dark"} style={{ fontSize: "25px"}}>
-				{meal_category || drink_category|| 0}
+				{drink_category || 0}
 			</Badge>
 			<br />
 			<div style={{ display: "inline" }}>
