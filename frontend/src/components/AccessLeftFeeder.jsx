@@ -3,13 +3,26 @@ import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import Image from "react-bootstrap/Image";
 import ApiRoute, { ApiLogout } from "../config/ApiSettings";
-import { Context } from "../App";
 
 export default function AccessLeftFeeder({ userData }) {
-	const { meal_category, used_count, balance } = userData || {};
+	const { meal_category, used_count, balance, message, owner_profile, swipe_count, } = userData || {};
 	const { grant_type } = userData || {};
-	const { drink_category } = userData || {};
+	const { drink_category, access_point } = userData || {};
 	const ACCESS_GRANTED = "ACCESS GRANTED";
+	const ACCESS_POINT = "BAR"
+
+
+
+	useEffect(()=>{
+		if (grant_type===ACCESS_GRANTED && access_point===ACCESS_POINT){
+			const timeout = setTimeout(()=>{
+				window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/drinks-access-gate/?drink=${drink_category}&&uid=${owner_profile}&&swipe=${swipe_count}&&used=${used_count}&&access=${access_point}&&grant=${grant_type}`);
+
+			},3000)
+		}
+		return (timeout)=>(clearTimeout(timeout))
+	})
+
 	return (
 		<div style={{ height: "335px" }}>
 			<div style={{ display: "inline" }}>
@@ -53,6 +66,7 @@ export default function AccessLeftFeeder({ userData }) {
 			>
 				{grant_type || "NO ACCESS"}
 			</span>
+			<span>{message}</span>
 		</div>
 	);
 }

@@ -20,30 +20,36 @@ from .reports import report
 
 @api_view(["POST"])
 def drink_transaction(request):
-	ACCESS_GRANTED = "ACCESS GRANTED"
 	request_data = request.data
 	print("####...: ", request_data)
 	request_json = json.dumps(request_data)
 	owner_profile = UserProfile.objects.get(id=request_data['owner_profile'])
 	drink_category = owner_profile.category.drink_access
+	reader_uid = owner_profile.reader_uid
 	#...get today's transaction
 	today = timezone.now().date()
 	# today_transaction = Transaction.objects.filter(reader_uid=request_data['reader_uid'], 
 	# 	grant_type=ACCESS_GRANTED, access_point='BAR', 
 	# 	date__date=today)
-	drink_taken = DrinkCart.objects.filter(reader_uid=request_data['reader_uid'], order_date__date=today)
-	total_drink_taken = drink_taken.aggregate(total_qty=Sum('qty'))['total_qty']
+	drink_taken_queryset = DrinkCart.objects.filter(reader_uid=reader_uid, order_date__date=today)
+	first_drink = drink_taken_queryset.first()
+	total_drink_taken = 0
+	if first_drink:
+		total_drink_taken = drink_taken_queryset.aggregate(total_qty=Sum('qty'))['total_qty']
+	print("TAKEN: ", total_drink_taken)
 	balance = drink_category - total_drink_taken
 	sum_cart = sum([val for key,val in request_data['cart_item'].items()])
 	print("Sum Cart: ", sum_cart)
 	if (sum_cart > drink_category) or (sum_cart > balance):
 		return Response(data={"error": "Excess drinks taken"}, status=status.HTTP_400_BAD_REQUEST)
 	#...create Transaction
+	INCREMENT = 1
+	SWIPE_COUNT = int(request_data['swipe_count']) + INCREMENT
 	transaction = Transaction.objects.create(
 	owner=owner_profile,
 	authorizer=owner_profile,
-	swipe_count=request_data['swipe_count'],
-	reader_uid=request_data['reader_uid'],
+	swipe_count=SWIPE_COUNT,
+	reader_uid=reader_uid,
 	access_point=request_data['access_point'],
 	raw_payload=request_json,
 	grant_type=request_data['grant_type'],
@@ -54,7 +60,7 @@ def drink_transaction(request):
 	for key,val in request_data['cart_item'].items():
 		try:
 			drink = Drink.objects.get(drink=key.capitalize())
-			DrinkCart.objects.create(drink=drink, qty=val,transaction=transaction,reader_uid=request_data['reader_uid'])
+			DrinkCart.objects.create(drink=drink, qty=val,transaction=transaction,reader_uid=reader_uid)
 		except Drink.DoesNotExist:
 			Response(data=request_data, status=status.HTTP_400_BAD_REQUEST)
 
@@ -305,6 +311,7 @@ def get_restaurant_transaction_details(request, pk=None):
 			"avatar": avatar,
 			"department": str(owner_profile.department),
 			"grant_type": grant_type,
+			"message": request_data["message"]
 		}
 		return Response(data=response_data, status=status.HTTP_200_OK)
 	return Response(data={_user.username}, status=status.HTTP_200_OK)

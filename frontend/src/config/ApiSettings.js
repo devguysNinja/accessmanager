@@ -20,6 +20,7 @@ class ApiRoute {
   static TRANSACTION_LIST_URL = `${ApiRoute.BASE_URL}/transactions`;
   static TRANSACTION_ACTRL_URL = `${ApiRoute.BASE_URL}/transactions/access-control`;
   static TRANSACTION_OWNER_DETAILS_URL = `${ApiRoute.BASE_URL}/transactions/owner-details`;
+  static TRANSACTION_DRINK_CART_URL = `${ApiRoute.BASE_URL}/drink-cart`;
 }
 
 export async function ApiLogout(url = ApiRoute.LOGOUT_URL, metd = "POST", cred = false) {
