@@ -77,11 +77,18 @@ def create_transaction(
 def is_valid_shift_time(shift_times, time_now_obj):
 	is_within_interval = False
 	for start_time, end_time in shift_times:
-		# Check if start_time <= given_time <= end_time for intervals not spanning midnight
+		# shift_delta = (start_time - time_now_obj) <= 24
+		# print("#####....DELTA: ", shift_delta)
+		#... Check if start_time <= given_time <= end_time for intervals not spanning midnight
 		if start_time <= time_now_obj <= end_time:
 			is_within_interval = True
 			break
-		# Check if given_time is within the night shift interval spanning midnight
+		#... Check if given_time is within 24 hrs shift interval spanning midnight
+		# elif (start_time > end_time) and shift_delta:
+		# 	# if time_now_obj >= start_time or time_now_obj <= end_time:
+		# 	is_within_interval = True
+		# 	break
+		#... Check if given_time is within the night shift interval spanning midnight
 		elif start_time > end_time:
 			if time_now_obj >= start_time or time_now_obj <= end_time:
 				is_within_interval = True
@@ -94,10 +101,13 @@ def is_valid_shift_time(shift_times, time_now_obj):
 
 def check_calendar(uid):
 	try:
-		t_day = timezone.now().strftime("%A")
+		# t_day = timezone.now().strftime("%A")
+		t_day = datetime.now().strftime("%A")
 		t_date = timezone.now().date().strftime("%Y-%m-%d")
+		print("DATE: ", t_date)
 		employee_profile = UserProfile.objects.get(reader_uid=uid)
 		batch = employee_profile.batch
+		print("****BATCH: ", batch)
 		work_day = WorkDay.objects.filter(day_symbol=t_day.capitalize()).first()
 		batch_rosters = MonthlyRoster.objects.filter(
 			batch=batch.id, work_day=work_day.id, shift_date=t_date
@@ -109,11 +119,11 @@ def check_calendar(uid):
 		print("DAY NAME: ", t_day)
 		employee_shift = [roster.shift.name for roster in batch_rosters]
 		print("SHIFTS: ", employee_shift)
-		employee_shit_interval = [
+		employee_shift_interval = [
 			(roster.shift.start_time, roster.shift.end_time) for roster in batch_rosters
 		]
-		print("TIMES: ", employee_shit_interval)
-		if is_valid_shift_time(employee_shit_interval, parsed_current_time):
+		print("TIMES: ", employee_shift_interval)
+		if is_valid_shift_time(employee_shift_interval, parsed_current_time):
 			return True
 		else:
 			return False
@@ -124,24 +134,28 @@ def check_calendar(uid):
 
 def smartcard_handler_for_restaurant(client, message):
 	reader_message = message.payload.decode("UTF-8")
-	print(f'Recieved message: {str(message.payload.decode("utf-8"))}')
+	print(f'Recieved message restaurant: {str(message.payload.decode("utf-8"))}')
 	print("IS JSON: ", is_json(reader_message))
 	if not is_json(reader_message):
 		reader_uid = str(reader_message)
 		owner_profile = UserProfile.objects.filter(reader_uid=reader_message).first()
 		if owner_profile is None:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			meta_data = {"message":"Invalid Card Detected!"}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED, reader_uid), **meta_data})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING.... NO USER PROFILE!")
 			return
 		on_schedule = check_calendar(reader_uid)
 		if on_schedule is None:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			meta_data = {"message":"Invalid Card Detected!"}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED, reader_uid), **meta_data})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING.... NO USER PROFILE!")
 			return
 		elif not on_schedule:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			meta_data = {"message":"Employee not on schedule!", **dict(username=owner_profile.user.username,
+				department=str(owner_profile.department),)}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED, reader_uid), **meta_data})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING....  EMPLOYEE NOT ON SCHEDULE!")
 			return
@@ -219,18 +233,22 @@ def smartcard_handler_for_bar(client, message):
 		reader_uid = str(reader_message)
 		owner_profile = UserProfile.objects.filter(reader_uid=reader_message).first()
 		if owner_profile is None:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			bar_meta = {"access_point":"BAR", "message":"Invalid Card Detected!"}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED, reader_uid), **bar_meta})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING.... NO USER PROFILE!")
 			return
 		on_schedule = check_calendar(reader_uid)
 		if on_schedule is None:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			bar_meta = {"access_point":"BAR", "message":"Invalid Card Detected!"}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED, reader_uid), **bar_meta})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING.... NO USER PROFILE!")
 			return
 		elif not on_schedule:
-			grant_data = json.dumps(publish_data(ACCESS_DENIED))
+			bar_meta = {"access_point":"BAR", "message":"Employee not on schedule!", **dict(username=owner_profile.user.username,
+				department=str(owner_profile.department),)}
+			grant_data = json.dumps({**publish_data(ACCESS_DENIED,reader_uid), **bar_meta})
 			client.publish(TOPIC, grant_data)
 			print("***->RETURNING....  EMPLOYEE NOT ON SCHEDULE!")
 			return
@@ -242,19 +260,20 @@ def smartcard_handler_for_bar(client, message):
 		print("THIS IS THE TRANSACTION OBJECT:", today_transaction)
 		# ...No transactions exist yet today for this user
 		if today_transaction.first() is None:
-			bar_data = {"access_point":"BAR", "owner_profile":str(owner_profile.id)}
+			bar_data = {"access_point":"BAR", "owner_profile":str(owner_profile.id), "message":"Enjoy your drinks!"}
 			bar_meta = {**bar_data, **dict(avatar=str(owner_profile.profile_image), 
 				username=owner_profile.user.username,
 				department=str(owner_profile.department),
 				drink_category=owner_profile.category.drink_access,
 				used_count = 0,
+				swipe_count= 0,
 				balance=owner_profile.category.drink_access,)}
 			grant_data = json.dumps({**publish_data(ACCESS_GRANTED, reader_uid), **bar_meta})
 			client.publish(TOPIC, grant_data)
 			return
 
 		# ...transactions exists for this user
-		transaction_count = today_transaction.count()
+		# transaction_count = today_transaction.count()
 		SWIPE_COUNT = today_transaction.last().swipe_count
 		drink_category = owner_profile.category.drink_access
 		drink_taken = DrinkCart.objects.filter(reader_uid=reader_uid, order_date__date=today)
@@ -262,10 +281,10 @@ def smartcard_handler_for_bar(client, message):
 		total_drink_taken = drink_taken.aggregate(total_qty=Sum('qty'))['total_qty']
 		print("&&&& Total Drink Taken: ", total_drink_taken )
 
-		if (transaction_count >= drink_category) or (total_drink_taken >= drink_category):
-			SWIPE_COUNT += SWIPE_COUNT
+		if (SWIPE_COUNT >= drink_category) or (total_drink_taken >= drink_category):
+			# SWIPE_COUNT += SWIPE_COUNT
 			balance = drink_category - total_drink_taken
-			bar_data = {"access_point":"BAR", "swipe_count":SWIPE_COUNT, "owner_profile":str(owner_profile.id)}
+			bar_data = {"access_point":"BAR", "swipe_count":SWIPE_COUNT, "owner_profile":str(owner_profile.id), "message": "You had enough drinks for today!"}
 			bar_meta = {**bar_data, **dict(avatar=str(owner_profile.profile_image),
 				username=owner_profile.user.username,
 				department=str(owner_profile.department),
@@ -278,8 +297,9 @@ def smartcard_handler_for_bar(client, message):
 			return
 
 		if total_drink_taken < drink_category:
+			# SWIPE_COUNT += SWIPE_COUNT
 			balance = drink_category - total_drink_taken
-			bar_data = {"access_point":"BAR", "swipe_count":SWIPE_COUNT, "owner_profile":str(owner_profile.id)}
+			bar_data = {"access_point":"BAR", "swipe_count":SWIPE_COUNT, "owner_profile":str(owner_profile.id), "message": "Enjoy your drinks!"}
 			bar_meta = {**bar_data, **dict(avatar=str(owner_profile.profile_image), 
 				username=owner_profile.user.username,
 				department=str(owner_profile.department),

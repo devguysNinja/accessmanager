@@ -1,6 +1,6 @@
 import { Client } from "paho-mqtt";
 
-// const mqttBroker = "ws://broker.hivemq.com/";
+// const mqttBroker = "ws://broker.hivemq.com/"; mqtt.eclipseprojects.io TEMPERATURE
 const mqttBroker = "broker.hivemq.com";
 const clientId = `react-client-${Math.random().toString(36).substring(7)}`;
 const client = new Client(mqttBroker, 8000, clientId);

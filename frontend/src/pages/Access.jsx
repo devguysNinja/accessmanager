@@ -10,6 +10,8 @@ import AccessLeftFeeder from "../components/AccessLeftFeeder";
 import BarAccessLeftFeeder from "../components/BarAccessLeftFeeder";
 import ApiRoute, { ApiLogout, Capitalize, BEARER } from "../config/ApiSettings";
 
+ 
+
 function Access() {
 	const { mqttclient } = useContext(Context);
 	const {
@@ -36,16 +38,21 @@ function Access() {
 		}
 	}, [mqttclient]);
 
-	console.log("Broker Message: ", brokerMessage);
 
 	//...Assemble the Payload
 	let restaurantPayLoad;
 	let barPayLoad;
+	let invalidPayLoad;
 	try {
 		// console.log("Broker Message: ", brokerMessage)
 		const { payloadString } = brokerMessage;
 		const ownerData = JSON.parse(payloadString);
+		// if ("grant_type" in ownerData && ownerData?.message) {
+		// 	console.log("Restaurant Data: ", ownerData);
+		// 	invalidPayLoad = { ...ownerData };
+		// }
 		if ("grant_type" in ownerData && !("access_point" in ownerData)) {
+			console.log("Restaurant Data: ", ownerData);
 			restaurantPayLoad = { ...ownerData };
 		}
 
