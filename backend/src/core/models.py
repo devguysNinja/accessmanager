@@ -80,14 +80,16 @@ def on_save_signal_event(*args, **kwargs):
 	reader_uid = kwargs["instance"].reader_uid
 	try:
 		if grant_type == ACCESS_GRANTED:
-			data = json.dumps(publish_data(ACCESS_GRANTED, uid=reader_uid))
+			meta_data = {"message":"Enjoy your meal!"}
+			data = json.dumps({**publish_data(ACCESS_GRANTED, uid=reader_uid), **meta_data})
 			mqtt_publish.single(
 				TOPIC,
 				payload=data,
 				hostname=mqtt_broker,
 			)
 		if grant_type == ACCESS_DENIED:
-			data = json.dumps(publish_data(ACCESS_DENIED, uid=reader_uid))
+			meta_data = {"message":"You had enough meal today!"}
+			data = json.dumps({**publish_data(ACCESS_GRANTED, uid=reader_uid), **meta_data})
 			mqtt_publish.single(
 				TOPIC,
 				payload=data,
