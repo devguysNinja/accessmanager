@@ -157,8 +157,8 @@ const ScheduleLayout = () => {
       try {
         const response = await fetch(ROSTERS_URL);
        
-        const shiftdata = await response.json();
-        setShiftsData(shiftdata);
+        const shiftData = await response.json();
+        setShiftsData(shiftData);
       } catch (error) {
         console.error("Error fetching Schedule:", error.message);
       }
@@ -304,7 +304,7 @@ const ScheduleLayout = () => {
           <tbody style={{padding:"5px"}}>
             {shiftsData.map((shift) => (
               <tr key={shift.id} style={{fontWeight:"500"}}>
-                <td>{shift.shift_date}</td>
+                <td>{shift.shift_start_date}</td>
                 <td style={{fontWeight:"700"}}>{shift.work_day}</td>
                 <td>{shift.shift}</td>
                 <td style={{fontWeight:"700"}}>{shift.batch}</td>

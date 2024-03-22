@@ -7,47 +7,49 @@ from .forms import MonthlyRosterForm
 
 
 class ShiftTypeAdmin(admin.ModelAdmin):
-    list_display = ["shift_type", "name", "start_time", "end_time"]
-    list_display_links = None  # ["name"]
-    list_editable = ["name", "start_time", "end_time"]
-    list_per_page = 20
+	list_display = ["shift_type", "name", "start_time", "end_time","duration"]
+	list_display_links = None # ["name"]
+	list_editable = ["name", "start_time", "end_time", "duration"]
+	list_per_page = 20
 
-    def shift_type(self, obj):
-        return f"{obj.name.upper()}"
+	def shift_type(self, obj):
+		return f"{obj.name.upper()}"
 
 
 admin.site.register(ShiftType, ShiftTypeAdmin)
 
 
 class WorkDayAdmin(admin.ModelAdmin):
-    list_display = ["day_symbol", "day_code"]
-    list_display_links = None
-    list_editable = ["day_symbol", "day_code"]
+	list_display = ["day_symbol", "day_code"]
+	list_display_links = None
+	list_editable = ["day_symbol", "day_code"]
 
 
 admin.site.register(WorkDay, WorkDayAdmin)
 
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
-    # form = MonthlyRosterForm
-    list_display = [
-        # "shift_days",
-        "work_day",
-        "shift",
-        "batch",
-        # "shift_members",
-        "week_start_date",
-        "shift_date"
-    ]
-    list_display_links = [
-        "shift_date",
-        "shift",
-        #   "week_no",
-    ]
-    # list_editable = ["shift", "start_date", "end_date"]
-    # filter_horizontal = ["employees"]
-    list_per_page = 20
-    save_on_top = True
+	# form = MonthlyRosterForm
+	list_display = [
+		# "shift_days",
+		"work_day",
+		"shift",
+		"batch",
+		# "shift_members",
+		"week_start_date",
+		"shift_start_date",
+		"shift_end_date"
+	]
+	list_display_links = [
+		"shift_start_date",
+		"shift_end_date",
+		"shift",
+		#   "week_no",
+	]
+	# list_editable = ["shift", "start_date", "end_date"]
+	# filter_horizontal = ["employees"]
+	list_per_page = 20
+	save_on_top = True
 
 
 #
