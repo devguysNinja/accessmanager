@@ -1,0 +1,152 @@
+/* TransactionReport.css */
+.transaction-report-container {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.transaction-report-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+    
+}
+
+.transaction-report-container p {
+    color: red;
+    font-size: 14px;
+    text-align: center;
+}
+
+.report-section {
+    margin-bottom: 30px;
+}
+
+/* ReportFilterComponent.css */
+.report-filter-container {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+}
+
+.report-filter-container label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.report-filter-container input[type="text"],
+.report-filter-container select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.report-filter-container select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23767676'%3E%3Cpath d='M7 10l5 5 5-5H7z'/%3E%3C/svg%3E") no-repeat right 10px center/15px 15px;
+    cursor: pointer;
+}
+
+.report-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    
+}
+
+.report-filter-children{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-filter-children > div + div {
+    margin-right: 15px;
+}
+.report-filter-container label {
+    margin-bottom: 5px;
+}
+
+.report-filter-container select,
+.report-filter-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.report-filter-container select {
+    cursor: pointer;
+}
+
+.report-filter-container input[type="text"] {
+    width: calc(100% - 18px); /* Adjust width for better appearance */
+}
+
+/* TransactionTableComponent.css */
+.transaction-table-container {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.transaction-table-container th,
+.transaction-table-container td {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.transaction-table-container th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: left;
+}
+
+.transaction-table-container td {
+    text-align: left;
+}
+
+.transaction-table-container tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.transaction-table-container tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+.report-filter-buttons {
+    display: flex;
+    justify-content: flex-end; 
+    margin-top: 20px; 
+}
+
+.report-filter-buttons button {
+    margin-left: 10px; 
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: gold;
+    color: #000;
+    cursor: pointer;
+}
+
+.report-filter-buttons button:hover {
+    background-color: #0056b3;
+}
+
+.no-records{
+    font-size: 20px;
+    color: red;
+}
