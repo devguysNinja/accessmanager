@@ -2,6 +2,7 @@ from typing import Any
 import jwt, datetime
 
 from .field_choices_serializers import (
+    BatchField,
     DepartmentField,
     EmployeeCategoryField,
     EmployeeStatusField,
@@ -29,6 +30,7 @@ from .serializers import (
     AvatarSerializer,
 )
 from .models import (
+    Batch,
     Department,
     EmployeeCategory,
     EmployeeStatus,
@@ -310,19 +312,22 @@ class ProfileFieldChoicesView(APIView):
         departments = Department.objects.all()
         emp_status = EmployeeStatus.objects.all()
         categories = EmployeeCategory.objects.all()
+        groups = Batch.objects.all()
 
         loc_serializer = LocationField(locations, many=True)
         departments_serializer = DepartmentField(departments, many=True)
         emp_status_serializer = EmployeeStatusField(emp_status, many=True)
         categories_serializer = EmployeeCategoryField(categories, many=True)
+        group_serializer = BatchField(groups, many=True)
 
         choice_dict_values = [
             loc_serializer.data,
             departments_serializer.data,
             emp_status_serializer.data,
             categories_serializer.data,
+            group_serializer.data
         ]
-        choice_dict_keys = ["location", "department", "emp_status", "category"]
+        choice_dict_keys = ["location", "department", "emp_status", "category", "group"]
         choice_dict = dict(zip(choice_dict_keys, choice_dict_values))
 
         return Response(data=choice_dict, status=status.HTTP_200_OK)

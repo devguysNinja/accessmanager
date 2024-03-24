@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Department, EmployeeCategory, EmployeeStatus, Location
+from .models import Batch, Department, EmployeeCategory, EmployeeStatus, Location
 
 
 class LocationField(serializers.ModelSerializer):
@@ -23,6 +23,11 @@ class EmployeeCategoryField(serializers.ModelSerializer):
     class Meta:
         model = EmployeeCategory
         fields = ["id", "cat_name"]
+
+class BatchField(serializers.ModelSerializer):
+    class Meta:
+        model = Batch
+        fields = ["id", "name"]
 
 
 
