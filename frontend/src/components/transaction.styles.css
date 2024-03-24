@@ -33,11 +33,22 @@
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
+    flex-wrap: wrap;
 }
+
+.column {
+    flex: 1;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+ 
 
 .report-filter-container label {
     font-weight: bold;
     margin-right: 10px;
+    margin-bottom: 5px;
+
 }
 
 .report-filter-container input[type="text"],
@@ -58,31 +69,11 @@
     cursor: pointer;
 }
 
-.report-filter-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;
-    
-}
-
-.report-filter-children{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.report-filter-children > div + div {
-    margin-right: 15px;
-}
-.report-filter-container label {
-    margin-bottom: 5px;
-}
 
 .report-filter-container select,
 .report-filter-container input {
     width: 100%;
-    padding: 8px;
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
@@ -128,8 +119,8 @@
 
 .report-filter-buttons {
     display: flex;
-    justify-content: flex-end; 
-    margin-top: 20px; 
+    justify-content: center; 
+  margin-top: 20px; 
 }
 
 .report-filter-buttons button {
