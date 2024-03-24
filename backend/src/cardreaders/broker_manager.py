@@ -21,7 +21,7 @@ def get_secret(setting):
 		raise ValueError(error_msg)
 
 DEPLOYMENT_LOCATION = get_secret('DEPLOYMENT_LOCATION')
-ACCESS_POINT = {"restaurant": "RESTAURANT", "bar": "BAR"}
+ACCESS_POINTS = {"restaurant": "RESTAURANT", "bar": "BAR"}
 
 class BrokerEventManager:
 	def __init__(self, client) -> None:
@@ -34,9 +34,9 @@ class BrokerEventManager:
 			# print("$$$$$...Calling usb_smartcard_handler")
 
 			# check if DEPLOYMENT_LOCATION=Restaurant
-			if DEPLOYMENT_LOCATION==ACCESS_POINT['restaurant']:
+			if DEPLOYMENT_LOCATION==ACCESS_POINTS['restaurant']:
 				smartcard_handler_for_restaurant(client, message)
-			elif DEPLOYMENT_LOCATION==ACCESS_POINT['bar']:
+			elif DEPLOYMENT_LOCATION==ACCESS_POINTS['bar']:
 				smartcard_handler_for_bar(client, message)
 
 
