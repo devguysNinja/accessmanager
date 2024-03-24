@@ -12,6 +12,7 @@ import { connect } from "./config/mqttService";
 import Footer from "./pages/Footer";
 import ApiRoute from "./config/ApiSettings";
 import Dashboard from "./components/MyAdmin";
+import TransactionReportComponent from "./components/TransactionReportComponent";
 
 export const Context = React.createContext("");
 export const ReportContext = React.createContext("");
@@ -116,6 +117,7 @@ function App() {
 				<Route path="/drinks-access-gate" component={() => <DrinksAccess />} />
 				<Route path="/schedule" component={() => <Schedule/>}/>
 				<Route path="/admin" component={() => <Dashboard/>} />
+				<Route path="/transaction-report" component={() => <TransactionReportComponent/>} />
 				<Footer/>
 			</ReportContext.Provider>
 			</Context.Provider>
