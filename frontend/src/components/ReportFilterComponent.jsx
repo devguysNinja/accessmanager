@@ -307,8 +307,8 @@ const ReportFilterComponent = ({
               onChange={handleFilterChange}
             >
               <option value="">Select Access-point</option>
-              <option value="Access_granted">Access granted</option>
-              <option value="Access_denied">Access denied</option>
+              <option value="ACCESS GRANTED">Access granted</option>
+              <option value="ACCESS DENIED">Access denied</option>
             </select>
           </div>
 

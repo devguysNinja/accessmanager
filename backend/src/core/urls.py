@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    TransactionAPIView,
     TransactionReportApiView,
     TransactionView,
     get_restaurant_transaction_details,
@@ -27,7 +28,7 @@ urlpatterns = [
     ),
     path(
         "transactions/access-control",
-        TransactionView.as_view(),
+        TransactionAPIView.as_view(),
         name="transaction_create_api_view",
     ),
     path(

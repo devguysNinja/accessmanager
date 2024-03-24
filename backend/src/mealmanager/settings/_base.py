@@ -196,3 +196,8 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 LOGIN_URL = "http://localhost:3000/login"
 APPEND_SLASH = True
 # SITE_ID = 1
+
+DEPLOYMENT_LOCATION = get_secret('DEPLOYMENT_LOCATION')
+ACCESS_POINTS = {"restaurant": "RESTAURANT", "bar": "BAR"}
+TOPIC = "orinlakantobad"
+MQTT_BROKER = "broker.hivemq.com"

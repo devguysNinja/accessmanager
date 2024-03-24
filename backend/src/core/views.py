@@ -1,5 +1,6 @@
 import jwt, datetime
 import json
+from django.conf import settings
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,6 +13,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import AuthenticationFailed
+
+from .transaction_event_handler import (
+    smartcard_handler_for_bar,
+    smartcard_handler_for_restaurant,
+)
 from .serializers import (
     DrinkCategoryListSerializer,
     TransactionReportSerializer,
@@ -91,8 +97,20 @@ def drink_transaction(request):
                 data={"error": f"Drink name [{key}]not found!"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-    return Response(data=serializer.data, status=status.HTTP_200_OK)
+    drink_taken_queryset = DrinkCart.objects.filter(
+        reader_uid=reader_uid, order_date__date=today
+    )
+    total_drink_taken = drink_taken_queryset.aggregate(total_qty=Sum("qty"))[
+        "total_qty"
+    ]
+    balance = drink_category - total_drink_taken
+    response_data = {
+        "balance": balance,
+        "allow_access": drink_category,
+        "used_access": total_drink_taken,
+        "employee": (owner_profile.user.full_name).capitalize(),
+    }
+    return Response(data=response_data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -172,6 +190,26 @@ class TransactionReportApiView(generics.ListCreateAPIView):
         print("Self REQUEST: ", self.request.query_params)
         q_set = filter_queryset(self.request, Transaction)
         return q_set
+
+
+class TransactionAPIView(generics.ListCreateAPIView):
+    def post(self, request, *args, **kwargs):
+        request_data = request.data
+        print("OOOOOO====request Data: ", request_data["usb_input"])
+        usb_input = request_data["usb_input"]
+        if usb_input.startswith("0"):
+            usb_input = usb_input[1:]
+        try:
+            # check if DEPLOYMENT_LOCATION=Restaurant
+            if settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["restaurant"]:
+                smartcard_handler_for_restaurant(usb_input)
+            elif settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["bar"]:
+                smartcard_handler_for_bar(usb_input)
+        except Exception as ex:
+            return Response(data={"error": ex.args[0]})
+        return Response(
+            data={"message": "Transaction successful!"}, status=status.HTTP_200_OK
+        )
 
 
 class TransactionView(APIView):
