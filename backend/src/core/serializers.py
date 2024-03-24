@@ -25,6 +25,30 @@ class DrinkCategoryListSerializer(serializers.ModelSerializer):
         return representation
 
 
+class TransactionReportSerializer(serializers.ModelSerializer):
+    # employee = serializers.CharField(source="owner.user.username")
+    class Meta:
+        model = Transaction
+        fields = [
+           "id",
+            "swipe_count",
+            "reader_uid",
+            "access_point",
+            "grant_type",
+            "date",
+        ]
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        representation['employee'] = instance.owner.user.full_name
+        representation['employee_id'] = instance.owner.employee_id
+        representation['department'] = instance.owner.department.dept_name
+        representation['employee_status'] = instance.owner.employee_status.status
+        representation['location'] = instance.owner.location.name
+        representation['group'] = instance.owner.batch.name
+        representation['category'] = instance.owner.category.cat_name
+        return representation
+
 class TransactionSerializer(serializers.ModelSerializer):
     owner = UserProfileSerializer()
     authorizer = UserProfileSerializer()

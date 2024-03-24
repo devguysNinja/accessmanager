@@ -23,6 +23,7 @@ class Transaction(models.Model):
 	raw_payload = models.JSONField()
 	door = models.CharField(max_length=128, blank=True, null=True)
 	grant_type = models.CharField(max_length=25)
+	reason = models.CharField(max_length=50, blank=True, null=True)
 
 	def __str__(self):
 		return f"Transaction-{self.owner.user.username}"
