@@ -2,7 +2,7 @@ class ApiRoute {
   static API_ADMIN = process.env.REACT_APP_API_ADMIN;
   static FRONTEND_DOMAIN = window.location.origin;
 
-   static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app" 
+  static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app";
   // static API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
 
   static BASE_PATH = "/api/v1";
@@ -21,9 +21,14 @@ class ApiRoute {
   static TRANSACTION_ACTRL_URL = `${ApiRoute.BASE_URL}/transactions/access-control`;
   static TRANSACTION_OWNER_DETAILS_URL = `${ApiRoute.BASE_URL}/transactions/owner-details`;
   static TRANSACTION_DRINK_CART_URL = `${ApiRoute.BASE_URL}/drink-cart`;
+  static REPORT_URL = `${ApiRoute.BASE_URL}/transactions/reports`
 }
 
-export async function ApiLogout(url = ApiRoute.LOGOUT_URL, metd = "POST", cred = false) {
+export async function ApiLogout(
+  url = ApiRoute.LOGOUT_URL,
+  metd = "POST",
+  cred = false
+) {
   try {
     await fetch(url, {
       method: metd,
@@ -46,13 +51,54 @@ export async function ApiLogout(url = ApiRoute.LOGOUT_URL, metd = "POST", cred =
 export function Capitalize(params) {
   try {
     var inputString = params;
-    var outputString = inputString.charAt(0).toUpperCase() + inputString.slice(1);
+    var outputString =
+      inputString.charAt(0).toUpperCase() + inputString.slice(1);
     return outputString;
   } catch (error) {
     // return "Staff";
   }
 }
-const auth_token = JSON.parse(localStorage.getItem('jwt'))
-export const BEARER = `Bearer ${auth_token}`
+
+export function TimeStringConverter(timestring) {
+  const timestamp = timestring;
+  const date = new Date(timestamp);
+
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+
+  const formattedDate = `${year}-${month}-${day}`;
+  const formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+  const result = `${formattedDate} ${formattedTime}`;
+  return result;
+}
+
+export function DateConverter(timestring) {
+  const timestamp = timestring;
+  const date = new Date(timestamp);
+
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+
+  const formattedDate = `${year}-${month}-${day}`;
+  return formattedDate;
+}
+
+
+export const CLEANED_URL = (my_url) => {
+  let removeAmpersand = my_url.replace(/\?&/g, "?");
+  return removeAmpersand
+}
+
+const auth_token = JSON.parse(localStorage.getItem("jwt"));
+export const BEARER = `Bearer ${auth_token}`;
 
 export default ApiRoute;

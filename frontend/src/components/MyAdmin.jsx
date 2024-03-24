@@ -15,8 +15,8 @@ const Dashboard = () => {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/schedule`);
   };
 
-  const viewOrders = () => {
-    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/orders`);
+  const transactionReport = () => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/transaction-report`);
   };
 
   const manageMenu = () => {
@@ -43,11 +43,11 @@ const Dashboard = () => {
           </Card>
           <Card className="dashboard-card">
             <Card.Body>
-              <Card.Title>History</Card.Title>
+              <Card.Title>Transaction History</Card.Title>
               <Card.Text>
-                View history.
+                View Report.
               </Card.Text>
-              <Button variant="success" onClick={viewOrders}>View History</Button>
+              <Button variant="success" onClick={transactionReport}>Transaction Report</Button>
             </Card.Body>
           </Card>
           <Card className="dashboard-card">

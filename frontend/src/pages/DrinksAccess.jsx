@@ -24,12 +24,12 @@ function DrinksAccess() {
 		// Check if the drink already exists in the cart
 		if (existingDrinkIndex !== -1) {
 			const updatedCart = [...cart];
-			updatedCart[existingDrinkIndex].count += 1; // Increment the count of the existing drink
+			updatedCart[existingDrinkIndex].count += 1; 
 			setCart(updatedCart);
 		} else {
      
 			if (cart.length >= paramObj.drink) {
-				alert("You can't add more than 2 drinks to the cart");
+				toast.error("You can't add more than 2 drinks to the cart");
 			} else {
 				// add the drink to the cart with count = 1
 				setCart([...cart, { drink: drink, count: 1 }]);
