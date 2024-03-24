@@ -27,6 +27,7 @@ TOPIC = "orinlakantobad"
 ACCESS_GRANTED = "ACCESS GRANTED"
 ACCESS_DENIED = "ACCESS DENIED"
 ACCESS_POINT = "LOCAL"
+DENIAL_REASON = "YOU HAD ENOUGH MEAL TODAY!"
 
 
 def create_transaction(
@@ -36,6 +37,7 @@ def create_transaction(
     point: str,
     raw: str,
     grant: str,
+    reason: str
 ):
     transaction = Transaction(
         owner=owner,
@@ -45,12 +47,11 @@ def create_transaction(
         access_point=point,
         raw_payload=raw,
         grant_type=grant,
+        reason=reason
     )
     return transaction
 
     # region
-
-
 # def check_calendar_old(uid):
 #     try:
 #         employee_profile = UserProfile.objects.get(reader_uid=uid)
@@ -79,17 +80,10 @@ def create_transaction(
 def is_valid_shift_time(shift_times, time_now_obj):
     is_within_interval = False
     for start_time, end_time in shift_times:
-        # shift_delta = (start_time - time_now_obj) <= 24
-        # print("#####....DELTA: ", shift_delta)
         # ... Check if start_time <= given_time <= end_time for intervals not spanning midnight
         if start_time <= time_now_obj <= end_time:
             is_within_interval = True
             break
-        # ... Check if given_time is within 24 hrs shift interval spanning midnight
-        # elif (start_time > end_time) and shift_delta:
-        # 	# if time_now_obj >= start_time or time_now_obj <= end_time:
-        # 	is_within_interval = True
-        # 	break
         # ... Check if given_time is within the night shift interval spanning midnight
         elif start_time > end_time:
             if time_now_obj >= start_time or time_now_obj <= end_time:
@@ -184,7 +178,6 @@ def smartcard_handler_for_restaurant(client, message):
             today_transaction = Transaction.objects.filter(
                 reader_uid=reader_uid, grant_type=ACCESS_GRANTED, date__date=today
             )
-            print("THIS IS THE TRANSACTION OBJECT:", today_transaction)
             # ...No transactions exist yet today for this user
             if today_transaction.first() is None:
                 raise Transaction.DoesNotExist(
@@ -193,7 +186,6 @@ def smartcard_handler_for_restaurant(client, message):
 
             # ...transactions exists for this user
             transaction_count = today_transaction.count()
-            # meal_category = today_transaction.first().owner.meal_category
             meal_category = owner_profile.category.meal_access
             SWIPE_COUNT = transaction_count
             if SWIPE_COUNT < meal_category:
@@ -221,6 +213,7 @@ def smartcard_handler_for_restaurant(client, message):
                     ACCESS_POINT,
                     reader_message,
                     ACCESS_DENIED,
+                    DENIAL_REASON
                 ).save()
                 print("***->RETURNING....YOU HAD ENOUGH MEAL TODAY!")
                 return
@@ -291,7 +284,7 @@ def smartcard_handler_for_bar(client, message):
             access_point="BAR",
             date__date=today,
         )
-        print("THIS IS THE TRANSACTION OBJECT:", today_transaction)
+        print("THIS IS THE TRANSACTION OBJECT:", today_transaction) 
         # ...No transactions exist yet today for this user
         if today_transaction.first() is None:
             bar_data = {

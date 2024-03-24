@@ -1,33 +1,41 @@
 from django.shortcuts import render
-from rest_framework import generics,status
+from rest_framework import generics, status
 from rest_framework.response import Response
 
 from users.auth_service import user_auth
 
 
 from .models import MonthlyRoster, ShiftType, WorkDay
-from .serializers import BatchCreateSerializer, BatchSerializer, RosterCreateSerializer, RosterSerializer, RosterUpdateSerializer
+from .serializers import (
+    BatchCreateSerializer,
+    BatchSerializer,
+    RosterCreateSerializer,
+    RosterSerializer,
+    RosterUpdateSerializer,
+)
 
 from users.models import Batch
 from utils.utils import get_shift_date
 
 # Create your views here.
 
-class BatchListCreateAPIView(generics.ListCreateAPIView):
-	queryset = Batch.objects.all()
-	serializer_class = BatchSerializer
 
-	def get_serializer_class(self):
-		if self.request.method == 'POST':
-			return BatchCreateSerializer
-		return BatchSerializer
+class BatchListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Batch.objects.all()
+    serializer_class = BatchSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return BatchCreateSerializer
+        return BatchSerializer
+
 
 class RosterListCreateAPIView(generics.ListCreateAPIView):
     queryset = MonthlyRoster.objects.all().select_related("batch")
     serializer_class = RosterSerializer
 
     def get_serializer_class(self):
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             return RosterCreateSerializer
         return RosterSerializer
 
@@ -77,31 +85,34 @@ class RosterListCreateAPIView(generics.ListCreateAPIView):
 
 
 class RosterRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-	queryset = MonthlyRoster.objects.all()
-	serializer_class = RosterSerializer
+    queryset = MonthlyRoster.objects.all()
+    serializer_class = RosterSerializer
 
-	def get_serializer_class(self):
-		if self.request.method == 'PUT' or self.request.method == 'PATCH':
-			return RosterUpdateSerializer
-		return RosterSerializer
+    def get_serializer_class(self):
+        if self.request.method == "PUT" or self.request.method == "PATCH":
+            return RosterUpdateSerializer
+        return RosterSerializer
 
-	def patch(self, request, *args, **kwargs):
-		payload = user_auth(request)
-		if payload.get("auth_error", None):
-			return Response(payload, status=status.HTTP_403_FORBIDDEN)
+    def patch(self, request, *args, **kwargs):
+        payload = user_auth(request)
+        if payload.get("auth_error", None):
+            return Response(payload, status=status.HTTP_403_FORBIDDEN)
 
-		print("###...UPDATE REQUEST DATA: ", request.data)
-		batch_name = request.data.get('batch')
-		shift_name = request.data.get('shift')
-		work_day_name = request.data.get('work_day')
-		try:
-			batch = Batch.objects.get(name__iexact=batch_name)
-			shift = ShiftType.objects.get(name__iexact=shift_name)
-			work_day = WorkDay.objects.get(day_symbol__iexact=work_day_name)
-			# Update request data with primary keys
-			request.data['batch'] = batch.pk
-			request.data['shift'] = shift.pk
-			request.data['work_day'] = work_day.pk
-		except (Batch.DoesNotExist, ShiftType.DoesNotExist, WorkDay.DoesNotExist) as e:
-			return Response({'error': 'Batch, shift, or work day not found'}, status=status.HTTP_400_BAD_REQUEST)
-		return super().patch(request, *args, **kwargs)
+        print("###...UPDATE REQUEST DATA: ", request.data)
+        batch_name = request.data.get("batch")
+        shift_name = request.data.get("shift")
+        work_day_name = request.data.get("work_day")
+        try:
+            batch = Batch.objects.get(name__iexact=batch_name)
+            shift = ShiftType.objects.get(name__iexact=shift_name)
+            work_day = WorkDay.objects.get(day_symbol__iexact=work_day_name)
+            # Update request data with primary keys
+            request.data["batch"] = batch.pk
+            request.data["shift"] = shift.pk
+            request.data["work_day"] = work_day.pk
+        except (Batch.DoesNotExist, ShiftType.DoesNotExist, WorkDay.DoesNotExist) as e:
+            return Response(
+                {"error": "Batch, shift, or work day not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return super().patch(request, *args, **kwargs)

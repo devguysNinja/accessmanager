@@ -30,11 +30,15 @@ class User(AbstractUser):
         blank=True,
     )
     username = models.CharField(max_length=50, unique=True)
-    email = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True)
     password = models.CharField(max_length=255)
 
     # USERNAME_FIELD = 'email'
     # REQUIRED_FIELDS = ['username', 'password']
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
 
 class Batch(models.Model):
