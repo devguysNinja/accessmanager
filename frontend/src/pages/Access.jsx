@@ -146,6 +146,10 @@ function Access() {
 
   let { username, department } = ownerDetails || barPayLoad || {};
 
+  useEffect(() => {
+	inputRef.current.focus()
+  }, [])
+
   return (
     <>
       {/* <input
@@ -160,17 +164,23 @@ function Access() {
       <input
         type="password"
         name="usb-reader"
+		placeholder="Flash your card"
         ref={inputRef}
         onChange={(e) => {
           let inputValue = e.target.value;
           if (inputValue.length >= 10) {
             console.log(inputValue)
             smartUsb(inputValue);
-            inputRef.current.value = ""
+            inputRef.current.value = "";
           }
         }}
+		style={{ filter: 'blur(1px)',
+		 border:"none", borderRadius:"5px",
+		  marginTop:"10px",
+		  outline: 'none',
+		 }}
       />
-      <div style={{ marginBottom: "40px" }}>
+      <div style={{ height: "900px", width:"auto" }}>
         {" "}
         <Container>
           <div
@@ -183,17 +193,19 @@ function Access() {
             <b>{"Daily Access"}</b>
           </div>
           <Row className="" style={{ backgroundColor: "none" }}>
-            <Col style={{ marginBottom: "20px" }}>
-              <LeftCardLayout>
+            <Col >
+              <LeftCardLayout style>
                 <AccessRightFeeder userData={ownerDetails} />
                 <div
                   style={{
                     fontSize: "57px",
                     color: "#000",
+					fontWeight:"bold"
+
                   }}
                 >
-                  <b>{Capitalize(username) || "USERNAME"} </b> <br />
-                  <b>{Capitalize(department) || "DEPARTMENT"}</b>
+                 <p> {Capitalize(username) || "Username"} </p> 
+                  <p>{Capitalize(department) || "Department"}</p>
                 </div>
               </LeftCardLayout>
             </Col>

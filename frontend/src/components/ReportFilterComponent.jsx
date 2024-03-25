@@ -8,8 +8,6 @@ import ApiRoute, { CLEANED_URL, DateConverter } from "../config/ApiSettings";
 
 const ReportFilterComponent = ({
   handleSearch,
-  handleDownload,
-  handleExport,
   filterChoices,
 }) => {
   const [date, setDate] = useState(new Date());
@@ -64,26 +62,26 @@ const ReportFilterComponent = ({
     setSearchEnabled(true); // Enable search when any filter is selected
   };
 
-  const handleSearchClick = () => {
-  
+  // const handleSearchClick = () => {
 
-    const filters = {
-      staffName,
-      staffID,
-      status,
-      emp_department,
-      emp_group,
-      emp_location,
-      startDate,
-      endDate,
-    };
+  //   const filters = {
+  //     staffName,
+  //     staffID,
+  //     status,
+  //     emp_department,
+  //     emp_group,
+  //     emp_location,
+  //     startDate,
+  //     endDate,
+  //   };
 
-    const queryString = buildQueryString(filters);
+  //   const queryString = buildQueryString(filters);
 
-    handleSearch(queryString);
-  };
+  //   handleSearch(queryString);
+  // };
 
   const buildQueryString = (
+    reportUrl,
     params = {
       start_date: startDate,
       end_date: endDate,
@@ -98,7 +96,7 @@ const ReportFilterComponent = ({
       grantType: grantType,
     }
   ) => {
-    let REPORT_URL = `${ApiRoute.REPORT_URL}/?`;
+    let REPORT_URL = reportUrl;
     if (params?.start_date) {
       REPORT_URL = `${REPORT_URL}start_date=${DateConverter(
         params?.start_date
@@ -151,11 +149,12 @@ const ReportFilterComponent = ({
 
   const getTransactionData = async () => {
     try {
+      let reportUrl = ApiRoute.REPORT_URL;
       if (!searchEnabled) {
         toast.error("Please select a search filter to enable search");
         return;
       }
-      const response = await fetch(`${buildQueryString()}`);
+      const response = await fetch(`${buildQueryString(reportUrl)}`);
       if (!response.ok) {
         throw new Error("Failed to fetch transactions");
       }
@@ -167,14 +166,41 @@ const ReportFilterComponent = ({
     }
   };
 
+  const exportToFile = async (e) => {
+    try {
+      if (!searchEnabled) {
+        toast.error("Please select a search filter to enable search");
+        return;
+      }
+      let reportUrl = ApiRoute.EXCEL_URL;
+      if (e.target.value === "pdf") {
+        reportUrl = ApiRoute.PDF_URL;
+      }
+      let queryString = buildQueryString(reportUrl);
+      console.log("QueryString", queryString);
+      const response = await fetch(queryString);
+      console.dir(response);
+      const blobUrl = await response.blob();
+      const pdfUrl = URL.createObjectURL(blobUrl);
+      window.open(pdfUrl, "_blank");
+
+      console.log("response..", response);
+      if (!response.ok) {
+        throw new Error("Failed to export transactions");
+      }
+    } catch (error) {
+      console.error("Error exporting to pdf:", error.message);
+    }
+  };
+
   const { location, group, emp_status, department } = filterChoices || {};
 
   return (
     <>
       <div className="report-filter-container">
-        <div className="column">
+        <div className="date-rows">
           <div>
-            <label>Start Date:</label>
+            <label>Start Date:</label> <br />
             <DatePicker
               selected={startDate}
               selectsStart
@@ -190,42 +216,7 @@ const ReportFilterComponent = ({
             />
           </div>
           <div>
-            <label>Staff Name:</label>
-            <input
-              type="text"
-              name="staffName"
-              value={staffName}
-              placeholder="Enter staff name"
-              onChange={handleFilterChange}
-            />
-          </div>
-          <div>
-            <label>Status:</label>
-            <select name="status" value={status} onChange={handleFilterChange}>
-              <option value="">Select Status</option>
-              {emp_status?.map((status) => (
-                <option key={status.id} value={status.status}>
-                  {status.status}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>Access point:</label>
-            <select
-              name="accessPoint"
-              value={accessPoint}
-              onChange={handleFilterChange}
-            >
-              <option value="">Select Access-point</option>
-              <option value="Restaurant">Restaurant</option>
-              <option value="Bar">Bar</option>
-            </select>
-          </div>
-        </div>
-        <div className="column">
-          <div>
-            <label>End Date:</label>
+            <label>End Date:</label> <br />
             <DatePicker
               selected={endDate}
               onChange={(date) => setEndDate(date)}
@@ -241,86 +232,129 @@ const ReportFilterComponent = ({
               onChangeRaw={() => setSearchEnabled(true)}
             />
           </div>
-          <div>
-            <label>Group:</label>
-            <select
-              name="group"
-              value={emp_group}
-              onChange={handleFilterChange}
-            >
-              <option value="">Select Group</option>
-              {group?.map((group) => (
-                <option key={group.id} value={group.name}>
-                  {group.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label>Location:</label>
-            <select
-              name="location"
-              value={emp_location}
-              onChange={handleFilterChange}
-            >
-              <option value="">Select Location</option>
-              {location?.map((staffLocation) => (
-                <option value={staffLocation.name} key={staffLocation.id}>
-                  {staffLocation.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label>Department:</label>
-            <select
-              name="department"
-              value={emp_department}
-              onChange={handleFilterChange}
-            >
-              <option value="">Select Department</option>
-              {department?.map((staffDept) => (
-                <option value={staffDept.name} key={staffDept.id}>
-                  {staffDept.dept_name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
-        <div className="column">
-          <div>
-            <label>Staff ID:</label>
-            <input
-              type="text"
-              name="staffID"
-              value={staffID}
-              placeholder="Enter staff ID"
-              onChange={handleFilterChange}
-            />
+        <div className="rows">
+          <div className="column">
+            <div>
+              <label>Staff Name:</label>
+              <input
+                type="text"
+                name="staffName"
+                value={staffName}
+                placeholder="Enter staff name"
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div>
+              <label>Status:</label>
+              <select
+                name="status"
+                value={status}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Status</option>
+                {emp_status?.map((status) => (
+                  <option key={status.id} value={status.status}>
+                    {status.status}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>Access point:</label>
+              <select
+                name="accessPoint"
+                value={accessPoint}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Access-point</option>
+                <option value="Restaurant">Restaurant</option>
+                <option value="Bar">Bar</option>
+              </select>
+            </div>
           </div>
-          <div>
-            <label>Grant type:</label>
-            <select
-              name="grantType"
-              value={grantType}
-              onChange={handleFilterChange}
-            >
-              <option value="">Select Access-point</option>
-              <option value="ACCESS GRANTED">Access granted</option>
-              <option value="ACCESS DENIED">Access denied</option>
-            </select>
-          </div>
+          <div className="column">
+            <div>
+              <label>Group:</label>
+              <select
+                name="group"
+                value={emp_group}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Group</option>
+                {group?.map((group) => (
+                  <option key={group.id} value={group.name}>
+                    {group.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div>
-            <label>Swipe count:</label>
-            <input
-              type="text"
-              name="swipe_count"
-              value={swipeCount}
-              placeholder="Enter swipe count"
-              onChange={handleFilterChange}
-            />
+            <div>
+              <label>Location:</label>
+              <select
+                name="location"
+                value={emp_location}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Location</option>
+                {location?.map((staffLocation) => (
+                  <option value={staffLocation.name} key={staffLocation.id}>
+                    {staffLocation.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label>Department:</label>
+              <select
+                name="department"
+                value={emp_department}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Department</option>
+                {department?.map((staffDept) => (
+                  <option value={staffDept.name} key={staffDept.id}>
+                    {staffDept.dept_name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="column">
+            <div>
+              <label>Staff ID:</label>
+              <input
+                type="text"
+                name="staffID"
+                value={staffID}
+                placeholder="Enter staff ID"
+                onChange={handleFilterChange}
+              />
+            </div>
+            <div>
+              <label>Grant type:</label>
+              <select
+                name="grantType"
+                value={grantType}
+                onChange={handleFilterChange}
+              >
+                <option value="">Select Access-point</option>
+                <option value="ACCESS GRANTED">Access granted</option>
+                <option value="ACCESS DENIED">Access denied</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Swipe count:</label>
+              <input
+                type="text"
+                name="swipe_count"
+                value={swipeCount}
+                placeholder="Enter swipe count"
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -329,8 +363,10 @@ const ReportFilterComponent = ({
         <button onClick={handleFetchAllTransactions}>
           Get All Transactions
         </button>
-        <button>Download</button>
-        <button>Export</button>
+        <button value="pdf" onClick={exportToFile}>
+          Pdf
+        </button>
+        <button onClick={exportToFile}>Excel</button>
       </div>
       <TransactionTableComponent transaction={transaction} />
       <Toaster />

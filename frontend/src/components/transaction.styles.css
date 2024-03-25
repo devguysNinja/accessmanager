@@ -30,10 +30,23 @@
 .report-filter-container {
     background-color: #f9f9f9;
     border-radius: 8px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 99;
+
+   
+}
+
+.rows{
     display: flex;
     flex-wrap: wrap;
+}
+
+.date-rows{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .column {
@@ -54,7 +67,7 @@
 .report-filter-container input[type="text"],
 .report-filter-container select {
     width: 100%;
-    padding: 8px;
+    padding: 5px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -73,7 +86,7 @@
 .report-filter-container select,
 .report-filter-container input {
     width: 100%;
-    padding: 12px;
+    padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
     box-sizing: border-box;
@@ -141,3 +154,11 @@
     font-size: 20px;
     color: red;
 }
+
+.access-granted {
+    color: green;
+  }
+  
+  .access-denied {
+    color: red;
+  }
