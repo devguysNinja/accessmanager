@@ -154,3 +154,7 @@ TIMEOUT = 1.2
 MQTT_BROKER = 'mqtt.eclipseprojects.io'
 client = mqtt.Client("Cafeteria")
 TOPIC = "TEMPERATURE"
+
+========================Exporter URLs================================
+For pdf => transactions/reports/export-to-file/?pdf
+For excel => transactions/reports/export-to-file/
