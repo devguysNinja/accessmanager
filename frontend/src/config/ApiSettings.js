@@ -21,7 +21,9 @@ class ApiRoute {
   static TRANSACTION_ACTRL_URL = `${ApiRoute.BASE_URL}/transactions/access-control`;
   static TRANSACTION_OWNER_DETAILS_URL = `${ApiRoute.BASE_URL}/transactions/owner-details`;
   static TRANSACTION_DRINK_CART_URL = `${ApiRoute.BASE_URL}/drink-cart`;
-  static REPORT_URL = `${ApiRoute.BASE_URL}/transactions/reports`
+  static REPORT_URL = `${ApiRoute.BASE_URL}/transactions/reports/?`
+  static PDF_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?exporter=pdf`
+  static EXCEL_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?`
 }
 
 export async function ApiLogout(

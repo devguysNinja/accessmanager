@@ -6,7 +6,7 @@ import "../App.css";
 
 function LeftCardLayout(props) {
   return (
-    <Card style={{background: "gold"}}>
+    <Card style={{background: "gold", height:"400px"}}>
       <Card.Body>
         <Card.Title>
           <div

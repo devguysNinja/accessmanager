@@ -66,7 +66,7 @@ export default function AccessLeftFeeder({ userData }) {
 			>
 				{grant_type || "NO ACCESS"}
 			</span>
-			<span>{message}</span>
+			<span style={{color:"red", fontSize:"14px", textAlign:"center"}}>{message}</span>
 		</div>
 	);
 }

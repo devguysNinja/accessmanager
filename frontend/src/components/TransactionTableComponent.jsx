@@ -43,7 +43,7 @@ const TransactionTableComponent = ({ transaction }) => {
                             <td>{transactionItem?.group}</td>
                             <td>{transactionItem?.location}</td>
                             <td>{transactionItem?.employee_status}</td>
-                            <td>{transactionItem?.grant_type}</td>
+                            <td className={transactionItem.grant_type === "ACCESS GRANTED" ? "access-granted" : "access-denied"}>{transactionItem?.grant_type}</td>
                         </tr>
                     ))}
                 </tbody>
