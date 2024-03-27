@@ -63,6 +63,19 @@ function DrinksAccess() {
     fetchDrinks();
   }, []);
 
+  const accessBoard = (e) => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/access-gate`);
+  };
+
+  useEffect(() => {
+    if (responseData && !responseData.error) {
+      const timeout = setTimeout(() => {
+        window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/access-gate`);
+      }, 4000);
+    }
+    return (timeout) => clearTimeout(timeout);
+  });
+
   const DRINK_CART_URL = `${ApiRoute.TRANSACTION_DRINK_CART_URL}`;
 
   const postPayloadToBackend = async () => {
@@ -94,7 +107,7 @@ function DrinksAccess() {
       const data = await response.json();
       setResponseData(data);
       console.log("Checkout successful!", data);
-      toast.success("Checkout successful, enjoy your drink");
+      toast.success("Checkout successful!");
 
       setCart([]);
       setIsCheckingOut(false);
@@ -141,9 +154,18 @@ function DrinksAccess() {
             {selectedCategory ? (
               <div>
                 {filteredDrinks.length > 0 ? (
-                  <div className="row">
+                  <div
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      overflowX: "auto",
+                      overflowY: "auto",
+                      maxHeight: "600px",
+                      maxWidth: "900px",
+                    }}
+                  >
                     {filteredDrinks.map((drink, index) => (
-                      <div className="col-md-3" key={index}>
+                      <div key={index}>
                         <div className="drink-item">
                           <p className="drink-name">{drink.drink}</p>
                           <div className="col-sm">
@@ -219,30 +241,44 @@ function DrinksAccess() {
               <p>Your cart is empty</p>
             )}
           </div>
-			{responseData &&
-			<div style={{ marginBottom: '20px', border: '1px solid #ccc', borderRadius: '5px', padding: '20px' }}>
-				  <div style={{ marginBottom: '10px' }}>
-          <p style={{ marginBottom: '5px', fontWeight: 'bold' }}>Name: {responseData.employee}</p>
-          <p style={{ marginBottom: '5px' }}>Allowed Access: {responseData.allowed_access}</p>
-          <p style={{ marginBottom: '5px' }}>Balance: {responseData.balance}</p>
-          <p style={{ marginBottom: '5px' }}>Used Access: {responseData.used_access}</p>
-        </div>
+          {responseData && (
+            <div
+              style={{
+                marginTop: "25px",
+                borderRadius: "5px",
+                padding: "20px",
+              }}
+            >
+              <div style={{ marginBottom: "10px" }}>
+                <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+                  Name: {employee}
+                </p>
+                <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+                  Allowed Access: {allowed_access}
+                </p>
+                <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+                  Balance: {balance}
+                </p>
+                <p style={{ marginBottom: "5px", fontWeight: "bold" }}>
+                  Used Access: {used_access}
+                </p>
+              </div>
 
-			<button
-        style={{
-          backgroundColor: '#007bff',
-          color: '#fff',
-          padding: '10px 20px',
-          border: 'none',
-          borderRadius: '5px',
-          cursor: 'pointer',
-        }}
-       
-      >
-        Take Your Drink(s)
-      </button>
-			</div>
-			}
+              <button
+                style={{
+                  backgroundColor: "#007bff",
+                  color: "#fff",
+                  padding: "10px 20px",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+                onClick={accessBoard}
+              >
+                Take Your Drink(s)
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <Toaster />

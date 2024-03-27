@@ -2,8 +2,6 @@ import os
 import json
 from datetime import datetime, timedelta
 from typing import Any
-
-# import paho.mqtt.client as mqtt
 import paho.mqtt.publish as mqtt_publish
 from django.db.models import Q
 from django.db.models import Sum
@@ -100,7 +98,7 @@ def check_calendar(uid):
 
 def smartcard_handler_for_restaurant(usb_data):
     # reader_message = message.payload.decode("UTF-8")
-    # print(f'Recieved message restaurant: {str(message.payload.decode("utf-8"))}')
+    # print(f'Received message restaurant: {str(message.payload.decode("utf-8"))}')
     print("IS JSON: ", is_json(usb_data))
     if not is_json(usb_data):
         reader_uid = str(usb_data)

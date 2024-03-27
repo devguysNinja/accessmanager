@@ -1,3 +1,4 @@
+from typing import Any
 import jwt, datetime
 import json
 from django.conf import settings
@@ -5,7 +6,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, Sum
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.exceptions import NotFound
 from rest_framework.renderers import JSONRenderer
@@ -20,11 +21,14 @@ from .transaction_event_handler import (
 )
 from .serializers import (
     DrinkCategoryListSerializer,
+    DrinkCategorySerializer,
+    DrinkSerializer,
+    ExcelDrinkSerializer,
     TransactionReportSerializer,
     TransactionSerializer,
 )
 from .models import Drink, DrinkCart, DrinkCategory, Transaction
-from users.models import User, UserProfile
+from users.models import EmployeeBatchUpload, User, UserProfile
 from users.auth_service import user_auth
 from .reports import export_to_excel, export_to_pdf, report, filter_queryset
 
@@ -33,7 +37,7 @@ from .reports import export_to_excel, export_to_pdf, report, filter_queryset
 
 
 @api_view(["GET"])
-def transaction_report_export_data(request):
+def export_transaction_report_data(request):
     exporter = export_to_excel
     if request.query_params.get("exporter") == "pdf":
         exporter = export_to_pdf
@@ -397,3 +401,63 @@ class TransactionView(APIView):
                     data=transaction_serializer.errors,
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+def create_drink_category_from_excel(request):
+    try:
+        batch_file: Any = EmployeeBatchUpload.objects.get(
+            batch_file__icontains="employee_batch"
+        ).batch_file
+        print("Batch File Found:", batch_file)
+    except EmployeeBatchUpload.DoesNotExist:
+        return Response(
+            data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        wb: Workbook = load_workbook(filename=batch_file)
+        ws_drink_categ = [ws for ws in wb.worksheets if ws.title=="DrinkCategory"][0]
+        ws_drink = [ws for ws in wb.worksheets if ws.title=="Drink"][0]
+        imported_drink_categ_counter = 0
+        imported_drink_counter = 0
+        skipped_drink_categ_counter = 0
+        skipped_drink_counter = 0
+        ws_drink_categ_columns = ["name"]
+        ws_drink_columns = ["drink", "type"]
+        drink_categ_rows = ws_drink_categ.iter_rows(min_row=2)
+        drink_rows = ws_drink.iter_rows(min_row=2)
+        for index, drink_categ_row in enumerate(drink_categ_rows, start=1):
+            drink_categ_row_values = [cell.value for cell in drink_categ_row[1:]]
+            drink_categ_row_dict = dict(zip(ws_drink_categ_columns, drink_categ_row_values))
+            drink_categ_serializer = DrinkCategorySerializer(data=drink_categ_row_dict)
+            if drink_categ_serializer.is_valid():
+                drink_categ_serializer.save()
+                imported_drink_categ_counter += 1
+            else:
+                skipped_drink_categ_counter += 1
+        
+        for index, drink_row in  enumerate(drink_rows, start=1):
+            drink_row_values = [cell.value for cell in drink_row[1:]]
+            categ_name = drink_row_values[1]
+            categ = DrinkCategory.objects.get(name=categ_name)
+            drink_row_values[1] = categ.pk
+            drink_row_dict = dict(zip(ws_drink_columns, drink_row_values))
+            drink_serializer = ExcelDrinkSerializer(data=drink_row_dict)
+            if drink_serializer.is_valid():
+                drink_serializer.save()
+                imported_drink_counter += 1
+            else:
+                skipped_drink_counter += 1
+            
+    except Exception as ex:
+        print("Exception occurred: ", ex.args[0])
+        raise
+        return Response(data={"error": ex.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    
+    data = (
+        {
+            "total_uploaded_drink_categ": imported_drink_categ_counter,
+            "total_skipped_drink_categ": skipped_drink_categ_counter,
+            "total_uploaded_drink": imported_drink_counter,
+            "total_skipped_drink": skipped_drink_counter,
+        },
+    )
+    return Response(data=data, status=status.HTTP_200_OK)

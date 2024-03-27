@@ -1,7 +1,7 @@
 from rest_framework.exceptions import NotFound
 from django.core.exceptions import BadRequest
 from rest_framework import serializers
-from .models import Department, EmployeeCategory, EmployeeStatus, Location, User, UserProfile
+from .models import Batch, Department, EmployeeCategory, EmployeeStatus, Location, User, UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -77,6 +77,67 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
         
 
+class GetUserFromExcelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "first_name",
+            "last_name",
+            "middle_name",
+            "username",
+            "reader_uid",
+            "password",
+        ]
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
+    def create(self, validated_data):
+        password = validated_data.pop("password", None)
+        instance = self.Meta.model(**validated_data)
+        if password is None:
+            raise BadRequest("Password is required!")
+        instance.set_password(password)
+        instance.save()
+        return instance
+        
+    def update(self, instance, validated_data):
+        password = validated_data.pop("password", None)
+        validated_data.pop("username", None)
+        validated_data.pop("email", None)
+        # if password is not None:
+        #     instance.set_password(password)
+        instance.first_name = validated_data.pop("first_name", instance.first_name)
+        instance.last_name = validated_data.pop("last_name", instance.last_name)
+        instance.middle_name = validated_data.pop("middle_name", instance.middle_name)
+        instance.save(
+            update_fields=["first_name", "last_name", "middle_name", ]
+        )
+        return instance
+
+
+class GetUserProfileFromExcelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = [
+            "id",
+            "user",
+            "reader_uid",
+            "employee_id",
+            "gender",
+            "category",
+            "profile_image",
+            "department",
+            "location",
+            "batch",
+            "employee_status",
+        ]
+
+class BatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Batch
+        fields = "__all__"
+ 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
