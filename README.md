@@ -156,5 +156,8 @@ client = mqtt.Client("Cafeteria")
 TOPIC = "TEMPERATURE"
 
 ========================Exporter URLs================================
+
 For pdf => transactions/reports/export-to-file/?exporter=pdf
+=======
+
 For excel => transactions/reports/export-to-file/
