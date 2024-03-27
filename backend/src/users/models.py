@@ -4,9 +4,8 @@ from uuid import uuid4
 from django.core.exceptions import BadRequest
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from utils.utils import dummy_unique_str
+from utils.utils import dummy_email, dummy_unique_str
 
-# from staffcalendar.models import ShiftManager
 
 
 def upload_image(instance, filename):
@@ -28,14 +27,17 @@ class User(AbstractUser):
     middle_name = models.CharField(
         max_length=50,
         blank=True,
+        null=True
     )
     username = models.CharField(max_length=50, unique=True)
-    email = models.EmailField(max_length=255, unique=True)
+    email = models.EmailField(max_length=255, unique=True, default=dummy_email)
+    reader_uid = models.CharField(
+        max_length=128,
+        default=dummy_unique_str,
+        unique=True
+    )
     password = models.CharField(max_length=255)
 
-    # USERNAME_FIELD = 'email'
-    # REQUIRED_FIELDS = ['username', 'password']
-    
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -43,12 +45,13 @@ class User(AbstractUser):
 
 class Batch(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    
+
     class Meta:
         verbose_name_plural = "Batches"
 
     def __str__(self):
         return self.name
+
 
 class EmployeeCategory(models.Model):
     cat_name = models.CharField(max_length=125)
@@ -57,11 +60,10 @@ class EmployeeCategory(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Employees' categories"
+        verbose_name_plural = "Employees' Categories"
 
     def __str__(self):
         return f"{self.cat_name}"
-
 
 
 class UserProfile(models.Model):
@@ -76,9 +78,7 @@ class UserProfile(models.Model):
         max_length=50,
     )
     profile_image = models.ImageField(upload_to=upload_image, blank=True, null=True)
-    category = models.ForeignKey(
-        EmployeeCategory, null=True, on_delete=models.SET_NULL
-    )
+    category = models.ForeignKey(EmployeeCategory, null=True, on_delete=models.SET_NULL)
     department = models.ForeignKey("Department", null=True, on_delete=models.SET_NULL)
     location = models.ForeignKey("Location", null=True, on_delete=models.SET_NULL)
     employee_status = models.ForeignKey(
@@ -87,15 +87,17 @@ class UserProfile(models.Model):
     batch = models.ForeignKey(
         Batch, related_name="users", null=True, on_delete=models.SET_NULL
     )
-    # shift = models.ForeignKey(ShiftManager, null=True, on_delete=models.SET_NULL)
+    
+    class Meta:
+        verbose_name_plural = "User Profiles"
 
     def __str__(self) -> str:
         return self.user.username
 
 
 class Location(models.Model):
-    name = models.CharField(max_length=50)
-    address = models.CharField(max_length=255)
+    name = models.CharField(max_length=50, unique=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"
@@ -113,17 +115,20 @@ class EmployeeStatus(models.Model):
     description = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Employees' status"
+        verbose_name_plural = "Employees' Status"
 
     def __str__(self):
         return f"{self.status}"
-
 
 
 class EmployeeBatchUpload(models.Model):
     batch_file = models.FileField(upload_to=upload_xlsx, blank=True, null=True)
     date_uploaded = models.DateTimeField(auto_now_add=True)
     uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    
+    class Meta:
+        verbose_name_plural = "Batch File Upload"
+
 
     def __str__(self) -> str:
         return self.uploaded_by.username

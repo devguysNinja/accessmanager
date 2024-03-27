@@ -11,21 +11,22 @@ class ShiftType(models.Model):
     start_time = models.TimeField()
     end_time = models.TimeField()
     duration = models.PositiveSmallIntegerField()
-    # start_date = models.DateField()
-    # end_date = models.DateField()
-    # user = models.ForeignKey(UserProfile, null=True, on_delete=models.SET_NULL)
+    
+    class Meta:
+        verbose_name_plural = "Shift Types"
 
     def __str__(self):
         return str(self.name)
 
 
 class WorkDay(models.Model):
-    day_symbol = models.CharField(max_length=10)
-    day_code = models.PositiveSmallIntegerField()
+    day_symbol = models.CharField(max_length=10, unique=True)
+    day_code = models.PositiveSmallIntegerField(unique=True)
 
     class Meta:
         unique_together = (("day_symbol", "day_code"),)
         ordering = ["day_code"]
+        verbose_name_plural = "Work Days"
 
     def __str__(self):
         return f"{self.day_symbol}"
@@ -40,8 +41,11 @@ class MonthlyRoster(models.Model):
     shift_end_date = models.DateField()
 
     class Meta:
-        verbose_name = "Employees' roster"
+        verbose_name_plural = "Duty Roster"
         # unique_together = (("shift_start_date", "work_day", "shift", "batch"),)
 
     def __str__(self):
-        return f"{self.shift.name.capitalize()} | {self.batch} | {self.work_day.day_symbol}"
+        try:
+            return f"{self.shift.capitalize()} | {self.batch} | {self.work_day.day_symbol}"
+        except AttributeError:
+            return f"{self.shift} | {self.batch} | {self.work_day}"

@@ -1,7 +1,18 @@
 from rest_framework import serializers
 
 from users.models import Batch
-from .models import MonthlyRoster
+from .models import MonthlyRoster, ShiftType, WorkDay
+
+
+class ShiftTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShiftType
+        fields = "__all__"
+        
+class WorkdaySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkDay
+        fields = "__all__"
 
 
 class RosterSerializer(serializers.ModelSerializer):

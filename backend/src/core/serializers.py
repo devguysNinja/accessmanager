@@ -6,6 +6,16 @@ from users.serializers import UserProfileSerializer
 from users.models import UserProfile
 
 
+class DrinkCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DrinkCategory
+        fields = "__all__"
+        
+class ExcelDrinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Drink
+        fields = "__all__"
+
 class DrinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drink

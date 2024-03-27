@@ -1,4 +1,6 @@
+from typing import Any
 from django.shortcuts import render
+from openpyxl import Workbook, load_workbook
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -12,9 +14,11 @@ from .serializers import (
     RosterCreateSerializer,
     RosterSerializer,
     RosterUpdateSerializer,
+    ShiftTypeSerializer,
+    WorkdaySerializer,
 )
 
-from users.models import Batch
+from users.models import Batch, EmployeeBatchUpload
 from utils.utils import get_shift_date
 
 # Create your views here.
@@ -116,3 +120,74 @@ class RosterRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().patch(request, *args, **kwargs)
+
+
+def create_shift_type_from_excel(request):
+    try:
+        batch_file: Any = EmployeeBatchUpload.objects.get(
+            batch_file__icontains="employee_batch"
+        ).batch_file
+        print("Batch File Found:", batch_file)
+    except EmployeeBatchUpload.DoesNotExist:
+        return Response(
+            data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        wb: Workbook = load_workbook(filename=batch_file)
+        ws_shift_type = [ws for ws in wb.worksheets if ws.title=="ShiftType"][0]
+        imported_shift_type_counter = 0
+        skipped_shift_type_counter = 0
+        ws_shift_type_columns = ["name", "start_time", "end_time", "duration"]
+        shift_type_rows = ws_shift_type.iter_rows(min_row=2)
+        for index, shift_type_row in enumerate(shift_type_rows, start=1):
+            ws_shift_type_values = [cell.value for cell in shift_type_row[1:]]
+            ws_shift_type_dict = dict(zip(ws_shift_type_columns, ws_shift_type_values))
+            shift_type_serializer = ShiftTypeSerializer(data=ws_shift_type_dict)
+            if shift_type_serializer.is_valid():
+                shift_type_serializer.save()
+                imported_shift_type_counter += 1
+            else:
+                skipped_shift_type_counter +=1
+    except Exception as ex:
+        return Response(data={"error": ex.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    
+    data = {
+            "total_uploaded_shift_type": imported_shift_type_counter,
+            "total_skipped_shift_type": skipped_shift_type_counter,
+        }
+    return Response(data=data, status=status.HTTP_200_OK)
+
+def create_workday_from_excel(request):
+    try:
+        batch_file: Any = EmployeeBatchUpload.objects.get(
+            batch_file__icontains="employee_batch"
+        ).batch_file
+        print("Batch File Found:", batch_file)
+    except EmployeeBatchUpload.DoesNotExist:
+        return Response(
+            data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
+        )
+    try:
+        wb: Workbook = load_workbook(filename=batch_file)
+        ws_workday = [ws for ws in wb.worksheets if ws.title=="WorkDay"][0]
+        imported_workday_counter = 0
+        skipped_workday_counter = 0
+        ws_workday_columns = ["day_symbol", "day_code"]
+        workday_rows = ws_workday.iter_rows(min_row=2)
+        for index, workday_row in enumerate(workday_rows, start=1):
+            workday_values = [cell.value for cell in workday_row[1:]]
+            ws_workday_dict = dict(zip(ws_workday_columns, workday_values))
+            ws_workday_serializer = WorkdaySerializer(data=ws_workday_dict)
+            if ws_workday_serializer.is_valid():
+                ws_workday_serializer.save()
+                imported_workday_counter += 1
+            else:
+                skipped_workday_counter +=1
+    except Exception as ex:
+        return Response(data={"error": ex.args[0]}, status=status.HTTP_400_BAD_REQUEST)
+    
+    data = {
+            "total_uploaded_workday": imported_workday_counter,
+            "total_skipped_workday": skipped_workday_counter,
+        }
+    return Response(data=data, status=status.HTTP_200_OK)

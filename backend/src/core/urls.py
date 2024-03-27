@@ -6,14 +6,14 @@ from .views import (
     get_restaurant_transaction_details,
     get_drink_list,
     drink_transaction,
-    transaction_report_export_data,
+    export_transaction_report_data,
 )
 
 
 urlpatterns = [
     path(
         "transactions/reports/export-to-file/",
-        transaction_report_export_data,
+        export_transaction_report_data,
         name="transaction_report_export_api_view",
     ),
     path(
