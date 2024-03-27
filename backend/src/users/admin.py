@@ -1,4 +1,7 @@
 from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.urls import path
+from django.urls.resolvers import URLPattern
 from staffcalendar.models import MonthlyRoster
 from .models import (
     EmployeeStatus,
@@ -8,13 +11,20 @@ from .models import (
     Location,
     Department,
     EmployeeBatchUpload,
-    Batch
+    Batch,
 )
-from .views import bulk_create
+from .views import (
+    create_category_from_excel,
+    create_department_from_excel,
+    create_group_from_excel,
+    create_location_from_excel,
+    create_status_from_excel,
+    create_users_from_excel,
+)
 
 
 class UserAdmin(admin.ModelAdmin):
-    # change_list_template = "user_change_list.html"
+    change_list_template = "user_change_list.html"
     list_display = [
         "first_name",
         "last_name",
@@ -41,36 +51,21 @@ class UserProfileAdmin(admin.ModelAdmin):
         "employee_id",
         "location",
         "profile_image",
-        "batch"
+        "batch",
     ]
 
 
-#     def employee_shift(self, obj):
-#         rosters_for_employee = MonthlyRoster.objects.filter(employees=obj)
-#         employee_shift = [shift.shift.name for shift in rosters_for_employee
-#                           ]
-#         employee_time = [(shift.shift.start_time, shift.shift.end_time) for shift in rosters_for_employee]
-#         print("78888:",employee_time)
-#         print("++++++++++++",employee_shift)
-#         assigned_work_days = [roster.work_days.all() for roster in rosters_for_employee]
-#         if len(assigned_work_days) > 0:
-#             work_days = [work_days[::1] for work_days in assigned_work_days]
-#             day_list = [day.day_symbol for days in work_days for day in days]
-#             print("************", day_list)
-#             return f"{', '.join(set(day_list))}"
-#         elif len(assigned_work_days) == 0:
-#             print("======", assigned_work_days)
-#
-#     employee_shift.short_description = "Shift days"
 admin.site.register(UserProfile, UserProfileAdmin)
 
 
-
 class BatchAdmin(admin.ModelAdmin):
-    list_display = ["name", ]
+    list_display = [
+        "name",
+    ]
 
 
 admin.site.register(Batch, BatchAdmin)
+
 
 class LocationAdmin(admin.ModelAdmin):
     list_display = ["name", "address"]
@@ -104,7 +99,8 @@ MAX_OBJECTS = 1
 
 
 class EmployeeBatchUploadAdmin(admin.ModelAdmin):
-    actions = ["populate_with_batch_data"]
+    change_list_template = "user_change_list.html"
+    # actions = ["populate_user_profile_tables", "populate_location_table","populate_status_table"]
     list_display = ["batch_file", "date_uploaded", "uploaded_by"]
 
     def has_add_permission(self, request):
@@ -112,9 +108,20 @@ class EmployeeBatchUploadAdmin(admin.ModelAdmin):
             return False
         return super().has_add_permission(request)
 
-    def populate_with_batch_data(self, request, queryset):
-        response = bulk_create(request=request)
+    def get_urls(self) -> list[URLPattern]:
+        urls = super().get_urls()
+        my_urls = [
+            path("populate-user-profile/", self.populate_user_profile_tables),
+            path("populate-location/", self.populate_location_table),
+            path("populate-emp-status/", self.populate_status_table),
+            path("populate-category/", self.populate_category_table),
+            path("populate-department/", self.populate_department_table),
+            path("populate-group/", self.populate_group_table),
+        ]
+        return my_urls + urls
 
+    def populate_user_profile_tables(self, request, obj=None):
+        response = create_users_from_excel(request=request)
         print("###...THIS IS BULK", response)
         if response.status_code != 200:
             self.message_user(
@@ -124,8 +131,67 @@ class EmployeeBatchUploadAdmin(admin.ModelAdmin):
             self.message_user(
                 request, "Success: Tables populated", level=messages.SUCCESS
             )
+        return HttpResponseRedirect("../")
 
-    populate_with_batch_data.short_description = "Populate with batch data"
+    def populate_location_table(self, request, obj=None):
+        response = create_location_from_excel(request=request)
+        if response.status_code != 200:
+            self.message_user(
+                request, "Error: Tables not populated", level=messages.ERROR
+            )
+        if response.status_code == 200:
+            self.message_user(
+                request, "Success: Tables populated", level=messages.SUCCESS
+            )
+        return HttpResponseRedirect("../")
+
+    def populate_status_table(self, request, obj=None):
+        response = create_status_from_excel(request=request)
+        if response.status_code != 200:
+            self.message_user(
+                request, "Error: Tables not populated", level=messages.ERROR
+            )
+        if response.status_code == 200:
+            self.message_user(
+                request, "Success: Tables populated", level=messages.SUCCESS
+            )
+        return HttpResponseRedirect("../")
+
+    def populate_category_table(self, request, obj=None):
+        response = create_category_from_excel(request=request)
+        if response.status_code != 200:
+            self.message_user(
+                request, "Error: Tables not populated", level=messages.ERROR
+            )
+        if response.status_code == 200:
+            self.message_user(
+                request, "Success: Tables populated", level=messages.SUCCESS
+            )
+        return HttpResponseRedirect("../")
+
+    def populate_department_table(self, request, obj=None):
+        response = create_department_from_excel(request=request)
+        if response.status_code != 200:
+            self.message_user(
+                request, "Error: Tables not populated", level=messages.ERROR
+            )
+        if response.status_code == 200:
+            self.message_user(
+                request, "Success: Tables populated", level=messages.SUCCESS
+            )
+        return HttpResponseRedirect("../")
+
+    def populate_group_table(self, request, obj=None):
+        response = create_group_from_excel(request=request)
+        if response.status_code != 200:
+            self.message_user(
+                request, "Error: Tables not populated", level=messages.ERROR
+            )
+        if response.status_code == 200:
+            self.message_user(
+                request, "Success: Tables populated", level=messages.SUCCESS
+            )
+        return HttpResponseRedirect("../")
 
 
 admin.site.register(EmployeeBatchUpload, EmployeeBatchUploadAdmin)

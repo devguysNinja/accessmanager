@@ -1,12 +1,18 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.http import HttpResponseRedirect
+from django.urls import URLPattern, path
 from django.utils.html import format_html
+
+
 from .models import ShiftType, MonthlyRoster, WorkDay
 from .forms import MonthlyRosterForm
+from .views import create_shift_type_from_excel, create_workday_from_excel
 
 # Register your models here.
 
 
 class ShiftTypeAdmin(admin.ModelAdmin):
+	change_list_template = "staffcalendar_change_list.html"
 	list_display = ["shift_type", "name", "start_time", "end_time","duration"]
 	list_display_links = None # ["name"]
 	list_editable = ["name", "start_time", "end_time", "duration"]
@@ -15,21 +21,60 @@ class ShiftTypeAdmin(admin.ModelAdmin):
 	def shift_type(self, obj):
 		return f"{obj.name.upper()}"
 
+	def get_urls(self) -> list[URLPattern]:
+		urls = super().get_urls()
+		my_urls = [
+			path("populate-shift-type/", self.populate_shift_type_table),
+		]
+		return my_urls + urls
+
+	def populate_shift_type_table(self, request, obj=None):
+		response = create_shift_type_from_excel(request=request)
+		print("!!!=>>>Response data", response.data)
+		if response.status_code != 200:
+			self.message_user(
+				request, "Error: Tables not populated", level=messages.ERROR
+			)
+		if response.status_code == 200:
+			self.message_user(
+				request, "Success: Tables populated", level=messages.SUCCESS
+			)
+		return HttpResponseRedirect("../")
 
 admin.site.register(ShiftType, ShiftTypeAdmin)
 
 
 class WorkDayAdmin(admin.ModelAdmin):
+	change_list_template = "staffcalendar_change_list.html"
 	list_display = ["day_symbol", "day_code"]
 	list_display_links = None
 	list_editable = ["day_symbol", "day_code"]
+ 
+	def get_urls(self) -> list[URLPattern]:
+		urls = super().get_urls()
+		my_urls = [
+			path("populate-workday/", self.populate_workday_table),
+		]
+		return my_urls + urls
 
+	def populate_workday_table(self, request, obj=None):
+		response = create_workday_from_excel(request=request)
+		print("!!!=>>>Response data", response.data)
+		if response.status_code != 200:
+			self.message_user(
+				request, "Error: Tables not populated", level=messages.ERROR
+			)
+		if response.status_code == 200:
+			self.message_user(
+				request, "Success: Tables populated", level=messages.SUCCESS
+			)
+		return HttpResponseRedirect("../")
 
 admin.site.register(WorkDay, WorkDayAdmin)
 
 
 class MonthlyRosterAdmin(admin.ModelAdmin):
-	# form = MonthlyRosterForm
+	change_list_template = "staffcalendar_change_list.html"
 	list_display = [
 		# "shift_days",
 		"work_day",
@@ -50,28 +95,6 @@ class MonthlyRosterAdmin(admin.ModelAdmin):
 	# filter_horizontal = ["employees"]
 	list_per_page = 20
 	save_on_top = True
-
-
-#
-#     def shift_members(self, obj):
-#         members = [members.user.username for members in obj.employees.all()]
-#         print("****Members: ", members)
-#         html = ""
-#         for mem in members:
-#             html += f"<b>{mem}</b><br>"
-#         print( "&&&&&&&&HTML",html)
-#
-#         return format_html(html)
-#         # return f"{', '.join(members)}"
-#
-#     shift_members.short_description = "Members"
-
-#     def shift_days(self, obj):
-#         work_days = [days.day_symbol for days in obj.work_days.all()]
-#         print("Work-days: ", work_days)
-#         return f"{', '.join(work_days)}"
-#
-#     shift_days.short_description = "Shift days"
 
 
 admin.site.register(MonthlyRoster, MonthlyRosterAdmin)

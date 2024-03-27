@@ -8,7 +8,7 @@ from .views import (
     UserProfileView,
     UserProfileDetailAPIView,
     UploadProfileImageView,
-    bulk_create,
+    create_users_from_excel
 )
 
 
@@ -30,6 +30,6 @@ urlpatterns = [
     ),
     path("profiles", UserProfileView.as_view(), name="profiles_list_create_api_view"),
     path("avatar", UploadProfileImageView.as_view(), name="avatar_api_view"),
-    path("batch-loader", bulk_create, name="bulk_create_api_view"),
+    path("excel-user-loader", create_users_from_excel, name="create_users_from_excel_api_view"),
 ]
 

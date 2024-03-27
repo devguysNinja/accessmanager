@@ -48,8 +48,12 @@ def generate_unique_str():
 
 
 def dummy_unique_str():
-    random_string = "".join(random.choices("0123456789ABCDEFGHIJKLMNPRSTVWXYZ", k=10))
-    return f"DUMMY-{random_string}"
+    random_dummy = f"DUMMY-{generate_unique_str()}"
+    return random_dummy
+
+def dummy_email():
+    dummy_mail = f"{dummy_unique_str()}@mealmanager.com"
+    return dummy_mail
 
 
 def get_shift_date(work_day_param: str, shift_params, start_date_param):
