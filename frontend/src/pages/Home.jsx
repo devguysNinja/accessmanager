@@ -5,7 +5,6 @@ import "../App.css";
 const Home = (props) => {
   const images = [
     { src: './fufu.avif', alt: 'Fufu' },
-    { src: './jollof.jpeg', alt: 'Jollof' },
     { src: './amara.webp', alt: 'Amara' },
     { src: './eba.webp', alt: 'Eba' },
   ];
