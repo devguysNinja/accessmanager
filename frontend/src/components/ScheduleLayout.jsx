@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "../ScheduleLayout.css";
-import ApiRoute, { BEARER } from "../config/ApiSettings";
+import ApiRoute, { BEARER, DateTimeStringConverter } from "../config/ApiSettings";
 import { AiOutlineDelete } from "react-icons/ai";
 import { AiOutlineEdit } from "react-icons/ai";
 import EditRoster from "./EditRoster";
@@ -113,14 +113,16 @@ const ScheduleLayout = () => {
       }
     }
     
-    const exactStartDate = new Date(startDate);
+    const exactStartDate = DateTimeStringConverter(new Date(startDate));
+    console.log("$$$ =>StartDate: ", exactStartDate)
     const payload = rows.map(row => {
         const shiftsByDay = {};
         dayArray.forEach((day, index) => {
           shiftsByDay[day] = row.shifts[index] || "Off";
         });
+        console.log("$$$ => MAJOR SUSPECT StartDate: ", exactStartDate)
         return {
-          start_date: exactStartDate.toISOString(), 
+          start_date: exactStartDate, 
 
           group: row.group,
           shifts: shiftsByDay
@@ -134,6 +136,7 @@ const ScheduleLayout = () => {
   
   const postPayload = async () => {
     const payload = generatePayload();
+    console.log("$$$ => ROSTER PAYLOAD: ", payload)
     try {
       const response = await fetch(ROSTERS_URL, {
         method: 'POST',
@@ -165,7 +168,7 @@ const ScheduleLayout = () => {
     };
 
     fetchShifts();
-  }, []);
+  }, [payloadData]);
 
   const handleEdit = (row) => {
     setEditingRow(row);

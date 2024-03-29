@@ -2,6 +2,7 @@ from typing import Any
 from django.shortcuts import render
 from openpyxl import Workbook, load_workbook
 from rest_framework import generics, status
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from users.auth_service import user_auth
@@ -11,6 +12,7 @@ from .models import MonthlyRoster, ShiftType, WorkDay
 from .serializers import (
     BatchCreateSerializer,
     BatchSerializer,
+    ClientShiftTypeSerializer,
     RosterCreateSerializer,
     RosterSerializer,
     RosterUpdateSerializer,
@@ -35,7 +37,7 @@ class BatchListCreateAPIView(generics.ListCreateAPIView):
 
 
 class RosterListCreateAPIView(generics.ListCreateAPIView):
-    queryset = MonthlyRoster.objects.all().select_related("batch")
+    queryset = MonthlyRoster.objects.all().select_related("batch").order_by('-shift_start_date')
     serializer_class = RosterSerializer
 
     def get_serializer_class(self):
@@ -121,6 +123,11 @@ class RosterRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
             )
         return super().patch(request, *args, **kwargs)
 
+@api_view(['GET'])
+def get_shift_type_list(request):
+    q_set = ShiftType.objects.all()
+    serializer = ClientShiftTypeSerializer(q_set, many=True)
+    return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 def create_shift_type_from_excel(request):
     try:
