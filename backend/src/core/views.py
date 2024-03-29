@@ -15,6 +15,8 @@ from rest_framework.response import Response
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import AuthenticationFailed
 
+from .paginations import CustomPagination
+
 from .transaction_event_handler import (
     smartcard_handler_for_bar,
     smartcard_handler_for_restaurant,
@@ -183,6 +185,7 @@ def get_restaurant_transaction_details(request, pk=None):
 class TransactionReportApiView(generics.ListCreateAPIView):
     queryset = Transaction.objects.all().select_related()
     serializer_class = TransactionReportSerializer
+    pagination_class = CustomPagination  # Apply custom pagination class
 
     # def get(self, request, *args, **kwargs):
     #     payload = user_auth(self.request)

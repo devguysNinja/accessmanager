@@ -355,7 +355,7 @@ class UploadProfileImageView(APIView):
 
 
 
-@api_view(["POST"])
+# @api_view(["POST"])
 def create_users_from_excel(request):
     try:
         batch_file: Any = EmployeeBatchUpload.objects.get(
@@ -367,9 +367,7 @@ def create_users_from_excel(request):
             data={"error": "No batch file found!"}, status=status.HTTP_400_BAD_REQUEST
         )
     wb: Workbook = load_workbook(filename=batch_file)
-    # ws_user = wb.worksheets[0]
     ws_user = [ws for ws in wb.worksheets if ws.title=="User"][0]
-    # ws_profile = wb.worksheets[1]
     ws_profile = [ws for ws in wb.worksheets if ws.title=="Profile"][0]
     imported_user_counter = 0
     skipped_user_counter = 0
@@ -477,7 +475,6 @@ def create_location_from_excel(request):
         )
     try:
         wb: Workbook = load_workbook(filename=batch_file)
-        # ws_location = wb.worksheets[2]
         ws_location = [ws for ws in wb.worksheets if ws.title=="Location"][0]
         imported_location_counter = 0
         skipped_location_counter = 0
@@ -517,7 +514,6 @@ def create_status_from_excel(request):
         )
     try:
         wb: Workbook = load_workbook(filename=batch_file)
-        # ws_emp_status = wb.worksheets[3]
         ws_emp_status = [ws for ws in wb.worksheets if ws.title=="EmployeeStatus"][0]
         imported_emp_status_counter = 0
         skipped_emp_status_counter = 0
@@ -556,7 +552,6 @@ def create_category_from_excel(request):
         )
     try:
         wb: Workbook = load_workbook(filename=batch_file)
-        # ws_category = wb.worksheets[4]
         ws_category = [ws for ws in wb.worksheets if ws.title=="Category"][0]
         imported_category_counter = 0
         skipped_category_counter = 0
@@ -595,7 +590,6 @@ def create_department_from_excel(request):
         )
     try:
         wb: Workbook = load_workbook(filename=batch_file)
-        # ws_department = wb.worksheets[5]
         ws_department = [ws for ws in wb.worksheets if ws.title=="Department"][0]
         imported_department_counter = 0
         skipped_department_counter = 0
@@ -634,7 +628,6 @@ def create_group_from_excel(request):
         )
     try:
         wb: Workbook = load_workbook(filename=batch_file)
-        # ws_department = wb.worksheets[5]
         ws_group = [ws for ws in wb.worksheets if ws.title=="Group"][0]
         imported_group_counter = 0
         skipped_group_counter = 0

@@ -2,8 +2,9 @@ class ApiRoute {
   static API_ADMIN = process.env.REACT_APP_API_ADMIN;
   static FRONTEND_DOMAIN = window.location.origin;
 
-  static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app";
-  // static API_DOMAIN = process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
+  // static API_DOMAIN = "https://namely-ace-beetle.ngrok-free.app";
+  static API_DOMAIN =
+    process.env.REACT_APP_API_DOMAIN || "http://localhost:8000"; // to be read from .env on PROD
 
   static BASE_PATH = "/api/v1";
   static BASE_URL = `${ApiRoute.API_DOMAIN}${ApiRoute.BASE_PATH}`;
@@ -21,9 +22,9 @@ class ApiRoute {
   static TRANSACTION_ACTRL_URL = `${ApiRoute.BASE_URL}/transactions/access-control`;
   static TRANSACTION_OWNER_DETAILS_URL = `${ApiRoute.BASE_URL}/transactions/owner-details`;
   static TRANSACTION_DRINK_CART_URL = `${ApiRoute.BASE_URL}/drink-cart`;
-  static REPORT_URL = `${ApiRoute.BASE_URL}/transactions/reports/?`
-  static PDF_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?exporter=pdf`
-  static EXCEL_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?`
+  static REPORT_URL = `${ApiRoute.BASE_URL}/transactions/reports/?`;
+  static PDF_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?exporter=pdf`;
+  static EXCEL_URL = `${ApiRoute.BASE_URL}/transactions/reports/export-to-file/?`;
 }
 
 export async function ApiLogout(
@@ -82,7 +83,7 @@ export function TimeStringConverter(timestring) {
   return result;
 }
 
-export function DateConverter(timestring) {
+export function YearMonthDayDateConverter(timestring) {
   const timestamp = timestring;
   const date = new Date(timestamp);
 
@@ -94,11 +95,27 @@ export function DateConverter(timestring) {
   return formattedDate;
 }
 
+export function DateTimeStringConverter(dateTimeString) {
+  const dateObj = new Date(dateTimeString);
+
+  // Set the time to 0:00:00 of the next day
+  dateObj.setDate(dateObj.getDate() + 1);
+  dateObj.setHours(0, 0, 0, 0);
+
+  // Subtract one second to get the last second of the original date
+  dateObj.setSeconds(dateObj.getSeconds() - 1);
+
+  // Adjust the time zone offset to represent UTC time
+  dateObj.setMinutes(dateObj.getMinutes() - dateObj.getTimezoneOffset());
+
+  let formattedDate = dateObj.toISOString().replace(/\.\d+Z$/, ".000Z");
+  return formattedDate;
+}
 
 export const CLEANED_URL = (my_url) => {
   let removeAmpersand = my_url.replace(/\?&/g, "?");
-  return removeAmpersand
-}
+  return removeAmpersand;
+};
 
 const auth_token = JSON.parse(localStorage.getItem("jwt"));
 export const BEARER = `Bearer ${auth_token}`;

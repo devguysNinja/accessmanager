@@ -4,12 +4,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./transaction.styles.css";
 import toast, { Toaster } from "react-hot-toast";
 import TransactionTableComponent from "./TransactionTableComponent";
-import ApiRoute, { CLEANED_URL, DateConverter } from "../config/ApiSettings";
+import ApiRoute, {
+  CLEANED_URL,
+  YearMonthDayDateConverter,
+} from "../config/ApiSettings";
 
-const ReportFilterComponent = ({
-  handleSearch,
-  filterChoices,
-}) => {
+const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -98,12 +98,14 @@ const ReportFilterComponent = ({
   ) => {
     let REPORT_URL = reportUrl;
     if (params?.start_date) {
-      REPORT_URL = `${REPORT_URL}start_date=${DateConverter(
+      REPORT_URL = `${REPORT_URL}start_date=${YearMonthDayDateConverter(
         params?.start_date
       )}`;
     }
     if (params?.end_date) {
-      REPORT_URL = `${REPORT_URL}&end_date=${DateConverter(params?.end_date)}`;
+      REPORT_URL = `${REPORT_URL}&end_date=${YearMonthDayDateConverter(
+        params?.end_date
+      )}`;
     }
     if (params?.staff_name) {
       REPORT_URL = `${REPORT_URL}&staff_name=${params?.staff_name}`;
