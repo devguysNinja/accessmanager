@@ -11,7 +11,11 @@ import { Context } from "../App";
 
 function PageNavbar(props) {
   // const [redirect, setRedirect] = useState(false);
+  const {profile} = useContext(Context)
+  const userProfile = profile[0];
+  const isAdmin = userProfile?.user?.is_superuser;
 
+ 
   //...logout Handler
   const logout = async (e) => {
     await ApiLogout();
@@ -24,13 +28,17 @@ function PageNavbar(props) {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/login`);
   };
 
+  const goToHome = (e) => {
+    window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/`);
+  };
+
   //...register Handler
   // const register = (e) => {
   //   window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/register`);
   // };
 
   //...Profile Handler
-  const profile = (e) => {
+  const goToProfile = (e) => {
     window.location.assign(`${ApiRoute.FRONTEND_DOMAIN}/profile`);
   };
 
@@ -58,47 +66,30 @@ function PageNavbar(props) {
   // }
 
   // get user profile
-  const {
-    profile: [userProfile, setUserProfile],
-  } = useContext(Context);
+  // const {
+  //   profile: [userProfile, setUserProfile],
+  // } = useContext(Context);
 
-  return (
-    <Navbar className="navbar-container">
-      <Container>
-        <Image src="/diageo.jpeg" style={{height: "70px", width: "70px", display: "block", borderRadius: "5px"}} />
-        <Navbar.Toggle />
-        <Navbar.Collapse className="justify-content-end" >
-          <Navbar.Text className="ml-auto" >
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={accessBoard} >
-                Access Board
-              </Button>
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={drinksAccessBoard} >
-               Drinks Access Board
-              </Button>
-              <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={gotoAdmin}>
-                Admin
-              </Button>
-              {/* <Button variant="outline-secondary" style={{color:'black', margin: '5px'}} onClick={schedule}>
-                Schedule
-              </Button> */}
-              {userProfile ? (
-              <>
-                <Button
-                  variant="outline-secondary"
-                  style={{ color: "black", margin: "5px" }}
-                  onClick={profile}
-                >
-                  Profile
-                </Button>
-                <Button
-                  variant="outline-secondary"
-                  style={{ color: "black", margin: "5px" }}
-                  onClick={logout}
-                >
-                  Logout
-                </Button>
-              </>
-            ) : (
+
+  // const admin = userProfile?.user?.is_superuser 
+ if (!userProfile) {
+    return (
+      <Navbar className="navbar-container">
+        <Container>
+          <Image
+            src="/diageo.jpeg"
+            style={{
+              height: "70px",
+              width: "70px",
+              display: "block",
+              borderRadius: "5px",
+              cursor:"pointer"
+            }}
+            onClick={goToHome}
+          />
+          <Navbar.Toggle />
+          <Navbar.Collapse className="justify-content-end">
+            <Navbar.Text className="ml-auto">
               <Button
                 variant="outline-secondary"
                 style={{ color: "black", margin: "5px" }}
@@ -106,6 +97,66 @@ function PageNavbar(props) {
               >
                 Login
               </Button>
+            </Navbar.Text>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    );
+  }
+
+  return (
+    <Navbar className="navbar-container">
+      <Container>
+        <Image
+          src="/diageo.jpeg"
+          style={{
+            height: "70px",
+            width: "70px",
+            display: "block",
+            borderRadius: "5px",
+          }}
+        />
+        <Navbar.Toggle />
+        <Navbar.Collapse className="justify-content-end">
+          <Navbar.Text className="ml-auto">
+            <Button
+              variant="outline-secondary"
+              style={{ color: "black", margin: "5px" }}
+              onClick={goToProfile}
+            >
+              Profile
+            </Button>
+            <Button
+              variant="outline-secondary"
+              style={{ color: "black", margin: "5px" }}
+              onClick={logout}
+            >
+              Logout
+            </Button>
+            {isAdmin && (
+              <>
+                <Button
+                  variant="outline-secondary"
+                  style={{ color: "black", margin: "5px" }}
+                  onClick={gotoAdmin}
+                >
+                  Admin
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  style={{ color: "black", margin: "5px" }}
+                  onClick={accessBoard}
+                >
+                  Access Board
+                </Button>
+                <Button
+                  variant="outline-secondary"
+                  style={{ color: "black", margin: "5px" }}
+                  onClick={drinksAccessBoard}
+                >
+                  Drinks Access Board
+                </Button>
+              </>
             )}
           </Navbar.Text>
         </Navbar.Collapse>
@@ -113,5 +164,6 @@ function PageNavbar(props) {
     </Navbar>
   );
 }
+
 
 export default PageNavbar;
