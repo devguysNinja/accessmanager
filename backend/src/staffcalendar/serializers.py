@@ -4,6 +4,11 @@ from users.models import Batch
 from .models import MonthlyRoster, ShiftType, WorkDay
 
 
+class ClientShiftTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShiftType
+        fields = ['id','name']
+
 class ShiftTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShiftType

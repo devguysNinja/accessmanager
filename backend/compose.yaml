@@ -40,6 +40,7 @@ services:
       EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
       PIP_REQUIREMENTS: "${PIP_REQUIREMENTS}"
       JWT_SALT: "${JWT_SALT}" 
+      DEPLOYMENT_LOCATION: "${DEPLOYMENT_LOCATION}"
     networks:
       - back-to-front
 
