@@ -24,7 +24,13 @@ DRINK_DENIAL_REASON = "You had enough drinks for today!"
 
 
 def create_transaction(
-    owner: Any, count: int, uid: str, point: str, raw: str, grant: str, reason: str
+    owner: Any,
+    count: int,
+    uid: str,
+    point: str,
+    raw: str,
+    grant: str,
+    reason: str = "",
 ):
     transaction = Transaction(
         owner=owner,
@@ -110,7 +116,7 @@ def smartcard_handler_for_restaurant(usb_data):
             )
             mqtt_publish.single(TOPIC, payload=grant_data, hostname=MQTT_BROKER)
             print("***->RETURNING.... NO USER PROFILE!")
-            return
+            return meta_data
         on_schedule = check_calendar(reader_uid)
         if on_schedule is None:
             meta_data = {"message": "Invalid Card Detected!"}
@@ -119,7 +125,7 @@ def smartcard_handler_for_restaurant(usb_data):
             )
             mqtt_publish.single(TOPIC, payload=grant_data, hostname=MQTT_BROKER)
             print("***->RETURNING.... NO USER PROFILE!")
-            return
+            return meta_data
         elif not on_schedule:
             meta_data = {
                 "message": "Employee not on schedule!",
@@ -133,7 +139,7 @@ def smartcard_handler_for_restaurant(usb_data):
             )
             mqtt_publish.single(TOPIC, payload=grant_data, hostname=MQTT_BROKER)
             print("***->RETURNING....  EMPLOYEE NOT ON SCHEDULE!")
-            return
+            return meta_data
         print("***User Profile***: ", owner_profile)
         try:
             today = timezone.now().date()
@@ -161,7 +167,14 @@ def smartcard_handler_for_restaurant(usb_data):
                     ACCESS_GRANTED,
                 ).save()
                 print("***->RETURNING.... ENJOY YOUR MEAL!")
-                return
+                meta_data = {
+                    "message": "Enjoy your meal!",
+                    **dict(
+                        username=owner_profile.user.username,
+                        department=str(owner_profile.department),
+                    ),
+                }
+                return meta_data
             if SWIPE_COUNT >= meal_category:
                 today_transaction = Transaction.objects.filter(
                     reader_uid=reader_uid, date__date=today
@@ -177,8 +190,15 @@ def smartcard_handler_for_restaurant(usb_data):
                     ACCESS_DENIED,
                     MEAL_DENIAL_REASON,
                 ).save()
+                meta_data = {
+                    "message": "You had enough meal today!",
+                    **dict(
+                        username=owner_profile.user.username,
+                        department=str(owner_profile.department),
+                    ),
+                }
                 print("***->RETURNING....YOU HAD ENOUGH MEAL TODAY!")
-                return
+                return meta_data
         except Transaction.DoesNotExist as e:
             print("ObjectDoesNotExist: ", e)
             if owner_profile:
@@ -191,8 +211,15 @@ def smartcard_handler_for_restaurant(usb_data):
                     usb_data,
                     ACCESS_GRANTED,
                 ).save()
+                meta_data = {
+                    "message": "Enjoy your meal!",
+                    **dict(
+                        username=owner_profile.user.username,
+                        department=str(owner_profile.department),
+                    ),
+                }
                 print("***->RETURNING.... TRANSACTION Created ENJOY YOUR MEAL!")
-                return
+                return meta_data
         else:
             grant_data = json.dumps(publish_data(ACCESS_DENIED))
             mqtt_publish.single(TOPIC, payload=grant_data, hostname=MQTT_BROKER)

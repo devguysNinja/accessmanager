@@ -53,4 +53,9 @@ def on_message:
     ::wrap all Api calls in try-catch block in react app
     ::replace all print statements with ic or logger
     :::Generate random integer string of 10 characters *rm::
-    
+
+::Bug List::
+:: Check logout and login -> Some menu items did not display
+:: No hyperlink on the Brand logo -> Frontend
+:::Published Restaurant data not displayed -> Frontend
+:: To ensure Flash card input field always has focus -> Frontend

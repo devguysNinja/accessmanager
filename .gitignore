@@ -110,6 +110,8 @@ celerybeat-schedule
 # media and static directories
 /backend/src/static/
 /backend/src/media/
+/backend/mqtt5
+/__mqtt5
 
 !/backend/src/static/.gitkeep
 !/backend/src/media/.gitkeep

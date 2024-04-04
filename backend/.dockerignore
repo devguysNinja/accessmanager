@@ -76,4 +76,6 @@ README.md
 **/compose*
 **/staticfiles/
 **/mediafiles/
+**/mqtt5
+**/__mqtt5
 README.md

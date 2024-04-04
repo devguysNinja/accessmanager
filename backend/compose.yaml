@@ -72,6 +72,22 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     networks:
       - back-to-front
+  
+  mqtt5:
+    image: eclipse-mosquitto
+    container_name: mqtt5
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9083:9083" #custom mqtt port for websockets
+      # - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ./mqtt_config:/mosquitto/config:rw
+      - ./mqtt_data:/mosquitto/data:rw
+      - ./mqtt_log:/mosquitto/log:rw
+    networks:
+      - back-to-front
+    restart: unless-stopped
+
 
 networks:
   back-to-front:
@@ -81,3 +97,6 @@ volumes:
   postgres_data:
   static_volume:
   media_volume:
+  mqtt_config:
+  mqtt_data:
+  mqtt_log:

@@ -8,7 +8,7 @@ import Home from "./pages/Home";
 import Access from "./pages/Access";
 import DrinksAccess from "./pages/DrinksAccess";
 import Schedule from "./pages/Schedule";
-import { connect } from "./config/mqttService";
+import { connect, TOPIC } from "./config/mqttService";
 import Footer from "./pages/Footer";
 import ApiRoute from "./config/ApiSettings";
 import Dashboard from "./components/MyAdmin";
@@ -24,7 +24,7 @@ function App() {
 	const [authToken, setAuthToken] = useState(null)
 	const [profileFields, setProfileFields] = useState(null)
 
-	const TOPIC = "orinlakantobad";
+	// const TOPIC = "orinlakantobad";
 
 	console.log("App @UserProfile:", userProfile);
 	console.log("#####...App @UserProfileChoiceField:", profileFields);
@@ -70,7 +70,7 @@ function App() {
 			const mqttClient = connect();
 			setClient(mqttClient);
 		} catch (error) {
-			console.log("#$#$#$#$MQTT Client-eroor: ", error.message);
+			console.log("#$#$#$#$MQTT Client-error: ", error.message);
 		}
 
 		// Cleanup function on component unmount

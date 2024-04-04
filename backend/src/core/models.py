@@ -1,6 +1,7 @@
 import json
 from django.utils import timezone
 from django.db import models
+from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 import paho.mqtt.publish as mqtt_publish
@@ -19,18 +20,18 @@ class Transaction(models.Model):
     authorizer = models.ForeignKey(
         UserProfile, related_name="opener", on_delete=models.CASCADE
     )
-    access_point = models.CharField(max_length=25)
+    access_point = models.CharField(max_length=125)
     raw_payload = models.JSONField()
     door = models.CharField(max_length=128, blank=True, null=True)
     grant_type = models.CharField(max_length=25)
-    reason = models.CharField(max_length=50, blank=True, null=True)
+    reason = models.CharField(max_length=155, blank=True, null=True)
 
     def __str__(self):
         return f"Transaction-{self.owner.user.username}"
 
 
 class DrinkCategory(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=155, unique=True)
 
     class Meta:
         verbose_name_plural = "Drink Categories"
@@ -40,7 +41,7 @@ class DrinkCategory(models.Model):
 
 
 class Drink(models.Model):
-    drink = models.CharField(max_length=50, unique=True)
+    drink = models.CharField(max_length=155, unique=True)
     type = models.ForeignKey(DrinkCategory, on_delete=models.CASCADE)
 
     class Meta:
@@ -75,10 +76,10 @@ class ReportType(models.Model):
 
 @receiver(post_save, sender=Transaction)
 def on_save_signal_event(*args, **kwargs):
-    TOPIC = "orinlakantobad"
+    TOPIC = settings.TOPIC
     ACCESS_GRANTED = "ACCESS GRANTED"
     ACCESS_DENIED = "ACCESS DENIED"
-    mqtt_broker = "broker.hivemq.com"
+    mqtt_broker = settings.MQTT_BROKER
     print(
         "transaction.model.py#$#$#$#$#$#$#$# Transaction signal: Kwargs",
         kwargs["instance"].grant_type,
