@@ -1,10 +1,12 @@
 import { Client } from "paho-mqtt";
 
-// const mqttBroker = "ws://broker.hivemq.com/"; mqtt.eclipseprojects.io TEMPERATURE
-const mqttBroker = "broker.hivemq.com";
+const mqttBroker = process.env.REACT_APP_MQTT_BROKER; 
+const broker_port = parseInt(process.env.REACT_APP_MQTT_BROKER_WS_PORT)
 const clientId = `react-client-${Math.random().toString(36).substring(7)}`;
-const client = new Client(mqttBroker, 8000, clientId);
-const TOPIC = "orinlakantobad";
+const client = new Client(mqttBroker, broker_port, clientId);
+const TOPIC =  process.env.REACT_APP_TOPIC || "waiter";
+
+console.log("&&&& mqttBroker", mqttBroker) 
 
 const connect = () => {
   client.connect({
@@ -18,7 +20,7 @@ const connect = () => {
 const onConnect = () => {
   console.log("Connected to MQTT broker");
   client.subscribe(TOPIC);
-  console.log(`Subcribed to Topic: ${TOPIC}`);
+  console.log(`Subscribed to Topic: ${TOPIC}`);
 };
 
 const onFailure = (responseObject) => {
@@ -28,4 +30,4 @@ const onFailure = (responseObject) => {
   );
 };
 
-export { connect };
+export { connect, TOPIC };

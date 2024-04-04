@@ -199,5 +199,8 @@ APPEND_SLASH = True
 
 DEPLOYMENT_LOCATION = get_secret('DEPLOYMENT_LOCATION')
 ACCESS_POINTS = {"restaurant": "RESTAURANT", "bar": "BAR"}
-TOPIC = "orinlakantobad"
-MQTT_BROKER = "broker.hivemq.com"
+TOPIC = get_secret('REACT_APP_TOPIC')
+# MQTT_BROKER = "broker.hivemq.com"
+MQTT_BROKER = get_secret('REACT_APP_MQTT_BROKER')
+MQTT_BROKER_PORT = get_secret('REACT_APP_MQTT_BROKER_PORT')
+MQTT_BROKER_WS_PORT = get_secret('REACT_APP_MQTT_BROKER_WS_PORT')
