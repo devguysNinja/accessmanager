@@ -146,9 +146,30 @@ function Access() {
 
   let { username, department } = ownerDetails || barPayLoad || {};
 
+  //...Function to ensure focus on the input element
+  const ensureFocus = () => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  //...Ensure focus on the input element when the component mounts
   useEffect(() => {
-	inputRef.current.focus()
-  }, [])
+    ensureFocus();
+  }, []);
+
+  //...Add event listener to handle focus events
+  useEffect(() => {
+    const handleFocusOut = () => {
+      ensureFocus();
+    };
+
+    document.addEventListener("focusout", handleFocusOut);
+
+    return () => {
+      document.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
 
   return (
     <>
@@ -164,23 +185,25 @@ function Access() {
       <input
         type="password"
         name="usb-reader"
-		placeholder="Flash your card"
+        placeholder="Flash your card"
         ref={inputRef}
         onChange={(e) => {
           let inputValue = e.target.value;
           if (inputValue.length >= 10) {
-            console.log(inputValue)
+            console.log(inputValue);
             smartUsb(inputValue);
             inputRef.current.value = "";
           }
         }}
-		style={{ filter: 'blur(1px)',
-		 border:"none", borderRadius:"5px",
-		  marginTop:"10px",
-		  outline: 'none',
-		 }}
+        style={{
+          filter: "blur(1px)",
+          border: "none",
+          borderRadius: "5px",
+          marginTop: "10px",
+          outline: "none",
+        }}
       />
-      <div style={{ height: "900px", width:"auto" }}>
+      <div style={{ height: "900px", width: "auto" }}>
         {" "}
         <Container>
           <div
@@ -193,18 +216,17 @@ function Access() {
             <b>{"Daily Access"}</b>
           </div>
           <Row className="" style={{ backgroundColor: "none" }}>
-            <Col >
+            <Col>
               <LeftCardLayout style>
                 <AccessRightFeeder userData={ownerDetails} />
                 <div
                   style={{
                     fontSize: "57px",
                     color: "#000",
-					fontWeight:"bold"
-
+                    fontWeight: "bold",
                   }}
                 >
-                 <p> {Capitalize(username) || "Username"} </p> 
+                  <p> {Capitalize(username) || "Username"} </p>
                   <p>{Capitalize(department) || "Department"}</p>
                 </div>
               </LeftCardLayout>

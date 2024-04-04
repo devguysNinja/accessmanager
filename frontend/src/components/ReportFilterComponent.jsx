@@ -23,8 +23,9 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
   const [swipeCount, setSwipeCount] = useState("");
   const [accessPoint, setAccessPoint] = useState("");
   const [grantType, setGrantType] = useState("");
-  const [searchMessage, setSearchMessage] = useState("");
-  const [transaction, setTransaction] = useState(null);
+  const [transaction, setTransaction] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -56,6 +57,8 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
       case "grantType":
         setGrantType(value);
         break;
+      case "limit":
+        setItemsPerPage(parseInt(value));
       default:
         break;
     }
@@ -94,6 +97,8 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
       accessPoint: accessPoint,
       swipeCount: swipeCount,
       grantType: grantType,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage
     }
   ) => {
     let REPORT_URL = reportUrl;
@@ -135,19 +140,19 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
     if (params?.grantType) {
       REPORT_URL = `${REPORT_URL}&grant_type=${params?.grantType}`;
     }
+    if (params?.limit) {
+      REPORT_URL = `${REPORT_URL}&limit=${params?.limit}`;
+    }
     REPORT_URL = CLEANED_URL(REPORT_URL);
     console.log("&&&& REPORT_URL: ", REPORT_URL);
     return REPORT_URL;
   };
 
-  //   useEffect(() => {
-  //     buildQueryString();
-  //   });
+  // useEffect(() => {
+  //   buildQueryString();
+  // });
 
-  const handleFetchAllTransactions = () => {
-    // Fetch all transactions
-    handleSearch({});
-  };
+
 
   const getTransactionData = async () => {
     try {
@@ -163,10 +168,28 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
       const data = await response.json();
       console.log("getTransaction data", data);
       setTransaction(data);
+      console.log(reportUrl);
     } catch (error) {
       console.error("Error fetching transactions:", error.message);
     }
   };
+
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber)
+    getTransactionData()
+  }
+
+  const handleItemsPerPageChange = (pageSize) => {
+    setItemsPerPage(pageSize)
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(transaction.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = transaction.slice(startIndex, endIndex);
+  
 
   const exportToFile = async (e) => {
     try {
@@ -362,15 +385,28 @@ const ReportFilterComponent = ({ handleSearch, filterChoices }) => {
       </div>
       <div className="report-filter-buttons">
         <button onClick={getTransactionData}>Search</button>
-        <button onClick={handleFetchAllTransactions}>
-          Get All Transactions
-        </button>
+
         <button value="pdf" onClick={exportToFile}>
           Pdf
         </button>
         <button onClick={exportToFile}>Excel</button>
+        <select
+          style={{ width: "80px", marginLeft: "10px", cursor: "pointer" }}
+          onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+        >
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={30}>30</option>
+          <option value={40}>40</option>
+          <option value={50}>50</option>
+        </select>
       </div>
-      <TransactionTableComponent transaction={transaction} />
+      <TransactionTableComponent 
+      transaction={currentItems}
+      onPageChange={handlePageChange}
+      currentPage={currentPage}
+      totalPages={totalPages}
+       />
       <Toaster />
     </>
   );

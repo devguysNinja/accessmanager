@@ -135,7 +135,7 @@ def get_restaurant_transaction_details(request, pk=None):
     if payload.get("auth_error", None):
         return Response(payload, status=status.HTTP_403_FORBIDDEN)
     _user = User.objects.filter(id=payload["id"]).first()
-    if not _user.is_superuser or not _user.is_staff:
+    if _user is None or not _user.is_superuser or not _user.is_staff:
         return Response(
             data={
                 "error": "User is not an Admin!",
@@ -153,7 +153,7 @@ def get_restaurant_transaction_details(request, pk=None):
             reader_uid=request_data["uid"], date__date=today
         )
         if transactions.count() == 0:
-            return Response(data={"NO TRANSACTION MATCH!"}, status=status.HTTP_200_OK)
+            return Response(data=request_data, status=status.HTTP_404_NOT_FOUND)
         approved_transaction_counts = transactions.filter(
             grant_type=ACCESS_GRANTED,
         ).count()
@@ -209,14 +209,14 @@ class TransactionAPIView(generics.ListCreateAPIView):
         try:
             # check if DEPLOYMENT_LOCATION=Restaurant
             if settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["restaurant"]:
-                smartcard_handler_for_restaurant(usb_input)
+                result = smartcard_handler_for_restaurant(usb_input)
             elif settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["bar"]:
                 smartcard_handler_for_bar(usb_input)
         except Exception as ex:
             return Response(data={"error": ex.args[0]})
         return Response(
-            data={"message": "Transaction successful!"}, status=status.HTTP_200_OK
-        )
+            data=result, status=status.HTTP_200_OK
+        ) 
 
 
 class TransactionView(APIView):
@@ -249,7 +249,7 @@ class TransactionView(APIView):
         if payload.get("auth_error", None):
             return Response(payload, status=status.HTTP_403_FORBIDDEN)
         _user = User.objects.filter(id=payload["id"]).first()
-        if not _user.is_superuser:
+        if _user is None or not _user.is_superuser:
             return Response(
                 data={
                     "error": NOT_ADMIN,
@@ -269,7 +269,7 @@ class TransactionView(APIView):
         if payload.get("auth_error", None):
             return Response(payload, status=status.HTTP_403_FORBIDDEN)
         _user = User.objects.filter(id=payload["id"]).first()
-        if not _user.is_superuser:
+        if _user is None or not _user.is_superuser:
             return Response(
                 data={
                     "error": "User is not an Admin!",
