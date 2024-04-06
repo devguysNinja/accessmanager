@@ -13,7 +13,7 @@ function PageNavbar(props) {
   // const [redirect, setRedirect] = useState(false);
   const {profile} = useContext(Context)
   const userProfile = profile[0];
-  const isAdmin = userProfile?.user?.is_superuser;
+  const isAdmin = userProfile?.is_superuser || userProfile?.user?.is_superuser;
 
  
   //...logout Handler
