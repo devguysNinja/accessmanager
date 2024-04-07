@@ -11,4 +11,8 @@ EMAIL_HOST_USER="your-email-user" \
 EMAIL_PORT=25 \
 EMAIL_HOST_PASSWORD="email-host-password" \
 REACT_APP_API_DOMAIN="http://localhost:8080" \
+REACT_APP_MQTT_BROKER=mqtt5 \
+REACT_APP_MQTT_BROKER_PORT=1883 \
+REACT_APP_MQTT_BROKER_WS_PORT=9083 \
+REACT_APP_TOPIC=waiter \
 docker-compose up --detach --build
