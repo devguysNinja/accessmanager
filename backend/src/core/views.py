@@ -208,6 +208,7 @@ class TransactionAPIView(generics.ListCreateAPIView):
             usb_input = usb_input[1:]
         try:
             # check if DEPLOYMENT_LOCATION=Restaurant
+            result = None
             if settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["restaurant"]:
                 result = smartcard_handler_for_restaurant(usb_input)
             elif settings.DEPLOYMENT_LOCATION == settings.ACCESS_POINTS["bar"]:
