@@ -290,23 +290,23 @@ useEffect(() => {
                   >
                     <option value="">Select Group</option>
                     {group?.map((group) => (
-                      <option key={group.id} value={group}>
+                      <option key={group.id} value={group.name}>
                         {group.name}
                       </option>
                     ))}
                   </select>
                 </td>
                 {row.shifts.map((shift, dayIndex) => (
-                  <td key={dayIndex}>
+                  <td key={dayIndex}  >
                     <select
-                      value={shift}
+                      value={shift.id}
                       onChange={(event) =>
                         handleShiftChange(rowIndex, dayIndex, event)
                       }
                     >
                        <option value="">Select Shift</option>
                       {shiftTypeArray?.map((shiftOption) => (
-                        <option key={shiftOption.id} value={shiftOption}>
+                        <option key={shiftOption.id} value={shiftOption.name}>
                           {shiftOption.name}
                         </option>
                       ))}
