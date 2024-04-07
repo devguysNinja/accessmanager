@@ -32,3 +32,14 @@ RUN ./env/bin/pip3 install -r /home/appuser/requirements/${PIP_REQUIREMENTS}
 
 # copy Django project files
 COPY --chown=appuser ./src .
+
+# Create mediafiles directory
+RUN mkdir -p /home/appuser/mediafiles
+
+# Adjust ownership and permissions for the mediafiles directory
+USER root
+RUN chown -R appuser:appuser /home/appuser/mediafiles
+
+# ensure the appuser has necessary permissions
+USER appuser
+

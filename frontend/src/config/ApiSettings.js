@@ -14,6 +14,7 @@ class ApiRoute {
   static ROSTERS_URL = `${ApiRoute.BASE_URL}/rosters/`;
   // static PROFILE_DETAILS_URL = `${ApiRoute.BASE_URL}/profiles/${id}`;
   static LOGIN_URL = `${ApiRoute.BASE_URL}/login`;
+  static SHIFTTYPES_URL = `${ApiRoute.BASE_URL}/rosters/shift-types/`;
   static AUTH_USER_URL = `${ApiRoute.BASE_URL}/auth-user`;
   static LOGOUT_URL = `${ApiRoute.BASE_URL}/logout`;
   static REGISTER_URL = `${ApiRoute.BASE_URL}/register`;

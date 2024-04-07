@@ -23,14 +23,8 @@ const ScheduleLayout = () => {
     "Friday",
     "Saturday",
   ]);
-  const [shiftArray] = useState([
-    "off",
-    "night",
-    "morning",
-    "afternoon",
-    "mid-day",
-  ]);
-  const [groupArray, setGroupArray] = useState(["Batch A", "Batch B", "Batch C"]);
+  const [shiftTypeArray, setShiftTypeArray] = useState(null);
+  const [groupArray, setGroupArray] = useState(null);
   const [rows, setRows] = useState([
     { id: 1, group: "", shifts: dayArray.map(() => "") },
   ]);
@@ -98,6 +92,47 @@ const ScheduleLayout = () => {
       toast.error('Failed to delete roster');
     }
   };
+
+  
+  const fetchShifts = async () => {
+       
+    try {
+        const response = await fetch(`${ApiRoute.SHIFTTYPES_URL}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch shift types");
+        }
+        const data = await response.json();
+        console.log("shift type data", data)
+        setShiftTypeArray(data);
+    } catch (error) {
+        console.error("Error fetching shift types:", error.message);
+    }
+
+    
+};
+
+const fetchGroups = async () => {
+       
+  try {
+      const response = await fetch(`${ApiRoute.PROFILE_CHOICES_URL}`);
+      if (!response.ok) {
+          throw new Error("Failed to fetch groups");
+      }
+      const data = await response.json();
+      console.log("shift group data", data)
+      setGroupArray(data);
+  } catch (error) {
+      console.error("Error fetching group types:", error.message);
+  }
+
+  
+};
+
+
+useEffect(() => {
+    fetchShifts();
+    fetchGroups();
+}, []);
   
   const generatePayload = () => {
     if (!startDate) {
@@ -210,6 +245,8 @@ const ScheduleLayout = () => {
   const cancelEditing = () => {
     setEditingRow(null);
   };
+  
+  const {group} = groupArray || {}
 
   return (
     <div className="schedule-container">
@@ -252,9 +289,9 @@ const ScheduleLayout = () => {
                     onChange={(event) => handleGroupChange(rowIndex, event)}
                   >
                     <option value="">Select Group</option>
-                    {groupArray.map((group, index) => (
-                      <option key={index} value={group}>
-                        {group}
+                    {group?.map((group) => (
+                      <option key={group.id} value={group}>
+                        {group.name}
                       </option>
                     ))}
                   </select>
@@ -267,9 +304,10 @@ const ScheduleLayout = () => {
                         handleShiftChange(rowIndex, dayIndex, event)
                       }
                     >
-                      {shiftArray.map((shiftOption, index) => (
-                        <option key={index} value={shiftOption}>
-                          {shiftOption}
+                       <option value="">Select Shift</option>
+                      {shiftTypeArray?.map((shiftOption) => (
+                        <option key={shiftOption.id} value={shiftOption}>
+                          {shiftOption.name}
                         </option>
                       ))}
                     </select>
