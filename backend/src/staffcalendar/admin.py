@@ -12,7 +12,7 @@ from .views import create_shift_type_from_excel, create_workday_from_excel
 
 
 class ShiftTypeAdmin(admin.ModelAdmin):
-	change_list_template = "staffcalendar_change_list.html"
+	change_list_template = "staffcalendar_change_list_shift.html"
 	list_display = ["shift_type", "name", "start_time", "end_time","duration"]
 	list_display_links = None # ["name"]
 	list_editable = ["name", "start_time", "end_time", "duration"]
@@ -45,7 +45,7 @@ admin.site.register(ShiftType, ShiftTypeAdmin)
 
 
 class WorkDayAdmin(admin.ModelAdmin):
-	change_list_template = "staffcalendar_change_list.html"
+	change_list_template = "staffcalendar_change_list_workday.html"
 	list_display = ["day_symbol", "day_code"]
 	list_display_links = None
 	list_editable = ["day_symbol", "day_code"]

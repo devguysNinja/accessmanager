@@ -24,7 +24,7 @@ from .views import (
 
 
 class UserAdmin(admin.ModelAdmin):
-    change_list_template = "user_change_list.html"
+    # change_list_template = "user_change_list.html"
     list_display = [
         "first_name",
         "last_name",
@@ -100,8 +100,7 @@ MAX_OBJECTS = 1
 
 class EmployeeBatchUploadAdmin(admin.ModelAdmin):
     change_list_template = "user_change_list.html"
-    # actions = ["populate_user_profile_tables", "populate_location_table","populate_status_table"]
-    list_display = ["batch_file", "date_uploaded", "uploaded_by"]
+    list_display = ["batch_file", "date_uploaded",]
 
     def has_add_permission(self, request):
         if self.model.objects.count() >= MAX_OBJECTS:
@@ -195,56 +194,3 @@ class EmployeeBatchUploadAdmin(admin.ModelAdmin):
 
 
 admin.site.register(EmployeeBatchUpload, EmployeeBatchUploadAdmin)
-
-
-# ....########################################
-"""
-# class UserAdmin(admin.ModelAdmin):
-#     # change_list_template = "user_change_list.html"
-#     list_display = [
-#         "first_name",
-#         "last_name",
-#         "username",
-#         "email",
-#         "is_active",
-#         "is_staff",
-#         "is_superuser",
-#     ]
-
-# 
-# # Register your models here.
-# admin.site.register(User, UserAdmin)
-
-# 
-# class UserProfileAdmin(admin.ModelAdmin):
-#     list_display = [
-#         "user",
-#         "reader_uid",
-#         "meal_category",
-#         "department",
-#         "profile_image",
-#         "employee_shift",
-#     ]
-# 
-#     def employee_shift(self, obj):
-#         rosters_for_employee = MonthlyRoster.objects.filter(employees=obj)
-#         employee_shift = [shift.shift.name for shift in rosters_for_employee
-#                           ]
-#         employee_time = [(shift.shift.start_time, shift.shift.end_time) for shift in rosters_for_employee]
-#         print("78888:",employee_time)
-#         print("++++++++++++",employee_shift)
-#         assigned_work_days = [roster.work_days.all() for roster in rosters_for_employee]
-#         if len(assigned_work_days) > 0:
-#             work_days = [work_days[::1] for work_days in assigned_work_days]
-#             day_list = [day.day_symbol for days in work_days for day in days]
-#             print("************", day_list)
-#             return f"{', '.join(set(day_list))}"
-#         elif len(assigned_work_days) == 0:
-#             print("======", assigned_work_days)
-# 
-#     employee_shift.short_description = "Shift days"
-# 
-# 
-# # Register your models here.
-# admin.site.register(UserProfile, UserProfileAdmin)
-"""
