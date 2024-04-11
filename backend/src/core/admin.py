@@ -18,7 +18,7 @@ admin.site.register(DrinkCart, DrinkCartAdmin)
 
 class DrinksAdmin(admin.ModelAdmin):
     change_list_template = "core_change_list.html"
-    list_display = ["drink", "type"]
+    list_display = ["drink", "type", "drink_image"]
 
     def get_urls(self) -> list[URLPattern]:
         urls = super().get_urls()

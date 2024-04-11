@@ -1,4 +1,5 @@
 import json
+import os
 from django.utils import timezone
 from django.db import models
 from django.conf import settings
@@ -8,6 +9,9 @@ import paho.mqtt.publish as mqtt_publish
 from users.models import UserProfile
 from utils.utils import publish_data, is_card_reader_json
 
+
+def upload_drink_image(instance, filename):
+	return os.path.join("images", "drinks", str(instance.pk), filename)
 
 # Create your models here.
 class Transaction(models.Model):
@@ -43,6 +47,7 @@ class DrinkCategory(models.Model):
 class Drink(models.Model):
     drink = models.CharField(max_length=155, unique=True)
     type = models.ForeignKey(DrinkCategory, on_delete=models.CASCADE)
+    drink_image = models.ImageField(upload_to=upload_drink_image, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Drinks"

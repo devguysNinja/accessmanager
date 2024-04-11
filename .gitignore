@@ -21,6 +21,7 @@ src/users/migrations/__pycache__/
 **/mediafiles/
 **/env.dev
 **/dev.env
+**/migrations
 
 # ***************** General *****************
 .env

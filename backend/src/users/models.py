@@ -1,6 +1,7 @@
 import os
 
 from uuid import uuid4
+from django.conf import settings
 from django.core.exceptions import BadRequest
 from django.db import models
 from django.contrib.auth.models import AbstractUser
@@ -13,6 +14,21 @@ def upload_image(instance, filename):
 
 
 def upload_xlsx(instance, filename):
+	try:
+		workbook_dir = f"{settings.MEDIA_ROOT}/workbook"
+		files = os.listdir(workbook_dir)
+		for file in files:
+			file_path = os.path.join(workbook_dir, file)
+			if os.path.isfile(file_path): # Check if it's a file (not a directory)
+				os.remove(file_path)
+				print(f"Removed file: {file_path}")
+			else:
+				print(f"Skipped: {file_path} is not a file")
+		print("All files removed successfully.")
+	except FileNotFoundError:
+		print(f"Directory '{workbook_dir}' not found.")
+	except Exception as e:
+		print(f"An error occurred: {e}")
 	base, extension = os.path.splitext(filename)
 	if base.lower() != "employee_batch" and extension.lower() != "xlsx":
 		return BadRequest(
@@ -124,7 +140,7 @@ class EmployeeStatus(models.Model):
 class EmployeeBatchUpload(models.Model):
 	batch_file = models.FileField(upload_to=upload_xlsx, blank=True, null=True)
 	date_uploaded = models.DateTimeField(auto_now_add=True)
-	uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
+	# uploaded_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
 	class Meta:
 		verbose_name_plural = "Batch File Upload"
